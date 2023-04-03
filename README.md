@@ -1,5 +1,5 @@
 # Savveen
-Savveen ist der Webshop, welcher im Rahmen des Webentwicklungsprojekt von Maria Mirnic, Nazia Nazari und Safwan Zullash erstellt wurde.
+Savveen ist der Kosmetik-Webshop, welcher im Rahmen des Webentwicklungsprojekts von Maria Mirnic, Nazia Nazari und Safwan Zullash erstellt wurde.
 
 ## General Guide für Entwickler*innen
 
