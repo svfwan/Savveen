@@ -1,0 +1,23 @@
+name: PHP Code Review
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2 # Replace with the version of PHP you are using
+      
+      - name: Install dependencies
+        run: composer install # Replace with your dependency installation command
+      
+      - name: Validate code
+        run: php -l . # Replace with your validation command
