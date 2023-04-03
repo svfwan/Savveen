@@ -14,10 +14,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2 # Replace with the version of PHP you are using
-      
-      - name: Install dependencies
-        run: composer install # Replace with your dependency installation command
+          php-version: 7.4 # Replace with the version of PHP you are using
       
       - name: Validate code
-        run: php -l . # Replace with your validation command
+        run: php -l Backend/ # Replace with the path to your PHP files
