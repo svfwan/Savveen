@@ -19,10 +19,32 @@ $(document).ready(function () {
   });
 
   // Registrierung-Ajax-Call
-  $('#register').on('click', function (event) {
-    event.preventDefault();
+  $('#register').on('click', function () {
+    console.log('button clicked');
     $.ajax({
-
+      type: 'POST',
+      url: '../Backend/logic/requestHandler.php',
+      data: {
+        method: 'registerUser',
+        param: {
+          formofAddress: $('#formofAddress').val(),
+          firstName: $('#firstName').val(),
+          lastName: $('#lastName').val(),
+          address: $('#address').val(),
+          postcode: $('#postcode').val(),
+          city: $('#city').val(),
+          email: $('#email').val(),
+          username: $('#username').val(),
+          password: $('#password').val(),
+        }
+      },
+      dataType: 'json',
+      success: function (response) {
+        console.log(JSON.stringify(response));
+      },
+      error: function (error) {
+        console.log(JSON.stringify(error));
+      }
     });
   });
 

@@ -1,8 +1,10 @@
 <?php
-include('./dbaccess.php');
+include('../config/dbaccess.php');
 class dataHandler
 {
-    public function registerUser()
+    public function registerUser($param)
     {
+        $result = 'works!!!';
+        return $result;
     }
 }
