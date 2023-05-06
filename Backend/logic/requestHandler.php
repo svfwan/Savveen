@@ -8,9 +8,14 @@ switch ($requestType) {
     case 'GET':
         isset($_GET["method"]) ? $method = $_GET["method"] : false;
         isset($_GET["param"]) ? $param = $_GET["param"] : false;
+        break;
     case 'POST':
         isset($_POST["method"]) ? $method = $_POST["method"] : false;
         isset($_POST["param"]) ? $param = $_POST["param"] : false;
+        break;
+    default:
+        http_response_code(400);
+        break;
 }
 
 $logic = new businessLogic();
