@@ -1,2 +1,8 @@
 <?php
-    // empty file just for initial commit
+include('./dbaccess.php');
+class dataHandler
+{
+    public function registerUser()
+    {
+    }
+}

@@ -1,5 +1,10 @@
 $(document).ready(function () {
- 
+  // Navbar-Logik
+  var storedContent = localStorage.getItem('content');
+  if (storedContent) {
+    $('#content').html(storedContent);
+  }
+
   $('nav a').on('click', function (event) {
     event.preventDefault();
     var url = $(this).attr('href');
@@ -9,20 +14,16 @@ $(document).ready(function () {
       if (!$('nav').length) {
         $('body').prepend($newContent.find('nav'));
       }
+      localStorage.setItem('content', $('#content').html());
     });
   });
 
-  $('#registration-form').submit(function (event) {
+  // Registrierung-Ajax-Call
+  $('#register').on('click', function (event) {
     event.preventDefault();
-    var formData = $(this).serialize();
     $.ajax({
-      type: 'POST',
-      url: '../Backend/logic/requestHandler.php',
-      data: formData,
-      success: function (response) {
-      },
-      error: function (xhr, status, error) {
-      }
+
     });
   });
+
 });
