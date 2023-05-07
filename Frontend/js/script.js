@@ -52,6 +52,15 @@ $(document).ready(function () {
         console.log(response);
         $('#loadingSpinner').css('display', 'none');
         if (response.success) {
+          $('#formofAddress').val('');
+          $('#firstName').val('');
+          $('#lastName').val('');
+          $('#address').val('');
+          $('#postcode').val('');
+          $('#city').val('');
+          $('#email').val('');
+          $('#username').val('');
+          $('#password').val('');
           $('#register-form').prepend('<div class="alert alert-success" role="alert">Registrierung erfolgreich, Sie können sich nun einloggen!</div>');
           setTimeout(function () {
             $('.alert-success').remove();
