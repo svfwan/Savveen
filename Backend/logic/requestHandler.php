@@ -7,11 +7,11 @@ $param = '';
 switch ($requestType) {
     case 'GET':
         isset($_GET['method']) ? $method = $_GET['method'] : false;
-        isset($_GET['param']) ? $param = $_GET['param'] : false;
+        isset($_GET['param']) ? $param = json_decode($_GET['param'], true) : false;
         break;
     case 'POST':
         isset($_POST['method']) ? $method = $_POST['method'] : false;
-        isset($_POST['param']) ? $param = $_POST['param'] : false;
+        isset($_POST['param']) ? $param = json_decode($_POST['param'], true) : false;
         break;
     default:
         http_response_code(400);

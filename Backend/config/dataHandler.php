@@ -13,7 +13,7 @@ class dataHandler
     public function registerUser($param)
     {
         $result = array();
-        $person = json_decode($param, true);
+        $person = $param;
 
         // authenticate user input
         if (empty($person['firstName']) || strlen(trim($person['firstName'])) == 0) {
