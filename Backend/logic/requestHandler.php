@@ -6,12 +6,12 @@ $param = '';
 
 switch ($requestType) {
     case 'GET':
-        isset($_GET["method"]) ? $method = $_GET["method"] : false;
-        isset($_GET["param"]) ? $param = $_GET["param"] : false;
+        isset($_GET['method']) ? $method = $_GET['method'] : false;
+        isset($_GET['param']) ? $param = $_GET['param'] : false;
         break;
     case 'POST':
-        isset($_POST["method"]) ? $method = $_POST["method"] : false;
-        isset($_POST["param"]) ? $param = $_POST["param"] : false;
+        isset($_POST['method']) ? $method = $_POST['method'] : false;
+        isset($_POST['param']) ? $param = $_POST['param'] : false;
         break;
     default:
         http_response_code(400);
@@ -22,7 +22,7 @@ $logic = new businessLogic();
 $result = $logic->handleRequest($method, $param);
 
 if ($result == null) {
-    response("GET", 400, null);
+    response('GET', 400, null);
 } else {
     response($requestType, 200, $result);
 }
@@ -35,6 +35,6 @@ function response($request, $httpStatus, $data)
         echo (json_encode($data));
     } else {
         http_response_code(405);
-        echo ("Method not supported yet!");
+        echo ('Method not supported yet!');
     }
 }

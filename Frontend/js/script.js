@@ -19,14 +19,23 @@ $(document).ready(function () {
   });
 
   // Registrierung-Ajax-Call
-  $('#register').on('click', function () {
+  $(document).on('click', '#register', function () {
     console.log('button clicked');
+    if (!$('#termsCheck').prop('checked')) {
+      $('#termsCheck').addClass('is-invalid');
+      $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte stimmen Sie den Nutzungsbedingungen zu!</div>');
+      setTimeout(function () {
+        $('.alert-warning').remove();
+      }, 5000);
+      return;
+    }
+    $('#loadingSpinner').css('display', 'block');
     $.ajax({
       type: 'POST',
       url: '../Backend/logic/requestHandler.php',
       data: {
         method: 'registerUser',
-        param: {
+        param: JSON.stringify({
           formofAddress: $('#formofAddress').val(),
           firstName: $('#firstName').val(),
           lastName: $('#lastName').val(),
@@ -36,14 +45,27 @@ $(document).ready(function () {
           email: $('#email').val(),
           username: $('#username').val(),
           password: $('#password').val(),
-        }
+        })
       },
       dataType: 'json',
       success: function (response) {
-        console.log(JSON.stringify(response));
+        console.log(response);
+        $('#loadingSpinner').css('display', 'none');
+        if (response.success) {
+          $('#register-form').prepend('<div class="alert alert-success" role="alert">Registrierung erfolgreich, Sie können sich nun einloggen!</div>');
+          setTimeout(function () {
+            $('.alert-success').remove();
+          }, 3000);
+        } else if (response.error) {
+          $('#register-form').prepend('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
+          setTimeout(function () {
+            $('.alert-danger').remove();
+          }, 5000);
+        }
       },
       error: function (error) {
-        console.log(JSON.stringify(error));
+        $('#loadingSpinner').css('display', 'none');
+        console.log(error);
       }
     });
   });

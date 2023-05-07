@@ -11,7 +11,7 @@ class businessLogic
     function handleRequest($method, $param)
     {
         switch ($method) {
-            case "registerUser":
+            case 'registerUser':
                 $res = $this->dh->registerUser($param);
                 break;
         }

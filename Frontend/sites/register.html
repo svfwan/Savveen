@@ -8,11 +8,19 @@
 
 <body>
     <div id="content">
-        <div class="container">
+        <div class="container" id="loadingSpinner" style="display: none;">
+            <div class="d-flex align-items-center text-primary">
+                <strong class="text-primary">Registrierung wird durchgeführt...</strong>
+                <div class="spinner-border text-primary ms-auto" role="status" aria-hidden="true"></div>
+            </div>
+        </div>
+        <div id="register-form" class="container">
+            <div class="form-group">
+                <h2>Registrierungs-Formular</h2>
+            </div>
             <div class="form-group">
                 <label for="inputFOD">Anrede</label>
                 <select class="form-select" id="formofAddress" required>
-                    <option selected disabled>Wählen Sie eine Anrede</option>
                     <option value="Herr">Herr</option>
                     <option value="Frau">Frau</option>
                 </select>
