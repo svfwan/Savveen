@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  // Navbar-Logik
+  // navbar logic
   var storedContent = localStorage.getItem('content');
   if (storedContent) {
     $('#content').html(storedContent);
@@ -18,18 +18,30 @@ $(document).ready(function () {
     });
   });
 
-  // Registrierung-Ajax-Call
+  // ajax call for registration
   $(document).on('click', '#register', function () {
     console.log('button clicked');
+
+    // client-side validation of parameters
     if (!$('#termsCheck').prop('checked')) {
       $('#termsCheck').addClass('is-invalid');
       $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte stimmen Sie den Nutzungsbedingungen zu!</div>');
       setTimeout(function () {
         $('.alert-warning').remove();
-      }, 5000);
+      }, 3000);
       return;
     }
+    if (!validateRegisterForm()) {
+      $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte beachten Sie die Anforderungen für die Registrierung!</div>');
+      setTimeout(function () {
+        $('.alert-warning').remove();
+      }, 3000);
+      return;
+    }
+    // display loading spinner
     $('#loadingSpinner').css('display', 'block');
+
+    // POST call to backend
     $.ajax({
       type: 'POST',
       url: '../Backend/logic/requestHandler.php',
@@ -50,8 +62,12 @@ $(document).ready(function () {
       dataType: 'json',
       success: function (response) {
         console.log(response);
+
+        // hide loading Spinner
         $('#loadingSpinner').css('display', 'none');
+
         if (response.success) {
+          // reset form inputs after success
           $('#formofAddress option:first').prop('selected', true);
           $('#firstName').val('');
           $('#lastName').val('');
@@ -70,7 +86,7 @@ $(document).ready(function () {
           $('#register-form').prepend('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
           setTimeout(function () {
             $('.alert-danger').remove();
-          }, 5000);
+          }, 3000);
         }
       },
       error: function (error) {
@@ -79,5 +95,79 @@ $(document).ready(function () {
       }
     });
   });
+
+
+  // helper functions
+
+  function validateRegisterForm() {
+    let isValid = true;
+
+    // Validate firstName
+    if ($('#firstName').val().trim().length === 0) {
+      $('#firstName').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#firstName').removeClass('is-invalid');
+    }
+
+    // Validate lastName
+    if ($('#lastName').val().trim().length === 0) {
+      $('#lastName').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#lastName').removeClass('is-invalid');
+    }
+
+    // Validate address
+    if ($('#address').val().trim().length === 0) {
+      $('#address').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#address').removeClass('is-invalid');
+    }
+
+    // Validate postcode
+    if ($('#postcode').val().trim().length === 0) {
+      $('#postcode').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#postcode').removeClass('is-invalid');
+    }
+
+    // Validate city
+    if ($('#city').val().trim().length === 0) {
+      $('#city').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#city').removeClass('is-invalid');
+    }
+
+    // Validate email
+    let email = $('#email').val().trim();
+    if (email.length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      $('#email').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#email').removeClass('is-invalid');
+    }
+
+    // Validate username
+    if ($('#username').val().trim().length === 0) {
+      $('#username').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#username').removeClass('is-invalid');
+    }
+
+    // Validate password
+    if ($('#password').val().trim().length < 8) {
+      $('#password').addClass('is-invalid');
+      isValid = false;
+    } else {
+      $('#password').removeClass('is-invalid');
+    }
+
+    return isValid;
+  }
 
 });
