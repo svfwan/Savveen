@@ -1,4 +1,4 @@
-const loginForm = document.getElementById("login-form");
+/*const loginForm = document.getElementById("login-form");
 loginForm.addEventListener("submit", function(event) {
     event.preventDefault();
 
@@ -21,4 +21,4 @@ loginForm.addEventListener("submit", function(event) {
     };
     xhr.send("username=" + encodeURIComponent(username) + "&password=" +
         encodeURIComponent(password) + "&remember_me=" + encodeURIComponent(rememberMe));
-});
+});*/

@@ -21,6 +21,9 @@ class businessLogic
             case 'registerUser':
                 $res = $this->dh->registerUser($param);
                 break;
+            
+            case "loginUser":
+                $res=$this->dh->loginUser($param);
         }
         return $res;
     }

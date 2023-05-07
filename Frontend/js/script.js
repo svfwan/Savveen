@@ -96,6 +96,57 @@ $(document).ready(function () {
     });
   });
 
+  // ajax call for login
+  $(document).on('click', '#loginbutton', function () {
+    console.log('Login button clicked');
+
+    // display loading spinner
+    $('#loadingSpinner').css('display', 'block');
+
+    // POST call to backend
+    $.ajax({
+
+      type: 'POST',
+      url: '../Backend/logic/requestHandler.php',
+      data: {
+        method: 'loginUser',
+        param: JSON.stringify({
+          username: $('#username').val(),
+          password: $('#password').val()
+        })
+      },
+      dataType: 'json',
+      success: function (response) {
+        console.log(response);
+
+        // hide loading Spinner
+        $('#loadingSpinner').css('display', 'none');
+
+        if (response.success) {
+          var rememberlogin = $('#remember_login').prop('checked');
+
+          handleLoginSuccess(response.username,response.admin, rememberlogin);
+
+          $('#username').val('');
+          $('#password').val('');
+          $('#login-form').prepend('<div class="alert alert-success" role="alert">' + response.success + '</div>');
+          setTimeout(function () {
+            $('.alert-success').remove();
+          }, 3000);
+        } else if (response.error) {
+          $('#login-form').prepend('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
+          setTimeout(function () {
+            $('.alert-danger').remove();
+          }, 3000);
+        }
+      },
+      error: function (error) {
+        $('#loadingSpinner').css('display', 'none');
+        console.log(error);
+      }
+    });
+  });
+
 
   // helper functions
 
@@ -170,10 +221,18 @@ $(document).ready(function () {
     return isValid;
   }
 
+  function handleLoginSuccess(username, isAdmin, rememberLogin) {
+   
+    var expiresIn = rememberLogin ? ";expires=" + new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toUTCString() : "";
+
+    // Set the 'username' and 'admin' cookies with the specified expiration time
+    document.cookie = "username=" + username + expiresIn;
+    document.cookie = "admin=" + isAdmin + expiresIn;
+
+    // Call the updateNavbarItems function to update the navbar based on the login status
+    
+  }
+
 });
 
-//Login-Ajax-Call
 
-$('#loginbutton').on('click'),function(){
-  
-}

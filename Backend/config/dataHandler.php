@@ -86,6 +86,51 @@ class dataHandler
         return $result;
     }
 
+    public function loginUser($param)
+    {
+        $result = array();
+
+        $username = $param['username'];
+        $password = $param['password'];
+        $sql = 'SELECT `username`,`passwort`, `admin` FROM `users` WHERE `username` = ? LIMIT 1';
+        $stmt = $this->db_obj->prepare($sql);
+        $stmt->bind_param('s', $username);
+
+
+        if ($stmt->execute()) {
+            $user = $stmt->get_result();
+            if ($user->num_rows == 1) {
+                $row = $user->fetch_assoc();
+
+                if (password_verify($password, $row['passwort'])) {
+                    $result['success'] = 'Login erfolgreich!';
+                    
+                        $_SESSION['username'] = $row['username'];
+                        $_SESSION['admin'] = $row['admin'];
+                        $result['username'] = $row['username'];
+                        $result['admin'] = $row['admin'];
+                        
+
+            
+               
+                } else {
+                    $result['error'] = 'Falsches Passwort!';
+                }
+            } else {
+                $result['error'] = 'Benutzername nicht gefunden!';
+            }
+        } else {
+            $result['error'] = 'Datenbankfehler!';
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+
+
+
+
     // helper functions
 
     private function checkConnection()
