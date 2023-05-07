@@ -7,4 +7,8 @@ class dataHandler
         $result = 'works!!!';
         return $result;
     }
+    public function loginUser($param){
+        $result= 'Login works';
+        return $result;
+    }
 }

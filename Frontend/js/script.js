@@ -48,10 +48,33 @@ $(document).ready(function () {
     });
   });
 
-});
 
 //Login-Ajax-Call
 
-$('#loginbutton').on('click'),function(){
-  
-}
+$('#loginbutton').on('click',function(){
+  console.log('Login Button clicked');
+  $.ajax({
+    type: 'POST',
+    url: '../Backend/logic/requestHandler.php',
+    data: {
+      method: 'loginUser',
+      param:{
+      username: $('#username').val(),
+      password: $('#password').val()
+      }
+    },
+    dataType: 'json',
+    success: function(response){
+      console.log(JSON.stringify(response));
+    },
+    error: function(error){
+      console.log(JSON.stringify(error));
+
+    }
+  });
+
+})
+
+});
+
+

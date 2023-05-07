@@ -1,4 +1,5 @@
 <?php
+/*
 session_start();
 
 if(isset($_POST['Anmelden'])) {
@@ -45,4 +46,5 @@ if(isset($_POST['Anmelden'])) {
 
     $conn->close();
 }
+*/
 ?>
