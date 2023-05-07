@@ -75,11 +75,14 @@ class dataHandler
         $stmt->bind_param('ssssssssss', $fod, $fname, $sname, $address, $postcode, $city, $mail, $uname, $pass, $uname);
 
         // if executed and a row affected return success message, else return error message
-        if ($stmt->execute()) {
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
             $result['success'] = 'Neuer Benutzer erstellt!';
         } else {
             $result['error'] = 'Benutzername existiert bereits!';
         }
+
+        $stmt->close();
+
         return $result;
     }
 
