@@ -33,7 +33,7 @@ class dataHandler
         if (empty($param['city']) || !isset($param['city']) || strlen(trim($param['city'])) == 0) {
             $result['error'] = 'Bitte geben Sie einen validen Ort ein!';
         }
-        if (empty($person['email']) || strlen(trim($person['email'])) == 0 || !filter_var($this->test_input($person["useremail"]), FILTER_VALIDATE_EMAIL)) {
+        if (empty($person['email']) || strlen(trim($person['email'])) == 0 || !filter_var($this->test_input($person["email"]), FILTER_VALIDATE_EMAIL)) {
             $result['error'] = 'Bitte geben Sie eine valide E-Mail ein!';
             return $result;
         }

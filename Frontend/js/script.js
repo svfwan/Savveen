@@ -52,7 +52,7 @@ $(document).ready(function () {
         console.log(response);
         $('#loadingSpinner').css('display', 'none');
         if (response.success) {
-          $('#formofAddress').val('');
+          $('#formofAddress option:first').prop('selected', true);
           $('#firstName').val('');
           $('#lastName').val('');
           $('#address').val('');
@@ -61,6 +61,7 @@ $(document).ready(function () {
           $('#email').val('');
           $('#username').val('');
           $('#password').val('');
+          $('#termCheck').prop('checked', false);
           $('#register-form').prepend('<div class="alert alert-success" role="alert">Registrierung erfolgreich, Sie können sich nun einloggen!</div>');
           setTimeout(function () {
             $('.alert-success').remove();
