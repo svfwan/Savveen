@@ -1,4 +1,22 @@
 $(document).ready(function () {
+
+  /*
+    note for self/team:
+     - dynamic loading of pages getting messy
+     - script getting long
+     - navbar logic getting complicated
+
+    possible solution:
+    - keep navbar same everywhere -> find way to keep navbar but change page below maybe
+    - seperate scripts i.e. register.js, login.js
+    - keep common functionality in script.js
+
+    further issues/ideas/solutions:
+     - ...
+  */
+
+
+
   // method to update frontend features based on backend session variables
   updateFeatures();
 
