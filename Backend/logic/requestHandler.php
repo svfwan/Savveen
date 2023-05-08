@@ -1,6 +1,5 @@
 <?php
 include('./businessLogic.php');
-session_start();
 $requestType = $_SERVER['REQUEST_METHOD'];
 $method = '';
 $param = '';
@@ -40,7 +39,3 @@ function response($request, $httpStatus, $data)
         echo ('Method not supported yet!');
     }
 }
-
-
-
-

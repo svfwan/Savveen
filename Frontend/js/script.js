@@ -1,22 +1,58 @@
 $(document).ready(function () {
+  // method to update frontend features based on backend session variables
+  updateFeatures();
+
   // navbar logic
   var storedContent = localStorage.getItem('content');
   if (storedContent) {
     $('#content').html(storedContent);
   }
 
-  $('nav a').on('click', function (event) {
+  $('nav button').on('click', function (event) {
     event.preventDefault();
-    var url = $(this).attr('href');
-    $.get(url, function (data) {
-      var $newContent = $('<div>').html(data);
-      $('#content').html($newContent.find('#content').html());
-      if (!$('nav').length) {
-        $('body').prepend($newContent.find('nav'));
-      }
+    var url = $(this).data('href');
+    $('#content').load(url + ' #content > *', function () {
       localStorage.setItem('content', $('#content').html());
     });
   });
+
+  function updateFeatures() {
+    // Check if the cookies exist
+    const username = getCookie('username');
+    const admin = getCookie('admin');
+
+    if (username && admin !== null) {
+      // Log in the user using the cookies
+      updateNavbar(true, username, admin === '1');
+    } else {
+      $.ajax({
+        type: 'POST',
+        url: '../Backend/logic/requestHandler.php',
+        data: {
+          method: 'getSessionInfo',
+        },
+        dataType: 'json',
+        success: function (response) {
+          if (response.loggedIn) {
+            // Update the features for logged-in users
+            if (response.admin) {
+              // Show admin-specific features
+              updateNavbar(true, response.username, true);
+            } else {
+              // Show non-admin features
+              updateNavbar(true, response.username, false);
+            }
+          } else {
+            // Show the default features for non-logged-in users
+            updateNavbar(false, '', false);
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+  }
 
   // ajax call for registration
   $(document).on('click', '#register', function () {
@@ -25,17 +61,11 @@ $(document).ready(function () {
     // client-side validation of parameters
     if (!$('#termsCheck').prop('checked')) {
       $('#termsCheck').addClass('is-invalid');
-      $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte stimmen Sie den Nutzungsbedingungen zu!</div>');
-      setTimeout(function () {
-        $('.alert-warning').remove();
-      }, 3000);
+      showAlert('Bitte stimmen Sie den Nutzungsbedingungen zu!', 'warning');
       return;
     }
     if (!validateRegisterForm()) {
-      $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte beachten Sie die Anforderungen für die Registrierung!</div>');
-      setTimeout(function () {
-        $('.alert-warning').remove();
-      }, 3000);
+      showAlert('Bitte beachten Sie die Anforderungen für die Registrierung!', 'warning');
       return;
     }
     // display loading spinner
@@ -78,15 +108,9 @@ $(document).ready(function () {
           $('#username').val('');
           $('#password').val('');
           $('#termCheck').prop('checked', false);
-          $('#register-form').prepend('<div class="alert alert-success" role="alert">Registrierung erfolgreich, Sie können sich nun einloggen!</div>');
-          setTimeout(function () {
-            $('.alert-success').remove();
-          }, 3000);
+          showAlert('Registrierung erfolgreich, Sie können sich nun einloggen!', 'success');
         } else if (response.error) {
-          $('#register-form').prepend('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
-          setTimeout(function () {
-            $('.alert-danger').remove();
-          }, 3000);
+          showAlert(response.error, 'danger');
         }
       },
       error: function (error) {
@@ -105,39 +129,27 @@ $(document).ready(function () {
 
     // POST call to backend
     $.ajax({
-
       type: 'POST',
       url: '../Backend/logic/requestHandler.php',
       data: {
         method: 'loginUser',
         param: JSON.stringify({
           username: $('#username').val(),
-          password: $('#password').val()
+          password: $('#password').val(),
+          rememberLogin: $('#remember_login').prop('checked')
         })
       },
       dataType: 'json',
       success: function (response) {
         console.log(response);
-
         // hide loading Spinner
         $('#loadingSpinner').css('display', 'none');
-
         if (response.success) {
-          var rememberlogin = $('#remember_login').prop('checked');
-
-          handleLoginSuccess(response.username,response.admin, rememberlogin);
-
-          $('#username').val('');
-          $('#password').val('');
-          $('#login-form').prepend('<div class="alert alert-success" role="alert">' + response.success + '</div>');
-          setTimeout(function () {
-            $('.alert-success').remove();
-          }, 3000);
+          showAlert(response.success, 'success');
+          $('#login-form').hide();
+          updateFeatures();
         } else if (response.error) {
-          $('#login-form').prepend('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
-          setTimeout(function () {
-            $('.alert-danger').remove();
-          }, 3000);
+          showAlert(response.error, 'danger');
         }
       },
       error: function (error) {
@@ -149,6 +161,76 @@ $(document).ready(function () {
 
 
   // helper functions
+
+  function updateNavbar(isLoggedIn, username, isAdmin) {
+    // The basic navbar items that are always visible
+    const basicNavbar = `
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="products">Products</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="help">Help</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="imprint">Imprint</button>
+        </li>
+      `;
+
+    // The items that should be visible only to logged-in users
+    const loggedInNavbar = `
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="profile">${username}</button>
+        </li>
+        <button class="btn btn-danger" name="logout">Logout</button>
+      `;
+
+    // The items that should be visible only to admin users
+    const adminNavbar = `
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="dashboard">Admin Dashboard</button>
+        </li>
+      `;
+
+    // The items that should be visible only to not logged-in users
+    const notLoggedInNavbar = `
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="register">Registrierung</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="login">Login</button>
+        </li>
+      `;
+
+    let navbarItems = basicNavbar;
+
+    if (isLoggedIn) {
+      navbarItems += loggedInNavbar;
+      if (isAdmin) {
+        navbarItems += adminNavbar;
+      }
+    } else {
+      navbarItems += notLoggedInNavbar;
+    }
+
+    $('#navbarNav > ul.navbar-nav').html(navbarItems);
+
+    // Add click event handlers to the buttons
+    $('button[data-page]').on('click', function (event) {
+      event.preventDefault();
+      var page = $(this).data('page');
+      console.log(page);
+      $('#content').load(`sites/${page}.html #content > *`, function () {
+        localStorage.setItem('content', $('#content').html());
+      });
+    });
+  }
+
+  function getCookie(name) {
+    const value = '; ' + document.cookie;
+    const parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
 
   function validateRegisterForm() {
     let isValid = true;
@@ -221,16 +303,23 @@ $(document).ready(function () {
     return isValid;
   }
 
-  function handleLoginSuccess(username, isAdmin, rememberLogin) {
-   
-    var expiresIn = rememberLogin ? ";expires=" + new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toUTCString() : "";
+  function showAlert(message, type) {
+    // remove any existing alerts
+    $('#alertContent').empty();
 
-    // Set the 'username' and 'admin' cookies with the specified expiration time
-    document.cookie = "username=" + username + expiresIn;
-    document.cookie = "admin=" + isAdmin + expiresIn;
+    // create the new alert
+    var alert = $('<div>')
+      .addClass('alert alert-' + type)
+      .attr('role', 'alert')
+      .text(message);
 
-    // Call the updateNavbarItems function to update the navbar based on the login status
-    
+    // add the alert to the alertContent div
+    $('#alertContent').append(alert);
+
+    // set timeout to remove alert after 3 seconds
+    setTimeout(function () {
+      alert.remove();
+    }, 3000);
   }
 
 });
