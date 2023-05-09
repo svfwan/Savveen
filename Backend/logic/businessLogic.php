@@ -28,6 +28,9 @@ class businessLogic
             case 'getSessionInfo':
                 $res = $this->dh->getSessionInfo();
                 break;
+            case 'logoutUser':
+                $res = $this->dh->logoutUser();
+                break;
         }
         return $res;
     }

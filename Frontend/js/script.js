@@ -175,7 +175,31 @@ $(document).ready(function () {
         console.log(error);
       }
     });
+
   });
+
+  $('#logout').on('click', function () {
+    $.ajax({
+      type: 'POST',
+      url: '../Backend/logic/requestHandler.php',
+      data: {
+        method: 'logoutUser',
+
+      },
+      dataType: 'json',
+      success: function (response) {
+        console.log(response);
+        if (response.success) {
+          console.log(response.success);
+        } else if (response.error) {
+          console.log(response.error)
+        }
+      },
+      error: function (error) {
+        console.log(error)
+      }
+    })
+  })
 
 
   // helper functions
@@ -199,7 +223,7 @@ $(document).ready(function () {
         <li class="nav-item">
           <button class="nav-link btn btn-link" data-page="profile">${username}</button>
         </li>
-        <button class="btn btn-danger" name="logout">Logout</button>
+        <button class="btn btn-danger" id="logout" name="logout">Logout</button>
       `;
 
     // The items that should be visible only to admin users
@@ -241,6 +265,10 @@ $(document).ready(function () {
         localStorage.setItem('content', $('#content').html());
       });
     });
+
+
+
+
   }
 
   function getCookie(name) {
