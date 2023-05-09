@@ -149,6 +149,15 @@ class dataHandler
         return $result;
     }
 
+    public function logoutUser()
+    {
+        session_destroy();
+        $result['loggedIn'] = false;
+        return $result;
+    }
+
+
+
     // helper functions
 
     private function checkConnection()

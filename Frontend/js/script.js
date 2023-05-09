@@ -193,7 +193,31 @@ $(document).ready(function () {
         console.log(error);
       }
     });
+
   });
+
+  $('#logout').on('click', function () {
+    $.ajax({
+      type: 'POST',
+      url: '../Backend/logic/requestHandler.php',
+      data: {
+        method: 'logoutUser',
+
+      },
+      dataType: 'json',
+      success: function (response) {
+        console.log(response);
+        if (response.success) {
+          console.log(response.success);
+        } else if (response.error) {
+          console.log(response.error)
+        }
+      },
+      error: function (error) {
+        console.log(error)
+      }
+    })
+  })
 
 
   // helper functions
@@ -210,7 +234,6 @@ $(document).ready(function () {
         <li class="nav-item">
           <button class="nav-link btn btn-link" data-page="imprint">Imprint</button>
         </li>
-    `;
 
     // The items that should be visible only to not logged-in users
     const notLoggedInNavbar = `
@@ -264,6 +287,10 @@ $(document).ready(function () {
         localStorage.setItem('content', $('#content').html());
       });
     });
+
+
+
+
   }
 
 
