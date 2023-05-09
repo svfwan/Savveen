@@ -5,6 +5,7 @@ $(document).ready(function () {
      - dynamic loading of pages getting messy
      - script getting long
      - navbar logic getting complicated
+     - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
 
     possible solution:
     - keep navbar same everywhere -> find way to keep navbar but change page below maybe
