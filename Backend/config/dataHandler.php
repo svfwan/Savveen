@@ -117,6 +117,9 @@ class dataHandler
                         // Set cookies with the username and admin status
                         setcookie('username', $username, time() + (86400 * 30), '/');
                         setcookie('admin', $row['admin'], time() + (86400 * 30), '/');
+                    } else {
+                        setcookie('username', $username, time() + 3600, '/');
+                        setcookie('admin', $row['admin'], time() + 3600, '/');
                     }
                 } else {
                     $result['error'] = 'Falsches Passwort!';
