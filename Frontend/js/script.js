@@ -36,6 +36,7 @@ $(document).ready(function () {
     });
   });
 
+  // does not work fully yet, login form can still be seen if user refreshes once logged in
   function updateFeatures() {
     // Check if the cookies exist
     const username = getCookie('username');
@@ -47,9 +48,11 @@ $(document).ready(function () {
     if (username && admin !== null) {
       // Log in the user using the cookies
       updateNavbar(true, username, admin === '1');
-      if (isLoggedIn) {
-        $('#login-form').hide();
-        $('#content').load(`sites/profile.html #content > *`);
+
+      // Check if the stored content is for a logged-in user
+      if (isLoggedIn && localStorage.getItem('content') === 'sites/profile.html') {
+        // Update the localStorage content with the appropriate page
+        localStorage.setItem('content', 'sites/products.html');
       }
     } else {
       $.ajax({
@@ -70,11 +73,10 @@ $(document).ready(function () {
               updateNavbar(true, response.username, false);
             }
 
-            if (isLoggedIn) {
-              $('#login-form').hide();
-              $('#content').load(`sites/profile.html #content > *`, function () {
-                localStorage.setItem('content', $('#content').html());
-              });
+            // Check if the stored content is for a logged-out user
+            if (!isLoggedIn && localStorage.getItem('content') === 'sites/products.html') {
+              // Update the localStorage content with the appropriate page
+              localStorage.setItem('content', 'sites/profile.html');
             }
           } else {
             // Show the default features for non-logged-in users
@@ -87,7 +89,6 @@ $(document).ready(function () {
       });
     }
   }
-
 
   // ajax call for registration
   $(document).on('click', '#register', function () {
