@@ -5,6 +5,7 @@ $(document).ready(function () {
      - dynamic loading of pages getting messy
      - script getting long
      - navbar logic getting complicated
+     - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
 
     possible solution:
     - keep navbar same everywhere -> find way to keep navbar but change page below maybe
@@ -26,22 +27,33 @@ $(document).ready(function () {
     $('#content').html(storedContent);
   }
 
-  $('nav button').on('click', function (event) {
+  $('button[data-page]').on('click', function (event) {
     event.preventDefault();
-    var url = $(this).data('href');
-    $('#content').load(url + ' #content > *', function () {
+    var page = $(this).data('page');
+    console.log(page);
+    $('#content').load(`sites/${page}.html #content > *`, function () {
       localStorage.setItem('content', $('#content').html());
     });
   });
 
+  // does not work fully yet, login form can still be seen if user refreshes once logged in
   function updateFeatures() {
     // Check if the cookies exist
     const username = getCookie('username');
     const admin = getCookie('admin');
 
+    // Check if the user is already logged in from previous session
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
     if (username && admin !== null) {
       // Log in the user using the cookies
       updateNavbar(true, username, admin === '1');
+
+      // Check if the stored content is for a logged-in user
+      if (isLoggedIn && localStorage.getItem('content') === 'sites/profile.html') {
+        // Update the localStorage content with the appropriate page
+        localStorage.setItem('content', 'sites/products.html');
+      }
     } else {
       $.ajax({
         type: 'POST',
@@ -59,6 +71,12 @@ $(document).ready(function () {
             } else {
               // Show non-admin features
               updateNavbar(true, response.username, false);
+            }
+
+            // Check if the stored content is for a logged-out user
+            if (!isLoggedIn && localStorage.getItem('content') === 'sites/products.html') {
+              // Update the localStorage content with the appropriate page
+              localStorage.setItem('content', 'sites/profile.html');
             }
           } else {
             // Show the default features for non-logged-in users
@@ -216,22 +234,6 @@ $(document).ready(function () {
         <li class="nav-item">
           <button class="nav-link btn btn-link" data-page="imprint">Imprint</button>
         </li>
-      `;
-
-    // The items that should be visible only to logged-in users
-    const loggedInNavbar = `
-        <li class="nav-item">
-          <button class="nav-link btn btn-link" data-page="profile">${username}</button>
-        </li>
-        <button class="btn btn-danger" id="logout" name="logout">Logout</button>
-      `;
-
-    // The items that should be visible only to admin users
-    const adminNavbar = `
-        <li class="nav-item">
-          <button class="nav-link btn btn-link" data-page="dashboard">Admin Dashboard</button>
-        </li>
-      `;
 
     // The items that should be visible only to not logged-in users
     const notLoggedInNavbar = `
@@ -241,18 +243,38 @@ $(document).ready(function () {
         <li class="nav-item">
           <button class="nav-link btn btn-link" data-page="login">Login</button>
         </li>
-      `;
+    `;
 
-    let navbarItems = basicNavbar;
-
+    // The items that should be visible only to logged-in users
+    let loggedInNavbar = '';
     if (isLoggedIn) {
-      navbarItems += loggedInNavbar;
-      if (isAdmin) {
-        navbarItems += adminNavbar;
-      }
-    } else {
-      navbarItems += notLoggedInNavbar;
+      loggedInNavbar = `
+            <li class="nav-item">
+              <button class="nav-link btn btn-link" data-page="profile">${username}</button>
+            </li>
+        `;
     }
+
+    // The items that should be visible only to admin users
+    let adminNavbar = '';
+    if (isAdmin) {
+      adminNavbar = `
+            <li class="nav-item">
+              <button class="nav-link btn btn-link" data-page="dashboard">Admin Dashboard</button>
+            </li>
+        `;
+    }
+
+    let navbarItems = '';
+    if (isAdmin) {
+      navbarItems += adminNavbar + basicNavbar;
+    } else if (isLoggedIn) {
+      navbarItems += loggedInNavbar + basicNavbar;
+    } else {
+      navbarItems += notLoggedInNavbar + basicNavbar;
+    }
+
+    const logoutButton = '';
 
     $('#navbarNav > ul.navbar-nav').html(navbarItems);
 
@@ -270,6 +292,7 @@ $(document).ready(function () {
 
 
   }
+
 
   function getCookie(name) {
     const value = '; ' + document.cookie;
