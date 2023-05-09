@@ -92,7 +92,7 @@ class dataHandler
         $username = $param['username'];
         $password = $param['password'];
 
-        // add validation of input
+        // need to add validation of input still
 
         if (!$this->checkConnection()) {
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
@@ -107,19 +107,22 @@ class dataHandler
             if ($user->num_rows == 1) {
                 $row = $user->fetch_assoc();
                 if (password_verify($password, $row['passwort'])) {
-                    $result['success'] = 'Login erfolgreich, willkommen ' . $username;
+                    $result['success'] = 'Login erfolgreich, willkommen ' . $username . '!';
                     $result['username'] = $username;
                     $result['admin'] = $row['admin'];
-                    session_start();
+                    if (!(isset($_SESSION))) {
+                        session_start();
+                    }
                     $_SESSION['username'] = $username;
                     $_SESSION['admin'] = $row['admin'];
                     if (isset($param['rememberLogin']) && $param['rememberLogin']) {
-                        // Set cookies with the username and admin status
+                        // 30-day cookie
+                        setcookie('rememberLogin', true, time() + (86400 * 30), '/');
                         setcookie('username', $username, time() + (86400 * 30), '/');
-                        setcookie('admin', $row['admin'], time() + (86400 * 30), '/');
                     } else {
+                        // 1-hour cookie
+                        setcookie('rememberLogin', true, time() + 3600, '/');
                         setcookie('username', $username, time() + 3600, '/');
-                        setcookie('admin', $row['admin'], time() + 3600, '/');
                     }
                 } else {
                     $result['error'] = 'Falsches Passwort!';
@@ -138,25 +141,42 @@ class dataHandler
     public function getSessionInfo()
     {
         $result = array();
-        session_start();
+        if (!(isset($_SESSION))) {
+            session_start();
+        }
         if (isset($_SESSION['username']) && isset($_SESSION['admin'])) {
-            $result['loggedIn'] = true;
-            $result['username'] = $_SESSION['username'];
-            $result['admin'] = $_SESSION['admin'];
+            if ($_SESSION['admin']) {
+                $result['status'] = 'loggedInAdmin';
+            } else {
+                $result['status'] = 'loggedInUser';
+            }
         } else {
-            $result['loggedIn'] = false;
+            $result['status'] = 'notLoggedIn';
         }
         return $result;
     }
 
+
     public function logoutUser()
     {
-        session_destroy();
-        $result['loggedIn'] = false;
+        $result = array();
+        if (!isset($_SESSION)) {
+            session_start();
+        }
+        if (isset($_SESSION) && isset($_SESSION['username'])) {
+            session_destroy();
+
+            if (isset($_COOKIE['rememberLogin'])) {
+                setcookie('rememberLogin', '', time() - 3600, '/');
+            }
+            if (isset($_COOKIE['username'])) {
+                setcookie('username', '', time() - 3600, '/');
+            }
+
+            $result['loggedIn'] = false;
+        }
         return $result;
     }
-
-
 
     // helper functions
 

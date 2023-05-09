@@ -17,6 +17,7 @@ class businessLogic
 
     function handleRequest($method, $param)
     {
+        $res = array();
         switch ($method) {
             case 'registerUser':
                 $res = $this->dh->registerUser($param);
@@ -30,6 +31,9 @@ class businessLogic
                 break;
             case 'logoutUser':
                 $res = $this->dh->logoutUser();
+                break;
+            default:
+                $res = null;
                 break;
         }
         return $res;
