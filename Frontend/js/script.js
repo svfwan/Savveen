@@ -1,22 +1,94 @@
 $(document).ready(function () {
+
+  /*
+    note for self/team:
+     - dynamic loading of pages getting messy
+     - script getting long
+     - navbar logic getting complicated
+     - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
+
+    possible solution:
+    - keep navbar same everywhere -> find way to keep navbar but change page below maybe
+    - seperate scripts i.e. register.js, login.js
+    - keep common functionality in script.js
+
+    further issues/ideas/solutions:
+     - ...
+  */
+
+
+
+  // method to update frontend features based on backend session variables
+  updateFeatures();
+
   // navbar logic
   var storedContent = localStorage.getItem('content');
   if (storedContent) {
     $('#content').html(storedContent);
   }
 
-  $('nav a').on('click', function (event) {
+  $('button[data-page]').on('click', function (event) {
     event.preventDefault();
-    var url = $(this).attr('href');
-    $.get(url, function (data) {
-      var $newContent = $('<div>').html(data);
-      $('#content').html($newContent.find('#content').html());
-      if (!$('nav').length) {
-        $('body').prepend($newContent.find('nav'));
-      }
+    var page = $(this).data('page');
+    console.log(page);
+    $('#content').load(`sites/${page}.html #content > *`, function () {
       localStorage.setItem('content', $('#content').html());
     });
   });
+
+  // does not work fully yet, login form can still be seen if user refreshes once logged in
+  function updateFeatures() {
+    // Check if the cookies exist
+    const username = getCookie('username');
+    const admin = getCookie('admin');
+
+    // Check if the user is already logged in from previous session
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (username && admin !== null) {
+      // Log in the user using the cookies
+      updateNavbar(true, username, admin === '1');
+
+      // Check if the stored content is for a logged-in user
+      if (isLoggedIn && localStorage.getItem('content') === 'sites/profile.html') {
+        // Update the localStorage content with the appropriate page
+        localStorage.setItem('content', 'sites/products.html');
+      }
+    } else {
+      $.ajax({
+        type: 'POST',
+        url: '../Backend/logic/requestHandler.php',
+        data: {
+          method: 'getSessionInfo',
+        },
+        dataType: 'json',
+        success: function (response) {
+          if (response.loggedIn) {
+            // Update the features for logged-in users
+            if (response.admin) {
+              // Show admin-specific features
+              updateNavbar(true, response.username, true);
+            } else {
+              // Show non-admin features
+              updateNavbar(true, response.username, false);
+            }
+
+            // Check if the stored content is for a logged-out user
+            if (!isLoggedIn && localStorage.getItem('content') === 'sites/products.html') {
+              // Update the localStorage content with the appropriate page
+              localStorage.setItem('content', 'sites/profile.html');
+            }
+          } else {
+            // Show the default features for non-logged-in users
+            updateNavbar(false, '', false);
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+  }
 
   // ajax call for registration
   $(document).on('click', '#register', function () {
@@ -25,17 +97,11 @@ $(document).ready(function () {
     // client-side validation of parameters
     if (!$('#termsCheck').prop('checked')) {
       $('#termsCheck').addClass('is-invalid');
-      $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte stimmen Sie den Nutzungsbedingungen zu!</div>');
-      setTimeout(function () {
-        $('.alert-warning').remove();
-      }, 3000);
+      showAlert('Bitte stimmen Sie den Nutzungsbedingungen zu!', 'warning');
       return;
     }
     if (!validateRegisterForm()) {
-      $('#register-form').prepend('<div class="alert alert-warning" role="alert">Bitte beachten Sie die Anforderungen für die Registrierung!</div>');
-      setTimeout(function () {
-        $('.alert-warning').remove();
-      }, 3000);
+      showAlert('Bitte beachten Sie die Anforderungen für die Registrierung!', 'warning');
       return;
     }
     // display loading spinner
@@ -78,15 +144,48 @@ $(document).ready(function () {
           $('#username').val('');
           $('#password').val('');
           $('#termCheck').prop('checked', false);
-          $('#register-form').prepend('<div class="alert alert-success" role="alert">Registrierung erfolgreich, Sie können sich nun einloggen!</div>');
-          setTimeout(function () {
-            $('.alert-success').remove();
-          }, 3000);
+          showAlert('Registrierung erfolgreich, Sie können sich nun einloggen!', 'success');
         } else if (response.error) {
-          $('#register-form').prepend('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
-          setTimeout(function () {
-            $('.alert-danger').remove();
-          }, 3000);
+          showAlert(response.error, 'danger');
+        }
+      },
+      error: function (error) {
+        $('#loadingSpinner').css('display', 'none');
+        console.log(error);
+      }
+    });
+  });
+
+  // ajax call for login
+  $(document).on('click', '#loginbutton', function () {
+    console.log('Login button clicked');
+
+    // display loading spinner
+    $('#loadingSpinner').css('display', 'block');
+
+    // POST call to backend
+    $.ajax({
+      type: 'POST',
+      url: '../Backend/logic/requestHandler.php',
+      data: {
+        method: 'loginUser',
+        param: JSON.stringify({
+          username: $('#username').val(),
+          password: $('#password').val(),
+          rememberLogin: $('#remember_login').prop('checked')
+        })
+      },
+      dataType: 'json',
+      success: function (response) {
+        console.log(response);
+        // hide loading Spinner
+        $('#loadingSpinner').css('display', 'none');
+        if (response.success) {
+          showAlert(response.success, 'success');
+          $('#login-form').hide();
+          updateFeatures();
+        } else if (response.error) {
+          showAlert(response.error, 'danger');
         }
       },
       error: function (error) {
@@ -98,6 +197,82 @@ $(document).ready(function () {
 
 
   // helper functions
+
+  function updateNavbar(isLoggedIn, username, isAdmin) {
+    // The basic navbar items that are always visible
+    const basicNavbar = `
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="products">Products</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="help">Help</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="imprint">Imprint</button>
+        </li>
+    `;
+
+    // The items that should be visible only to not logged-in users
+    const notLoggedInNavbar = `
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="register">Registrierung</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" data-page="login">Login</button>
+        </li>
+    `;
+
+    // The items that should be visible only to logged-in users
+    let loggedInNavbar = '';
+    if (isLoggedIn) {
+      loggedInNavbar = `
+            <li class="nav-item">
+              <button class="nav-link btn btn-link" data-page="profile">${username}</button>
+            </li>
+        `;
+    }
+
+    // The items that should be visible only to admin users
+    let adminNavbar = '';
+    if (isAdmin) {
+      adminNavbar = `
+            <li class="nav-item">
+              <button class="nav-link btn btn-link" data-page="dashboard">Admin Dashboard</button>
+            </li>
+        `;
+    }
+
+    let navbarItems = '';
+    if (isAdmin) {
+      navbarItems += adminNavbar + basicNavbar;
+    } else if (isLoggedIn) {
+      navbarItems += loggedInNavbar + basicNavbar;
+    } else {
+      navbarItems += notLoggedInNavbar + basicNavbar;
+    }
+
+    const logoutButton = '';
+
+    $('#navbarNav > ul.navbar-nav').html(navbarItems);
+
+    // Add click event handlers to the buttons
+    $('button[data-page]').on('click', function (event) {
+      event.preventDefault();
+      var page = $(this).data('page');
+      console.log(page);
+      $('#content').load(`sites/${page}.html #content > *`, function () {
+        localStorage.setItem('content', $('#content').html());
+      });
+    });
+  }
+
+
+  function getCookie(name) {
+    const value = '; ' + document.cookie;
+    const parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
 
   function validateRegisterForm() {
     let isValid = true;
@@ -170,4 +345,25 @@ $(document).ready(function () {
     return isValid;
   }
 
+  function showAlert(message, type) {
+    // remove any existing alerts
+    $('#alertContent').empty();
+
+    // create the new alert
+    var alert = $('<div>')
+      .addClass('alert alert-' + type)
+      .attr('role', 'alert')
+      .text(message);
+
+    // add the alert to the alertContent div
+    $('#alertContent').append(alert);
+
+    // set timeout to remove alert after 3 seconds
+    setTimeout(function () {
+      alert.remove();
+    }, 3000);
+  }
+
 });
+
+
