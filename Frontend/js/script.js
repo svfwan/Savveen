@@ -6,7 +6,6 @@ $(document).ready(function () {
      - script getting long
      - navbar logic getting complicated
      - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
-     - cookies are visible in front-end and can be changed easily
 
     possible solution:
     - keep navbar same everywhere -> find way to keep navbar but change page below maybe
@@ -14,7 +13,7 @@ $(document).ready(function () {
     - keep common functionality in script.js
     - move to MPA, but dynamic loading of content still via scripts
     - create seperate columns/divs in index.html for components such as login
-      -> then load those or hide them -> more SPA-affirm
+      -> then load those or hide them -> more SPA-affirm --> see modals, icons in nav etc
 
     further issues/ideas/solutions:
      - ...
