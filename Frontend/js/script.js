@@ -13,6 +13,8 @@ $(document).ready(function () {
     - seperate scripts i.e. register.js, login.js
     - keep common functionality in script.js
     - move to MPA, but dynamic loading of content still via scripts
+    - create seperate columns/divs in index.html for components such as login
+      -> then load those or hide them -> more SPA-affirm
 
     further issues/ideas/solutions:
      - ...
