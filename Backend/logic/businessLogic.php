@@ -13,6 +13,8 @@ class businessLogic
         $this->uh = new utilityHandler();
 
         also consider session/cookie handling (see input in group-chat)
+
+        what about db_obj->close(); -> where to put it?
     */
 
     function handleRequest($method, $param)
