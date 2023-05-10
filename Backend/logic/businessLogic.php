@@ -1,4 +1,5 @@
 <?php
+include('../config/dbaccess.php');
 include('../config/dataHandler.php');
 class businessLogic
 {

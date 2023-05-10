@@ -28,8 +28,9 @@ $(document).ready(function () {
   */
   function updateFeatures() {
     // Always make an AJAX request to get the session information
+    // change to get request
     $.ajax({
-      type: 'POST',
+      type: 'GET',
       url: '../Backend/logic/requestHandler.php',
       data: {
         method: 'getSessionInfo',
