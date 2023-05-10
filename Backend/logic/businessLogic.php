@@ -28,6 +28,16 @@ class businessLogic
             case 'getSessionInfo':
                 $res = $this->dh->getSessionInfo();
                 break;
+
+            case 'loadAllProducts':
+                $res = $this->dh->loadAllProducts();
+                break;
+
+            case 'checkStock':
+                $res = $this -> dh ->checkStock($param); 
+                break; 
+    
+
         }
         return $res;
     }

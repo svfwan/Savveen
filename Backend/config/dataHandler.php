@@ -164,4 +164,73 @@ class dataHandler
         $data = htmlspecialchars($data);
         return $data;
     }
+
+    //Alle Produkte laden
+    public function loadAllProducts()
+    {
+        //hier werden die fkt reingeschrieben. 
+
+
+        $tab = []; // Initialisiere das Array
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        // Führe die SQL-Abfrage aus
+        $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung` FROM `products`");
+        $sql->execute();
+        $result = $sql->get_result();
+
+        // Füge die Ergebnisse in das Array ein
+        while ($row = $result->fetch_assoc()) {
+            array_push($tab, $row);
+        }
+
+        // Schließe die Verbindung und gib das Array zurück
+        $sql->close();
+        return $tab;
+    }
+  
+
+    //checkStock()
+      public function checkStock($param){
+
+        //überarbeiten
+       // $tab = []; // Initialisiere das Array
+        $tab = array();
+
+        $n = $param['Name'];
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        
+        // Führe die SQL-Abfrage aus
+              // Wandele das JSON-Objekt in ein PHP-Array um
+              //$param = json_decode($param, true);
+
+              // Führe die SQL-Abfrage aus
+              $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
+             $sql->bind_param('s', $n);
+           //  echo "Datenbank: ". $param['Name'];
+              $sql->execute();
+              $result = $sql->get_result();
+      
+              // Füge die Ergebnisse in das Array ein
+              while ($row = $result->fetch_assoc()) {
+                  array_push($tab, $row);
+              }
+      
+              // Schließe die Verbindung und gib das Array zurück
+              $sql->close();
+              return $tab;
+
+    }
+
 }
