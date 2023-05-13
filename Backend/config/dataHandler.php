@@ -77,8 +77,10 @@ class dataHandler
         // if executed and a row affected return success message, else return error message
         if ($stmt->execute() && $stmt->affected_rows > 0) {
             $result['success'] = 'Neuer Benutzer erstellt!';
+            echo "SUCCESS";
         } else {
             $result['error'] = 'Benutzername existiert bereits!';
+            echo "ERROR"; 
         }
 
         $stmt->close();
@@ -210,10 +212,6 @@ class dataHandler
             return $tab;
         }
 
-        
-        // Führe die SQL-Abfrage aus
-              // Wandele das JSON-Objekt in ein PHP-Array um
-              //$param = json_decode($param, true);
 
               // Führe die SQL-Abfrage aus
               $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
@@ -231,6 +229,39 @@ class dataHandler
               $sql->close();
               return $tab;
 
+    }
+
+
+    public function reduceStock($param){
+        //arr erstellen für die ergebnisse
+       $tab = array();
+
+       $n = $param['Name'];
+       $s = $param['Stock'] - 1; 
+     
+
+       // Prüfe die Verbindung zur Datenbank
+       if (!$this->checkConnection()) {
+           $tab["error"] = "Versuchen Sie es später erneut!";
+           return $tab;
+       }
+
+        // Führe die SQL-Abfrage aus
+        $sql = $this->db_obj->prepare("UPDATE `products` SET `stock` = ?  WHERE `Name` = ? ");
+        $sql->bind_param('is', $s,$n);
+      //  echo "Datenbank: ". $param['Name']  
+       
+        //update gibt ja keine werte zurück, deswegen kann man die werte auch nicht in einem array speichern
+
+        if ($sql->execute() && $sql->affected_rows > 0) {
+            $tab['success'] = 'Stock wurde runtergesetzt!';
+        } else {
+            $tab['error'] = 'Stock konnte nicht runtergesetzt werden.';
+        }
+ 
+             // Schließe die Verbindung und gib das Array zurück
+             $sql->close();
+             return $tab;
     }
 
 }
