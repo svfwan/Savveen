@@ -36,6 +36,10 @@ class businessLogic
             case 'checkStock':
                 $res = $this -> dh ->checkStock($param); 
                 break; 
+
+            case 'reduceStock';
+                $res = $this -> dh -> reduceStock($param);
+                break; 
     
 
         }
