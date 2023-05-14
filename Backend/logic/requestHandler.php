@@ -21,7 +21,6 @@ switch ($requestType) {
 $logic = new businessLogic();
 $result = $logic->handleRequest($method, $param);
 
-
 if ($result == null) {
     response('GET', 400, null);
 } else {
