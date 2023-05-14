@@ -15,15 +15,15 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Savveen</a>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                 <button id="profileAction" class="btn me-md-2" type="button">
                     <img src="res/icons/person.svg">
                     <span id="usernameDisplay" class="m-0"></span>
                 </button>
                 <button id="showCart" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" class="btn me-md-2" type="button"
-                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                     <img src="res/icons/bag.svg">
+                    <span id="cartCounter" class="m-0"></span>
                 </button>
                 <button id="showOrders" class="btn me-md-2" type="button">
                     <img src="res/icons/box-seam.svg">
@@ -40,8 +40,7 @@
                     </ul>
                 </div>
                 <button id="showInfo" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasLeft" aria-controls="offcanvasLeft" class="btn me-md-2" type="button"
-                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasLeft" aria-controls="offcanvasLeft">
+                    data-bs-target="#offcanvasLeft" aria-controls="offcanvasLeft">
                     <img src="res/icons/info-circle.svg">
                 </button>
                 <button id="logoutButton" class="btn me-md-2" type="button">
@@ -72,7 +71,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
+            <div id="cartMessages"></div>
             <div id="userCart">
+            </div>
+            <div class="container-fluid">
+                <button class="btn btn-success" id="orderCart" type="button">Bestellen</button>
             </div>
         </div>
     </div>
@@ -190,6 +193,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="js/index.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/order.js"></script>
 </body>
 
 </html>
