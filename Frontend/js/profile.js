@@ -184,6 +184,7 @@ $(document).ready(function () {
         // default state - not logged in users
         $('#usernameDisplay').text('');
         $('#usernameDisplay').hide();
+        $('#showCart').show();
         $('#showOrders').hide();
         $('#showAdminAction').hide();
         $('#logoutButton').hide();
@@ -202,6 +203,7 @@ $(document).ready(function () {
             }
         }
     }
+
 
 
     function validateInput(input) {

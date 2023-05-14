@@ -16,8 +16,9 @@ body {
 /* Navbar */
 
 .navbar {
-    background-color: #006837;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #006837;
+    /* Set the font color to #006837 (dark green) */
 }
 
 .navbar-brand {
@@ -27,26 +28,27 @@ body {
 }
 
 .navbar-brand:hover {
-    color: #ccc;
+    color: #006837;
+    /* Keep the same font color on hover */
 }
 
 .navbar .btn {
     font-size: 16px;
     font-weight: bold;
-    color: #fff;
+    color: #006837;
     padding: 6px 12px;
     background-color: transparent;
     border: none;
-    transition: color 0.3s;
 }
 
 .navbar .btn:hover {
-    color: #ccc;
+    color: #006837;
+    /* Keep the same font color on hover */
 }
 
 .navbar .btn span {
-    color: initial;
-    transition: none;
+    color: #006837;
+    /* Set the font color to #006837 (dark green) */
 }
 
 .navbar img {
