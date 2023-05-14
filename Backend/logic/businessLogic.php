@@ -1,4 +1,5 @@
 <?php
+include('../config/dbaccess.php');
 include('../config/dataHandler.php');
 class businessLogic
 {
@@ -13,10 +14,13 @@ class businessLogic
         $this->uh = new utilityHandler();
 
         also consider session/cookie handling (see input in group-chat)
+
+        what about db_obj->close(); -> where to put it?
     */
 
     function handleRequest($method, $param)
     {
+        $res = array();
         switch ($method) {
             case 'registerUser':
                 $res = $this->dh->registerUser($param);
@@ -28,7 +32,12 @@ class businessLogic
             case 'getSessionInfo':
                 $res = $this->dh->getSessionInfo();
                 break;
-
+            case 'logoutUser':
+                $res = $this->dh->logoutUser();
+                break;
+            default:
+                $res = null;
+                break;
             case 'loadAllProducts':
                 $res = $this->dh->loadAllProducts();
                 break;
@@ -40,8 +49,6 @@ class businessLogic
             case 'reduceStock';
                 $res = $this -> dh -> reduceStock($param);
                 break; 
-    
-
         }
         return $res;
     }

@@ -10,26 +10,41 @@
 </head>
 
 <body>
-    <div id="content">
-        <div id="login-form" class="container">
-            <div class="form-group">
-                <label for="username">Username: </label>
-                <input type="text" id="username" class="form-control" name="username" placeholder="Benutzername"
-                    required>
-            </div>
-            <div class="form-group">
-                <label for="password">Passwort: </label>
-                <input type="password" id="password" class="form-control" name="password" placeholder="Passwort"
-                    required>
-            </div>
-            <div class="form-check">
-                <label class="form-check-label" for="remember_me">
-                    Login merken
-                </label>
-                <input id="remember_login" type="checkbox" class="form-check-input" name="remember_me">
-            </div>
-            <div class="form-group mt-2">
-                <button id="loginbutton" type="button" class="btn btn-primary" name="Anmelden">Anmelden</button>
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Login</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="message-container"></div>
+                    <div id="loginForm" class="container">
+                        <div class="form-group">
+                            <label for="username">Username: </label>
+                            <input type="text" id="username" class="form-control" name="username"
+                                placeholder="Benutzername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Passwort: </label>
+                            <input type="password" id="password" class="form-control" name="password"
+                                placeholder="Passwort" required>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="remember_me">
+                                Login merken
+                            </label>
+                            <input id="remember_login" type="checkbox" class="form-check-input" name="remember_me">
+                        </div>
+                        <div class="form-group">
+                            <a href="#" id="openRegisterModal">Sie haben noch kein Konto? Registrieren Sie sich
+                                hier!</a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="loginButton" type="button" class="btn btn-primary" name="Anmelden">Anmelden</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
