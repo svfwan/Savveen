@@ -40,13 +40,6 @@ $(document).ready(function () {
 
     // helper functions
 
-    function getCookie(name) {
-        const value = '; ' + document.cookie;
-        const parts = value.split('; ' + name + '=');
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    }
-
     function updateCartStatus() {
         let cart = sessionStorage.getItem("myCart") ? JSON.parse(sessionStorage.getItem("myCart")) : false;
 

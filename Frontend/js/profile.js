@@ -180,13 +180,6 @@ $(document).ready(function () {
 
     // helper functions
 
-    function getCookie(name) {
-        const value = '; ' + document.cookie;
-        const parts = value.split('; ' + name + '=');
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    }
-
     function updateNavbar(isLoggedIn, username, isAdmin) {
         // default state - not logged in users
         $('#usernameDisplay').text('');
