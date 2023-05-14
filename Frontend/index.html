@@ -18,6 +18,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button id="profileAction" class="btn me-md-2" type="button">
                     <img src="res/icons/person.svg">
+                    <span id="usernameDisplay" class="m-0"></span>
                 </button>
                 <button id="showCart" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" class="btn me-md-2" type="button"
@@ -35,6 +36,7 @@
                     <ul class="dropdown-menu dropdown-menu-lg-end">
                         <li><button id="showProfileManagement" class="btn dropdown-item">Kundenverwaltung</button></li>
                         <li><button id="showProductManagement" class="btn dropdown-item">Produktverwaltung</button></li>
+                        <li><button id="showOrderManagement" class="btn dropdown-item">Bestellverwaltung</button></li>
                     </ul>
                 </div>
                 <button id="showInfo" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
@@ -70,7 +72,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div id="userCart"></div>
+            <div id="userCart">
+            </div>
         </div>
     </div>
 

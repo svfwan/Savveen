@@ -189,18 +189,23 @@ $(document).ready(function () {
 
     function updateNavbar(isLoggedIn, username, isAdmin) {
         // default state - not logged in users
+        $('#usernameDisplay').text('');
+        $('#usernameDisplay').hide();
         $('#showOrders').hide();
         $('#showAdminAction').hide();
         $('#logoutButton').hide();
 
         // if a user is logged in
         if (isLoggedIn) {
-            $('#showOrders').show();  // show orders
+            $('#usernameDisplay').text(username);
+            $('#usernameDisplay').show();
             $('#logoutButton').show();  // show logout button
-
             // if the logged in user is admin
             if (isAdmin) {
+                $('#showCart').hide();
                 $('#showAdminAction').show();  // show admin dashboard
+            } else {
+                $('#showOrders').show();  // show orders
             }
         }
     }
