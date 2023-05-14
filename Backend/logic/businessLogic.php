@@ -38,6 +38,17 @@ class businessLogic
             default:
                 $res = null;
                 break;
+            case 'loadAllProducts':
+                $res = $this->dh->loadAllProducts();
+                break;
+
+            case 'checkStock':
+                $res = $this -> dh ->checkStock($param); 
+                break; 
+
+            case 'reduceStock';
+                $res = $this -> dh -> reduceStock($param);
+                break; 
         }
         return $res;
     }
