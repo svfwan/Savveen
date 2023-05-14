@@ -309,6 +309,7 @@ function addExistingItem(data){
     bewertung: data.bewertung,
     cat: data.cat
     
+    
   });
 
  // console.log("MyCart gepushed");
