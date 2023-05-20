@@ -1,4 +1,3 @@
- 
 //wenn Seite fertig geladen, alle Produkte anzeigen:
 $(document).ready(function () {
   let storedCart = JSON.parse(sessionStorage.getItem("myCart"));

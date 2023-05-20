@@ -1,4 +1,202 @@
-  #offcanvasRight {
+#offcanvasRight {
     overflow: auto;
     /* Weitere CSS-Stile für das offcanvasRight-Div */
-  }
+}
+/* General Styles */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar */
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #006837;
+    /* Set the font color to #006837 (dark green) */
+}
+
+#navbarLogo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #006837 !important;
+}
+
+.navbar-brand:hover {
+    color: #006837;
+    /* Keep the same font color on hover */
+}
+
+.navbar .btn {
+    font-size: 16px;
+    font-weight: bold;
+    color: #006837;
+    padding: 6px 12px;
+    background-color: transparent;
+    border: none;
+}
+
+.navbar .btn:hover {
+    color: #006837;
+    /* Keep the same font color on hover */
+}
+
+.navbar .btn span {
+    color: #006837;
+    /* Set the font color to #006837 (dark green) */
+}
+
+.navbar img {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+}
+
+/* Offcanvas */
+
+.offcanvas-header {
+    background-color: #006837;
+}
+
+.offcanvas-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.offcanvas-body {
+    background-color: #fff;
+    padding: 20px;
+}
+
+.offcanvas-body h2,
+.offcanvas-body h3,
+.offcanvas-body h5 {
+    color: #333;
+}
+
+.offcanvas-body p {
+    color: #666;
+}
+
+.offcanvas .btn-success {
+    background-color: #006837;
+    color: #fff;
+}
+
+.offcanvas .btn-success:hover {
+    background-color: #005a2d;
+}
+
+/* General Alert Container */
+
+#alertContent {
+    margin-top: 20px;
+}
+
+.alert {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* General Main Container */
+
+#mainView {}
+
+/* Info Offcanvas */
+
+#infoCanvas {
+    margin-top: 20px;
+}
+
+#infoCanvas h3 {
+    margin-top: 40px;
+}
+
+/* Footer */
+
+footer {
+    background-color: #006837;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Styling for Register Modal */
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #006837;
+    color: #fff;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.modal-body {
+    background-color: #f2f2f2;
+}
+
+.modal-footer {
+    background-color: #f2f2f2;
+}
+
+/* Styling for Login Modal */
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #006837;
+    color: #fff;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.modal-body {
+    background-color: #f2f2f2;
+}
+
+.modal-footer {
+    background-color: #f2f2f2;
+}
+
+/* Additional Styles for Savveen */
+
+/* Customize as needed to match the design of Savveen webshop */
+
+/* Example styles for product cards */

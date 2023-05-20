@@ -41,18 +41,18 @@ class businessLogic
             case 'loadAllProducts':
                 $res = $this->dh->loadAllProducts();
                 break;
-
             case 'checkStock':
-                $res = $this -> dh ->checkStock($param); 
-                break; 
-
+                $res = $this->dh->checkStock($param);
+                break;
             case 'reduceStock':
                 $res = $this -> dh -> reduceStock($param);
                 break; 
-
             case 'filterConSearch':
                 $res = $this -> dh -> filterConSearch($param);
                 break; 
+            case 'reduceStock';
+                $res = $this->dh->reduceStock($param);
+                break;
         }
         return $res;
     }
