@@ -1,24 +1,17 @@
 $(document).ready(function () {
+
   /*
-note for self/team:
- - dynamic loading of pages getting messy
- - script getting long
- - navbar logic getting complicated
- - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
-
-possible solution:
-- keep navbar same everywhere -> find way to keep navbar but change page below maybe
-- seperate scripts i.e. register.js, login.js
-- keep common functionality in script.js
-- move to MPA, but dynamic loading of content still via scripts
-- create seperate columns/divs in index.html for components such as login
--> then load those or hide them -> more SPA-affirm --> see modals, icons in nav etc
-
-further issues/ideas/solutions:
-- ...
-*/
-
-
+    possible solution:
+    - 
+  
+    further issues/ideas/solutions:
+    - products view not done yet,
+    - products not loaded correctly
+    - pictures should be loaded from frontend folder img/ not backend folder productpictures
+    - when products are added to the cart, they are added to the wrong, offCanvas div element
+    - cartCounter needs to be updated once items are added and removed from offCanvas view as well
+    - only use jQuery when necessary
+  */
 
 });
 

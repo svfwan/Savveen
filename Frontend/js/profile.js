@@ -6,10 +6,10 @@ $(document).ready(function () {
         let isLoggedIn = !!getCookie('username');
         // Define the file path and modal ID based on the login status
         var filePath = isLoggedIn ? 'sites/profile.html' : 'sites/login.html';
-        var modalId = isLoggedIn ? '#profileModal' : '#loginModal';
+        var modalID = isLoggedIn ? '#profileModal' : '#loginModal';
         // Load the content of the specified file into the modal placeholder and show the modal
         $('#modal-placeholder').load(filePath, function () {
-            $(modalId).modal('show');
+            $(modalID).modal('show');
         });
     });
 
@@ -88,6 +88,13 @@ $(document).ready(function () {
                     let username = getCookie('username');
                     let isAdmin = response.status === 'loggedInAdmin';
                     updateNavbar(true, username, isAdmin);
+                    if (isAdmin) {
+                        $('#productFilter').hide();
+                        $('#mainView').load('sites/dashboard.html #adminDashboard');
+                    } else {
+                        // Load the default content for non-admin users
+                        $('#mainView').empty();
+                    }
                 } else {
                     updateNavbar(false, '', false);
                     $('#mainView').empty();
@@ -187,21 +194,20 @@ $(document).ready(function () {
         $('#usernameDisplay').hide();
         $('#showCart').show();
         $('#showOrders').hide();
-        $('#showAdminAction').hide();
+        $('#showAdminDashboard').hide();
         $('#logoutButton').hide();
 
         // if a user is logged in
         if (isLoggedIn) {
             $('#usernameDisplay').text(username);
             $('#usernameDisplay').show();
-            $('#logoutButton').show();  // show logout button
+            $('#logoutButton').show(); // show logout button
             // if the logged in user is admin
             if (isAdmin) {
                 $('#showCart').hide();
-                $('#showAdminAction').show();  // show admin dashboard
-                $('#mainView').load('sites/dashboard.html #adminDashboard'); // Load the adminDashboard div from dashboard.html into the mainView section
+                $('#showAdminDashboard').show(); // show admin dashboard
             } else {
-                $('#showOrders').show();  // show orders
+                $('#showOrders').show(); // show orders
             }
         }
     }

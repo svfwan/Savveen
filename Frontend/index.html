@@ -29,17 +29,9 @@
                 <button id="showOrders" class="btn me-md-2" type="button">
                     <img src="res/icons/box-seam.svg">
                 </button>
-                <div id="showAdminAction" class="dropdown">
-                    <button class="btn me-md-2 dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <img src="res/icons/gear.svg">
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-lg-end">
-                        <li><button id="showProfileManagement" class="btn dropdown-item">Kundenverwaltung</button></li>
-                        <li><button id="showProductManagement" class="btn dropdown-item">Produktverwaltung</button></li>
-                        <li><button id="showOrderManagement" class="btn dropdown-item">Bestellverwaltung</button></li>
-                    </ul>
-                </div>
+                <button id="showAdminDashboard" class="btn me-md-2" type="button">
+                    <img src="res/icons/gear.svg">
+                </button>
                 <button id="showInfo" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasLeft" aria-controls="offcanvasLeft">
                     <img src="res/icons/info-circle.svg">
@@ -63,14 +55,26 @@
         </div>
     </div>
 
+    <!-- Produkt Filter Container -->
+    <div id="productFilter" class="container mt-1">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="input-group mb-3">
+                    <select id="category" class="form-select">
+                        <option value="" selected>Alle Kategorien</option>
+                        <option value="Skincare">Skincare</option>
+                        <option value="Make-Up">Make-Up</option>
+                        <option value="Parfüm">Parfüm</option>
+                    </select>
+                    <button type="button" id="filterCategory" class="btn btn-success">Filtern</button>
+                    <input type="text" id="searchTerm" class="form-control" placeholder="Suchfeld">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!--  General Main Container Alle Produkte hier anzeigen  -->
-
-    <!-- filtern-->
-    <select id="Kategorie">Kategorie</select>
-    <div id="prod"></div>
     <div id="mainView"></div>
-
 
     <!--  OffCanvas for Shopping Cart  -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -86,7 +90,6 @@
         <div class="container-fluid">
             <button class="btn btn-success" id="orderCart" type="button">Bestellen</button>
         </div>
-    </div>
     </div>
 
     <!--  OffCanvas for Help & Imprint  -->
@@ -204,6 +207,7 @@
     <script src="js/profile.js"></script>
     <script src="js/products_script.js"></script>
     <script src="js/order.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 
 </html>

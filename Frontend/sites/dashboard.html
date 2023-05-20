@@ -16,21 +16,24 @@
                 <div class="card-body">
                     <h5 class="card-title">Kundenverwaltung</h5>
                     <p class="card-text">Kundenprofile und Informationen verwalten.</p>
-                    <button type="button" class="btn btn-success">Zur Kundenverwaltung</button>
+                    <button type="button" id="showProfileManagement" class="btn btn-success">Zur
+                        Kundenverwaltung</button>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Produktverwaltung</h5>
                     <p class="card-text">Produkte, Bestände und Preise verwalten.</p>
-                    <button type="button" class="btn btn-success">Zur Produktverwaltung</button>
+                    <button type="button" id="showProductManagement" class="btn btn-success">Zur
+                        Produktverwaltung</button>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Bestellverwaltung</h5>
                     <p class="card-text">Kundenbestellungen verwalten und bearbeiten.</p>
-                    <button type="button" class="btn btn-success">Zur Bestellverwaltung</button>
+                    <button type="button" id="showOrderManagement" class="btn btn-success">Zur
+                        Bestellverwaltung</button>
                 </div>
             </div>
         </div>
@@ -41,8 +44,36 @@
     </div>
 
     <div id="productManagement" class="container">
-
-
+        <h2>Produktverwaltung</h2>
+        <div class="form-group">
+            <label for="category">Kategorie:</label>
+            <select id="category" class="form-control">
+                <option value="Skincare">Skincare</option>
+                <option value="Make-Up">Make-Up</option>
+                <option value="Parfüm">Parfüm</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="productName">Name:</label>
+            <input type="text" id="productName" class="form-control" placeholder="Produktname">
+        </div>
+        <div class="form-group">
+            <label for="price">Preis:</label>
+            <input type="number" id="price" class="form-control" placeholder="Produktpreis">
+        </div>
+        <div class="form-group">
+            <label for="stock">Lagerbestand:</label>
+            <input type="number" id="stock" class="form-control" placeholder="Produktlagerbestand">
+        </div>
+        <div class="form-group">
+            <label for="description">Beschreibung:</label>
+            <textarea id="description" class="form-control" placeholder="Enter product description"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="picture">Bild hochladen:</label>
+            <input type="file" id="picture" class="form-control" accept="image/jpeg, image/png, image/gif">
+        </div>
+        <button type="button" class="btn btn-primary">Produkt hinzufügen</button>
     </div>
 
     <div id="orderManagement" class="container">

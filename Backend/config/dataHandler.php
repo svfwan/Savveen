@@ -212,7 +212,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung` FROM `products`");
+        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
         $sql->execute();
         $result = $sql->get_result();
 
@@ -235,7 +235,7 @@ class dataHandler
         // $tab = []; // Initialisiere das Array
         $tab = array();
 
-        $n = $param['Name'];
+        $n = $param['name'];
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
@@ -245,7 +245,7 @@ class dataHandler
 
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
+        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `name` = ? ");
         $sql->bind_param('s', $n);
         //  echo "Datenbank: ". $param['Name'];
         $sql->execute();
@@ -278,7 +278,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("UPDATE `products` SET `stock` = ?  WHERE `Name` = ? ");
+        $sql = $this->db_obj->prepare("UPDATE `products` SET `bestand` = ?  WHERE `name` = ? ");
         $sql->bind_param('is', $s, $n);
         //  echo "Datenbank: ". $param['Name']  
 
@@ -311,7 +311,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung` FROM `products`");
+        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
         $sql->execute();
         $result = $sql->get_result();
 
