@@ -92,6 +92,7 @@ class dataHandler
         $result = array();
         $username = $param['username'];
         $password = $param['password'];
+        $active = 1;
 
         // need to add validation of input still
 
@@ -99,9 +100,9 @@ class dataHandler
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
         }
 
-        $sql = 'SELECT `username`, `passwort`, `admin` FROM `users` WHERE `username` = ? LIMIT 1';
+        $sql = 'SELECT `username`, `passwort`, `admin` FROM `users` WHERE `username` = ? AND `active` = ? LIMIT 1';
         $stmt = $this->db_obj->prepare($sql);
-        $stmt->bind_param('s', $username);
+        $stmt->bind_param('si', $username, $active);
 
         if ($stmt->execute()) {
             $user = $stmt->get_result();
@@ -129,7 +130,7 @@ class dataHandler
                     $result['error'] = 'Falsches Passwort!';
                 }
             } else {
-                $result['error'] = 'Benutzername nicht gefunden!';
+                $result['error'] = 'Benutzername nicht gefunden bzw. inaktiv!';
             }
         } else {
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
