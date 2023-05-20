@@ -21,10 +21,10 @@ body {
     /* Set the font color to #006837 (dark green) */
 }
 
-.navbar-brand {
+#navbarLogo {
     font-size: 24px;
     font-weight: bold;
-    color: #006837;
+    color: #006837 !important;
 }
 
 .navbar-brand:hover {
