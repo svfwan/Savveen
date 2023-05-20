@@ -1,3 +1,7 @@
+#offcanvasRight {
+    overflow: auto;
+    /* Weitere CSS-Stile für das offcanvasRight-Div */
+}
 /* General Styles */
 
 body {
