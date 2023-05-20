@@ -295,4 +295,43 @@ class dataHandler
              return $tab;
     }
 
+    //nach Buchstaben filtern 
+    function filterConSearch($param){
+
+        $tab = array(); 
+        $full = array(); 
+
+         $a = $param['letter']; 
+
+         //verbindung zur db prüfen
+         if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+          // Führe die SQL-Abfrage aus
+          $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung` FROM `products`");
+          $sql->execute();
+          $result = $sql->get_result();
+  
+          // Füge die Ergebnisse in das Array ein
+          while ($row = $result->fetch_assoc()) {
+            if(strpos($row['Name'], $a) !== false){ //wenn name buchstaben enthälten
+              array_push($tab, $row);
+            }
+            array_push($full,$row); 
+          }
+  
+          // Schließe die Verbindung und gib das Array zurück
+          $sql->close();
+         if (count($tab) == 0){
+            return $full; 
+         }
+          return $tab;
+
+
+
+    }
+
+
 }
