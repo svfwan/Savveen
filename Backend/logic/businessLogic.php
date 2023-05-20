@@ -1,4 +1,5 @@
 <?php
+include('../config/dbaccess.php');
 include('../config/dataHandler.php');
 class businessLogic
 {
@@ -36,6 +37,17 @@ class businessLogic
                 break;
             default:
                 $res = null;
+                break;
+            case 'loadAllProducts':
+                $res = $this->dh->loadAllProducts();
+                break;
+
+            case 'checkStock':
+                $res = $this->dh->checkStock($param);
+                break;
+
+            case 'reduceStock';
+                $res = $this->dh->reduceStock($param);
                 break;
         }
         return $res;

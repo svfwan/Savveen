@@ -6,53 +6,55 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Savveen</title>
+    <link rel="stylesheet" href="res/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous" />
 </head>
 
 <body>
+    <!--  Navbar  -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="index.html" id="home">Savveen</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item public-nav">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#registerModal">Registrierung</button>
-                    </li>
-                    <li class="nav-item public-nav">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#loginModal">Login</button>
-                    </li>
-                    <li class="nav-item user-nav" style="display: none;">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#profileModal">Profile</button>
-                    </li>
-                    <li class="nav-item user-nav admin-nav" style="display: none;">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#dashboardModal">Admin Dashboard</button>
-                    </li>
-                    <li class="nav-item user-nav" style="display: none;">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#productsModal">Products</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#helpModal">Help</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link btn btn-link" type="button" data-bs-toggle="modal"
-                            data-bs-target="#imprintModal">Imprint</button>
-                    </li>
-                </ul>
+            <a id="navbarLogo" class="navbar-brand" href="">Savveen</a>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                <button id="profileAction" class="btn me-md-2" type="button">
+                    <img src="res/icons/person.svg">
+                    <span id="usernameDisplay" class="m-0"></span>
+                </button>
+                <button id="showCart" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                    <img src="res/icons/bag.svg">
+                    <span id="cartCounter" class="m-0"></span>
+                </button>
+                <button id="showOrders" class="btn me-md-2" type="button">
+                    <img src="res/icons/box-seam.svg">
+                </button>
+                <div id="showAdminAction" class="dropdown">
+                    <button class="btn me-md-2 dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <img src="res/icons/gear.svg">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-lg-end">
+                        <li><button id="showProfileManagement" class="btn dropdown-item">Kundenverwaltung</button></li>
+                        <li><button id="showProductManagement" class="btn dropdown-item">Produktverwaltung</button></li>
+                        <li><button id="showOrderManagement" class="btn dropdown-item">Bestellverwaltung</button></li>
+                    </ul>
+                </div>
+                <button id="showInfo" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasLeft" aria-controls="offcanvasLeft">
+                    <img src="res/icons/info-circle.svg">
+                </button>
+                <button id="logoutButton" class="btn me-md-2" type="button">
+                    <img src="res/icons/box-arrow-right.svg">
+                </button>
             </div>
         </div>
     </nav>
 
+    <!--  Modal Placeholder  -->
+    <div id="modal-placeholder"></div>
+
+    <!--  General Alert Container  -->
     <div class="container">
         <div class="row justify-content-md-center">
             <div id="alertContent" class="col-sm">
@@ -60,17 +62,139 @@
         </div>
     </div>
 
-    <div id="content">
-        <div>
-            Index
+    <!--  General Main Container  -->
+    <div id="mainView"></div>
+
+    <!--  OffCanvas for Shopping Cart  -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Warenkorb</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="cartMessages"></div>
+            <div id="userCart">
+            </div>
+            <div class="container-fluid">
+                <button class="btn btn-success" id="orderCart" type="button">Bestellen</button>
+            </div>
         </div>
     </div>
+
+    <!--  OffCanvas for Help & Imprint  -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasLeft" aria-labelledby="offcanvasLeftLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasLeftLabel">Hilfe & Impressum</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="infoCanvas">
+                <h5>Über den Webshop</h5>
+                <p>Savveen ist der Webshop, der im Rahmen des Webentwicklungsprojekts von Maria Mirnic, Nazia Nazari und
+                    Safwan Zullash erstellt wurde.</p>
+
+                <h3>Hilfe</h3>
+                <h5>FAQ</h5>
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                Was unterscheidet Savveen von anderen Kosmetik-Webshops?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Savveen ist mehr als nur ein Kosmetik-Webshop. Wir sind eine feministische
+                                Marke, die sich der Stärkung von Frauen und Mädchen widmet. Unsere Produkte stehen für
+                                Selbstliebe und wir lehnen die Schönheitsindustrie ab, die uns vorschreiben will, wie
+                                unser Körper auszusehen hat. Zudem verwenden wir leistungsstarke, natürliche
+                                Inhaltsstoffe und unterstützen Gemeinden weltweit durch unser
+                                Community-Fair-Trade-Programm.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Woher bezieht Savveen seine Inhaltsstoffe?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Bei Savveen suchen wir auf der ganzen Welt nach den besten Inhaltsstoffen für
+                                unsere Produkte. Wir beziehen unsere Inhaltsstoffe von Tausenden von Produzenten und
+                                Handwerkern durch unser Community-Fair-Trade-Programm, das Gemeinden weltweit
+                                unterstützt.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Sind die Produkte von Savveen tierversuchsfrei?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Ja, bei Savveen kämpfen wir seit der ersten Stunde gegen Tierversuche. Unsere
+                                Produkte sind tierversuchsfrei und wir engagieren uns leidenschaftlich für die
+                                Entwicklung vegetarischer Produkte, die nie an Tieren getestet wurden und werden.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Für den Inhalt verantwortlich</h3>
+                <p>
+                    <strong>Savveen Kosmetikprodukte</strong><br>
+                    Savveen GmbH &amp; Co KG<br>
+                    FN 123456i<br>
+                    Handelsgericht Wien<br>
+                    Beispielstraße 123<br>
+                    A-1100 Wien<br>
+                </p>
+                <p>
+                    Wirtschaftskammer Wien<br>
+                    UID: ATU10336663<br>
+                </p>
+                <p>
+                    Tel.: +43 1 234 567<br>
+                    Email: <a href="mailto:info@savveen.at"
+                        title="E-Mail an Savveen Kosmetikprodukte">info@savveen.at</a>
+                </p>
+
+                <h3>Teammitglieder</h3>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h5>Maria Mirnic</h5>
+                        <p>Rolle: Webentwicklerin</p>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>Nazia Nazari</h5>
+                        <p>Rolle: UX-Designerin</p>
+                    </div>
+                    <div class="col-sm-4">
+                        <h5>Safwan Zullash</h5>
+                        <p>Rolle: Projektmanager</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/order.js"></script>
 </body>
 
 </html>
