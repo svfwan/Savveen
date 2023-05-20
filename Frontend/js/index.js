@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  
     /*
     note for self/team:
      - dynamic loading of pages getting messy

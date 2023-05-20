@@ -46,8 +46,12 @@ class businessLogic
                 $res = $this -> dh ->checkStock($param); 
                 break; 
 
-            case 'reduceStock';
+            case 'reduceStock':
                 $res = $this -> dh -> reduceStock($param);
+                break; 
+
+            case 'filterConSearch':
+                $res = $this -> dh -> filterConSearch($param);
                 break; 
         }
         return $res;
