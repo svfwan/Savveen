@@ -55,21 +55,22 @@
     <div id="modal-placeholder"></div>
 
     <!--  General Alert Container  -->
-    <div class="container">
+    <!-- General Alert Container -->
+    <div id="alertContainer" class="container d-none">
         <div class="row justify-content-md-center">
             <div id="alertContent" class="col-sm">
             </div>
         </div>
     </div>
 
+
     <!--  General Main Container Alle Produkte hier anzeigen  -->
 
-      <!-- filtern-->
+    <!-- filtern-->
+    <select id="Kategorie">Kategorie</select>
+    <div id="prod"></div>
+    <div id="mainView"></div>
 
-      <select id = "Kategorie">Kategorie</select>
-      <div id = "prod"></div>
-        <div id="mainView"></div>
-   
 
     <!--  OffCanvas for Shopping Cart  -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -79,12 +80,13 @@
         </div>
         <div class="offcanvas-body">
             <div id="cartMessages"></div>
-            <div id="userCart">
-            </div>
-            <div class="container-fluid">
-                <button class="btn btn-success" id="orderCart" type="button">Bestellen</button>
-            </div>
+            <div id="cartItems"></div>
+            <div id="cartTotal"></div>
         </div>
+        <div class="container-fluid">
+            <button class="btn btn-success" id="orderCart" type="button">Bestellen</button>
+        </div>
+    </div>
     </div>
 
     <!--  OffCanvas for Help & Imprint  -->

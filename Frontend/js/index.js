@@ -1,22 +1,24 @@
 $(document).ready(function () {
-      /*
-    note for self/team:
-     - dynamic loading of pages getting messy
-     - script getting long
-     - navbar logic getting complicated
-     - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
+  /*
+note for self/team:
+ - dynamic loading of pages getting messy
+ - script getting long
+ - navbar logic getting complicated
+ - when I log in content of login-form is saved and when I refresh because of local storage it gets loaded back in
 
-  possible solution:
-  - keep navbar same everywhere -> find way to keep navbar but change page below maybe
-  - seperate scripts i.e. register.js, login.js
-  - keep common functionality in script.js
-  - move to MPA, but dynamic loading of content still via scripts
-  - create seperate columns/divs in index.html for components such as login
-    -> then load those or hide them -> more SPA-affirm --> see modals, icons in nav etc
+possible solution:
+- keep navbar same everywhere -> find way to keep navbar but change page below maybe
+- seperate scripts i.e. register.js, login.js
+- keep common functionality in script.js
+- move to MPA, but dynamic loading of content still via scripts
+- create seperate columns/divs in index.html for components such as login
+-> then load those or hide them -> more SPA-affirm --> see modals, icons in nav etc
 
-  further issues/ideas/solutions:
-   - ...
+further issues/ideas/solutions:
+- ...
 */
+
+
 
 });
 
@@ -27,4 +29,30 @@ function getCookie(name) {
   const parts = value.split('; ' + name + '=');
   if (parts.length === 2) return parts.pop().split(';').shift();
   return null;
+}
+
+function showModalAlert(message, type) {
+  var alertClasses = {
+    'success': 'alert-success',
+    'info': 'alert-info',
+    'warning': 'alert-warning',
+    'danger': 'alert-danger'
+  };
+  var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
+  // Add the alert HTML to the message container
+  $('#message-container').html(alertHtml);
+}
+
+function showAlert(message, type) {
+  var alertClasses = {
+    'success': 'alert-success',
+    'info': 'alert-info',
+    'warning': 'alert-warning',
+    'danger': 'alert-danger'
+  };
+  var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
+  // Add the alert HTML to alertContent
+  $('#alertContent').html(alertHtml);
+  // Remove the d-none class from the alertContainer to show the alert
+  $('#alertContainer').removeClass('d-none');
 }

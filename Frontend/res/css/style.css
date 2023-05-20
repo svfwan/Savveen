@@ -1,7 +1,3 @@
-#offcanvasRight {
-    overflow: auto;
-    /* Weitere CSS-Stile für das offcanvasRight-Div */
-}
 /* General Styles */
 
 body {
@@ -193,6 +189,28 @@ footer {
 
 .modal-footer {
     background-color: #f2f2f2;
+}
+
+/* Additional Styles for Admin Dashboard */
+
+.card-deck {
+    margin-top: 20px;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #666;
 }
 
 /* Additional Styles for Savveen */

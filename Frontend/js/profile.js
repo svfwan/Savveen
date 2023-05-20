@@ -90,6 +90,7 @@ $(document).ready(function () {
                     updateNavbar(true, username, isAdmin);
                 } else {
                     updateNavbar(false, '', false);
+                    $('#mainView').empty();
                 }
             },
             error: function (error) {
@@ -198,13 +199,12 @@ $(document).ready(function () {
             if (isAdmin) {
                 $('#showCart').hide();
                 $('#showAdminAction').show();  // show admin dashboard
+                $('#mainView').load('sites/dashboard.html #adminDashboard'); // Load the adminDashboard div from dashboard.html into the mainView section
             } else {
                 $('#showOrders').show();  // show orders
             }
         }
     }
-
-
 
     function validateInput(input) {
         if (input.val().trim().length === 0) {
@@ -244,17 +244,4 @@ $(document).ready(function () {
 
         return isValid;
     }
-
-    function showModalAlert(message, type) {
-        var alertClasses = {
-            'success': 'alert-success',
-            'info': 'alert-info',
-            'warning': 'alert-warning',
-            'danger': 'alert-danger'
-        };
-        var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
-        // Add the alert HTML to the message container
-        $('#message-container').html(alertHtml);
-    }
-
 });
