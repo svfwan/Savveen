@@ -22,9 +22,9 @@ $(document).ready(function () {
             url: '../../Backend/logic/requestHandler.php',
             data: {
                 method: 'processOrder',
-                param: JSON.stringify({
+                param: {
 
-                })
+                }
             },
             dataType: 'json',
             success: function (response) {

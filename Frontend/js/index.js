@@ -43,9 +43,18 @@ function showAlert(message, type) {
     'warning': 'alert-warning',
     'danger': 'alert-danger'
   };
-  var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
+  var alertHtml = '<div class="alert ' + alertClasses[type] + ' alert-dismissible fade show" role="alert">' +
+    '<strong>' + message + '</strong>' +
+    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+    '</div>';
   // Add the alert HTML to alertContent
   $('#alertContent').html(alertHtml);
   // Remove the d-none class from the alertContainer to show the alert
   $('#alertContainer').removeClass('d-none');
+
+  // Handle the close button click event
+  $('#alertContainer .btn-close').on('click', function () {
+    // Add the d-none class to the alertContainer to hide it
+    $('#alertContainer').addClass('d-none');
+  });
 }

@@ -178,6 +178,31 @@ class dataHandler
         return $result;
     }
 
+    public function loadProductsForAdmin()
+    {
+        $result = array();
+
+        if (!$this->checkConnection()) {
+            $result['error'] = 'Produktkatalog kann nicht geladen werden, versuchen Sie es später erneut!';
+        }
+
+        $result['message'] = 'empty function';
+        return $result;
+    }
+
+    public function createProduct($param)
+    {
+        $result = array();
+
+        // Get the file extension
+        $fileExtension = pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION);
+
+        // Perform further processing with the file extension
+        $result['fileExt'] = $fileExtension;
+        $result['check'] = $param['category'];
+        return $result;
+    }
+
     // helper functions
 
     private function checkConnection()
@@ -317,7 +342,7 @@ class dataHandler
 
         // Füge die Ergebnisse in das Array ein
         while ($row = $result->fetch_assoc()) {
-            if (strpos($row['Name'], $a) !== false) { //wenn name buchstaben enthälten
+            if (strpos($row['name'], $a) !== false) { //wenn name buchstaben enthälten
                 array_push($tab, $row);
             }
             array_push($full, $row);

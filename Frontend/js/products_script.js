@@ -89,22 +89,29 @@ function displayCategory() {
   var selectedValue = $("#category").val();
   console.log("Kategorie: " + selectedValue);
 
-  let allProducts = $("#mainView").children(".row").children();
-  allProducts.hide();
+  $.ajax({
+    type: "GET",
+    url: "../Backend/logic/requestHandler.php",
+    data: {
+      method: "loadAllProducts",
+    },
+    dataType: "json",
+    success: function (data) {
+      let $row = $("<div class='row'></div>");
 
-  if (selectedValue === "") {
-    allProducts.show();
-  } else {
-    allProducts.each(function () {
-      console.log(this);
-      let productCategory = $(this).find(".card-title").text();
-      if (productCategory === selectedValue) {
-        $(this).show();
+      for (let i in data) {
+        let cur = data[i];
+        if (selectedValue === "" || cur.category === selectedValue) {
+          displayAll(cur, $row);
+          console.log("cur: " + cur);
+        }
       }
-    });
-  }
-
-  fillCart();
+      fillCart();
+    },
+    error: function (error) {
+      alert(error);
+    },
+  });
 }
 
 function displayAll(data, $row) {
@@ -125,15 +132,17 @@ function displayAll(data, $row) {
   `;
 
   let $product = $(productHTML);
-  $product.find(".add-to-cart-btn").on("click", function () {
-    addCart(data);
-  });
-
   $row.append($product);
+
   if ($row.children().length === 4) {
     $("#mainView").append($row);
     $row = $("<div class='row'></div>");
   }
+
+  // Event delegation for "Add to Cart" button
+  $row.on("click", ".add-to-cart-btn", function () {
+    addCart(data);
+  });
 }
 
 // Stock > 0?
