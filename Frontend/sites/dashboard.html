@@ -51,36 +51,39 @@
         </div>
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <div class="form-group">
-                    <label for="category">Kategorie:</label>
-                    <select id="categoryAdd" class="form-control">
-                        <option value="Skincare">Skincare</option>
-                        <option value="Make-Up">Make-Up</option>
-                        <option value="Parfüm">Parfüm</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="productNameAdd">Name:</label>
-                    <input type="text" id="productNameAdd" class="form-control" placeholder="Produktname">
-                </div>
-                <div class="form-group">
-                    <label for="priceAdd">Preis:</label>
-                    <input type="number" id="priceAdd" class="form-control" placeholder="Produktpreis">
-                </div>
-                <div class="form-group">
-                    <label for="stockAdd">Lagerbestand:</label>
-                    <input type="number" id="stockAdd" class="form-control" placeholder="Produktlagerbestand">
-                </div>
-                <div class="form-group">
-                    <label for="descriptionAdd">Beschreibung:</label>
-                    <textarea id="descriptionAdd" class="form-control"
-                        placeholder="Enter product description"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="pictureAdd">Bild hochladen:</label>
-                    <input type="file" id="pictureAdd" class="form-control" accept="image/jpeg, image/png, image/gif">
-                </div>
-                <button type="button" id="createProduct" class="btn btn-success">Produkt hinzufügen</button>
+                <form enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="category">Kategorie:</label>
+                        <select id="categoryAdd" class="form-control">
+                            <option value="Skincare">Skincare</option>
+                            <option value="Make-Up">Make-Up</option>
+                            <option value="Parfüm">Parfüm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productNameAdd">Name:</label>
+                        <input type="text" id="productNameAdd" class="form-control" placeholder="Produktname">
+                    </div>
+                    <div class="form-group">
+                        <label for="priceAdd">Preis:</label>
+                        <input type="number" id="priceAdd" class="form-control" placeholder="Produktpreis">
+                    </div>
+                    <div class="form-group">
+                        <label for="stockAdd">Lagerbestand:</label>
+                        <input type="number" id="stockAdd" class="form-control" placeholder="Produktlagerbestand">
+                    </div>
+                    <div class="form-group">
+                        <label for="descriptionAdd">Beschreibung:</label>
+                        <textarea id="descriptionAdd" class="form-control"
+                            placeholder="Enter product description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="pictureAdd">Bild hochladen:</label>
+                        <input type="file" id="pictureAdd" class="form-control"
+                            accept="image/jpeg, image/png, image/gif">
+                    </div>
+                    <button type="button" id="createProduct" class="btn btn-success">Produkt hinzufügen</button>
+                </form>
             </div>
         </div>
         <div class="row mt-2">
