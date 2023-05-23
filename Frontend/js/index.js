@@ -5,12 +5,8 @@ $(document).ready(function () {
     - 
   
     further issues/ideas/solutions:
-    - products view not done yet,
-    - products not loaded correctly
-    - pictures should be loaded from frontend folder img/ not backend folder productpictures
-    - when products are added to the cart, they are added to the wrong, offCanvas div element
-    - cartCounter needs to be updated once items are added and removed from offCanvas view as well
-    - only use jQuery when necessary
+    - when adding product to cart 6 items are added -> possible conflict because of button naming
+    - look into using more specific IDs and Classes for styling/jQuery referencing
   */
 
 });

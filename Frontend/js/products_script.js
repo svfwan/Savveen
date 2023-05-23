@@ -1,59 +1,64 @@
+//wenn Seite fertig geladen, alle Produkte anzeigen:
 $(document).ready(function () {
   let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
-  let length = 0;
 
+  //Anzahl der Produkte. soll neben dem warenkorb symbol sein -  
   if (storedCart && storedCart.length > 0) {
     for (let i = 0; i < storedCart.length; i++) {
-      length += storedCart[i].quant;
+      length = length + storedCart[i].quant;
     }
   }
 
-  updateCartCounter(length);
+  $("#userCart").text(length); //funktioniert nicht, anders umsetzen 
   $("#mainView").empty();
+  let $btn = $("<button>");
+  $btn.attr("id", "btn");
+  $btn.text("Search");
+  $("#prod").append($btn);
 
-  $("#filterCategory").on("click", function () {
-    displayCategory();
-  });
+  filterCategory();
+  //filter
+  ContinousSearch();
 
-  ContinuousSearch();
-
-  loadAllProducts();
-
-  fillCart();
-});
-
-function updateCartCounter(length) {
-  $("#cartCounter").text(length);
-}
-
-function loadAllProducts() {
+  //Daten aus Datenbank holen
   $.ajax({
     type: "GET",
     url: "../Backend/logic/requestHandler.php",
+    //cache: false,
     data: {
       method: "loadAllProducts",
     },
-    dataType: "json",
+    dataType: "json", //muss immer json sein
     success: function (data) {
-      let $row = $("<div class='row'></div>");
-
       for (let i in data) {
         let cur = data[i];
-        displayAll(cur, $row);
+        //console.log(data[i]);
+        displayAll(cur);
       }
-
-      fillCart();
     },
-    error: function (error) {
-      alert(error);
+    error: function (xhr, status, error) {
+      console.log("Ajax Call funktioniert nicht");
+      window.alert("Error: Seite kann nicht geladen werden");
     },
   });
-}
+}); //ende doc. load
 
-function ContinuousSearch() {
-  let $input = $("<input>").on("input", function (e) {
-    const value = e.target.value;
-    console.log(value);
+function ContinousSearch() {
+  let input = $("<input>");
+  $("#prod").append("<br>Filter: ");
+  $("#prod").append(input);
+  $("#prod").append("<br> <br>");
+
+  const i = document.querySelector("input");
+  const log = document.getElementById("prod");
+
+  i.addEventListener("input", updateValue);
+
+
+
+  function updateValue(e) {
+    console.log(e.target.value);
+    //ajax call - filterConSearch
 
     $.ajax({
       type: "GET",
@@ -61,114 +66,152 @@ function ContinuousSearch() {
       data: {
         method: "filterConSearch",
         param: JSON.stringify({
-          letter: value,
+          letter: e.target.value,
         }),
       },
-      dataType: "json",
+      dataType: "json", //muss immer json sein
       success: function (data) {
         console.log(data);
         $("#mainView").empty();
-        if (data.length === 0 && value !== "") {
+        if (data.length == 4 && e.target.value != "") { // bearbeiten
           window.alert("Keine Produkte gefunden");
+
         }
-        let $row = $("<div class='row'></div>");
+        //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
         for (let i in data) {
+
           console.log(data[i]);
-          displayAll(data[i], $row);
+          displayAll(data[i]);
         }
-        fillCart();
       },
       error: function (xhr, status, error) {
         console.log(xhr, status, error);
         window.alert("Error: Seite kann nicht geladen werden");
       },
     });
+    //ajax ende
+  }
+}
+
+
+
+
+function filterCategory() {
+  //Search Button
+
+  //Input Feld, um nach Kategorien zu filtern: 
+
+  var opt1 = $("<option>");
+  opt1.attr("value", "Skincare");
+  opt1.attr("text", "Skincare");
+  opt1.append("Skincare");
+  $("#Kategorie").append(opt1);
+
+  var opt2 = $("<option>");
+  opt2.attr("value", "MakeUp");
+  opt2.attr("text", "MakeUp");
+  opt2.append("MakeUp");
+  $("#Kategorie").append(opt2);
+
+  var opt3 = $("<option>");
+  opt3.attr("value", "Parfum");
+  opt3.attr("text", "Parfum");
+  opt3.append("Parfum");
+  $("#Kategorie").append(opt3);
+
+  $("#btn").on("click", function () {
+    displayCategory();
   });
 }
 
-function displayCategory() {
-  const selectedValue = $("#category").val();
+
+function displayCategory() { //onclick display category
+  //  console.log("Clicked");
+
+  // select the "Kategorie" element: funktioniert nicht
+  var selectedValue = $("#Kategorie").val(); // get the selected value
   console.log("Kategorie: " + selectedValue);
+  //Ajax call für bestimmte category
 
   $.ajax({
     type: "GET",
-    url: "../Backend/logic/requestHandler.php",
+    url: "../Backend/logic/requestHandler.php", //Das url soll von der index.html seite aus sein ? 
+    //cache: false,
     data: {
       method: "loadAllProducts",
     },
-    dataType: "json",
+    dataType: "json", //muss immer json sein
     success: function (data) {
-      let $row = $("<div class='row'></div>");
+      $("#mainView").empty();
+      console.log("mainView leer gemacht");
 
       for (let i in data) {
         let cur = data[i];
-        if (selectedValue === "" || cur.category === selectedValue) {
-          displayAll(cur, $row);
-          console.log("cur: " + cur);
+        if (cur.Category == selectedValue) {
+          console.log(data[i]);
+          displayAll(cur);
         }
       }
-      fillCart();
     },
-    error: function (error) {
-      alert(error);
+    error: function (xhr, status, error) {
+      console.log("Ajax Call funktioniert nicht");
+      // window.alert("Error: Seite kann nicht geladen werden");
+      console.log(xhr, status, error);
     },
   });
 }
 
-function displayAll(data, $row) {
-  let productHTML = `
-    <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="product card product-card">
-        <div class="card-img-container">
-          <div class="img-wrapper">
-            <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
-          </div>
-        </div>
-        <div class="card-body product-card-body">
-          <h5 class="card-title">${data.name}</h5>
-          <p class="card-text">Preis: ${data.preis}</p>
-          <p class="card-text">Bewertung: ${data.bewertung}/5</p>
-          <button class="btn btn-success add-to-cart-btn">In den Warenkorb hinzufügen</button>
-        </div>
-      </div>
-    </div>
-  `;
+function displayAll(data) {
 
-  let $product = $(productHTML);
-  $row.append($product);
-
-  if ($row.children().length === 4) {
-    $("#mainView").append($row);
-    $row = $("<div class='row'></div>");
-  }
-
-  $row.on("click", ".add-to-cart-btn", function (event) {
-    event.stopPropagation(); // Stop event propagation
+  //image erstellen pro file eintrag mit jquery.
+  // console.log("DisplayAll wird betreten"); 
+  let $cart = $("<button>");
+  //onclick -> addCart();
+  $cart.on("click", function () {
     addCart(data);
   });
+
+  $cart.append("In den Warenkorb hinzufügen  <br>");
+  let $product = $("<div>");
+  //$product.attr("id",idx);
+  $product.append($cart);
+  let $marker = $("<img>");
+  $marker.attr("src", "../Backend/productpictures/" + data.Name + ".jpg");
+  $product.append(" <br> Name: " + data.Name + "<br>");
+  $product.append("Preis: " + data.Price + "<br>");
+  $product.append("Bewertung: " + data.Bewertung + "/5 <br>");
+  $product.append($marker);
+  $("#mainView").append($product);
+  fillCart();
 }
 
-// Stock > 0?
+//Stcok > 0 ?
 function addCart(product) {
+
+  // console.log("ADDCART WIRD BETRETEN"); 
+
   $.ajax({
     type: "GET",
     url: "../Backend/logic/requestHandler.php",
     data: {
       method: "checkStock",
       param: JSON.stringify({
-        name: product.name,
+        Name: product.Name,
       }),
     },
-    dataType: "json",
+    dataType: "json", //muss immer json sein
     success: function (data) {
       console.log(data);
-      if (data && data.length > 0) {
-        const cur = data[0]; // Assuming the response contains a single item
-        console.log(cur);
-        if (cur.bestand > 0) {
+      //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
+      for (let i in data) {
+        let cur = data[i];
+        console.log(data[i]);
+        if (cur.stock > 0) {
           addItemtoCart(cur);
         } else {
-          window.alert("Dieses Produkt haben wir leider nicht mehr auf Lager");
+          window.alert(
+            "Dieses Produkt haben wir leider nicht mehr auf Lager"
+          );
         }
       }
     },
@@ -180,134 +223,177 @@ function addCart(product) {
 }
 
 function addItemtoCart(data) {
+
+  let cart = false;
+  let idx = 0;
+  let anzahl = 1;
+
   let myCart = [];
-  if (sessionStorage.getItem("myCart")) {
-    myCart = JSON.parse(sessionStorage.getItem("myCart"));
+  if (sessionStorage.getItem('myCart')) { //Wenn es in der Session schon ein myCart gibt
+    myCart = JSON.parse(sessionStorage.getItem('myCart'));
   }
 
-  let existingItem = myCart.find((item) => item.name === data.name);
+  //Produkt bereits im Warenkorb
+  for (let i = 0; i < myCart.length; i++) {
+    if (myCart[i].name == data.Name) {
+      console.log("Produkt bereits im Warenkorb");
+      cart = true;
+      idx = i;
+      anzahl = myCart[i].quant;
+      break;
+    }
+  }
 
-  if (existingItem) {
-    existingItem.quant += 1;
-  } else {
+  if (cart) {//cart = true
+    myCart[idx].quant = anzahl + 1;
+  }
+  else { //noch nicht im warenkorb:
     myCart.push({
-      name: data.name,
-      price: data.preis,
-      bewertung: data.bewertung,
-      cat: data.kategorie,
-      quant: 1,
+      name: data.Name,
+      price: data.Price,
+      bewertung: data.Bewertung,
+      cat: data.Category,
+      quant: anzahl,
     });
   }
 
+  //überprüfen
+  console.log(myCart);
+
+  //Warenkorb im Session Storage speichern.
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
 
-  let length = myCart.reduce((total, item) => total + item.quant, 0);
-  updateCartCounter(length);
+  let length = 0;
+  for (let i = 0; i < myCart.length; i++) {
+    length = myCart[i].quant + length;
+  }
+  $("#cartcounter").text(length);
 
-  // Update the cart items dynamically
-  updateCartItems(myCart);
+  fillCart();
+
+  //POST REQUEST: stock runtersetzen: unnötig, weil stock wird eh erst ab zahlung zurückgesetzt. 
+
+  /*  $.ajax({
+      type: 'POST',
+      url: "../../Backend/logic/requestHandler.php",
+      data: {
+        method: 'reduceStock',
+        param: JSON.stringify({
+          Name: data.Name,
+          Stock: data.stock,
+        })
+      },
+      dataType: 'json',
+      success: function (response) {
+       
+        console.log("Stock wurde reduziert ");
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr, status, error);
+      }
+    });
+    */
+  //Post ende
 }
 
-function updateCartItems(myCart) {
-  const $cartItems = $("#cartItems");
-  const $cartTotal = $("#cartTotal");
 
-  $cartItems.empty();
-  $cartTotal.empty();
 
-  if (myCart.length > 0) {
+//Warenkorb füllen
+function fillCart() {
+  $("#offcanvasRight").empty();
+
+  console.log("FILLCART");
+  //wenn das arr not null, dann warenkorb anzeigen 
+  if (sessionStorage.getItem('myCart')) {
+
+    let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
     let gesamtpreis = 0;
 
-    for (let i = 0; i < myCart.length; i++) {
-      const item = myCart[i];
+    //-- items erstellen
+    for (let i = 0; i < storedCart.length; i++) {
+      let $item = $("<div>");
+      let $marker = $("<img>");
+      $marker.attr("src", "../Backend/productpictures/" + storedCart[i].name + ".jpg");
 
-      const $item = $(`
-        <div class="list-group-item d-flex align-items-center">
-          <img src="../Frontend/res/img/${item.name}.jpg" alt="${item.name}" class="cart-item-img">
-          <div class="flex-grow-1">
-            <div>Name: ${item.name}</div>
-            <div>Preis: ${item.price}</div>
-            <div>Anzahl: ${item.quant}</div>
-            <div class="btn-group" role="group">
-              <button class="btn btn-danger remove-btn" data-item="${i}">-</button>
-              <button class="btn btn-success add-btn" data-item="${i}">+</button>
-            </div>
-          </div>
-        </div>
-      `);
-
-      $item.find(".remove-btn").on("click", function () {
-        removeItem(item);
+      $item.append("Anzahl: " + storedCart[i].quant);
+      //remove item
+      let $remove = $("<button>");
+      $remove.append("-");
+      $remove.on("click", function () {
+        removeItem(storedCart[i]);
       });
 
-      $item.find(".add-btn").on("click", function () {
-        addExistingItem(item);
+      //add item to cart:
+      let $add = $("<button>");
+      $add.append("+");
+      $add.on("click", function () {
+        addExistingItem(storedCart[i]);
       });
 
-      $cartItems.append($item);
+      $item.append($marker);
+      $item.append($remove);
+      $item.append($add);
+      $("#offcanvasRight").append("<br>");
+      $("#offcanvasRight").append($item);
 
-      gesamtpreis += item.price * item.quant;
+      let $li = $("<li>");
+      $li.attr("id", i);
+      ($li).append("Name: " + storedCart[i].name + "<br>");
+      ($li).append("Preis: " + storedCart[i].price * storedCart[i].quant + "<br>");
+      ($li).append("Bewertung: " + storedCart[i].bewertung + "/5 <br>");
+      $("#offcanvasRight").append($li);
+      gesamtpreis = gesamtpreis + storedCart[i].price * storedCart[i].quant;
     }
 
-    $cartTotal.html(`<div class="mt-3">Gesamtpreis: ${gesamtpreis}€</div>`);
-  } else {
-    $cartItems.html('<h2>Ihr Warenkorb ist leer</h2>');
-    $('#orderCart').hide();
+    $("#offcanvasRight").append("<br> Gesamtpreis: " + gesamtpreis + "€");
   }
+
 }
 
-function fillCart() {
-  const myCart = JSON.parse(sessionStorage.getItem("myCart"));
-
-  if (myCart && myCart.length > 0) {
-    updateCartItems(myCart);
-  } else {
-    $("#cartItems").html('<h2>Ihr Warenkorb ist leer</h2>');
-    $("#cartTotal").empty();
-    $("#orderCart").hide();
-  }
-}
-
+//removeitem
 function removeItem(data) {
-  let myCart = [];
-  if (sessionStorage.getItem("myCart")) {
-    myCart = JSON.parse(sessionStorage.getItem("myCart"));
-  }
 
+  // myArray.splice(2, 1); an der Position 2, 1 item entfernen
+  let myCart = [];
+  if (sessionStorage.getItem('myCart')) {
+    myCart = JSON.parse(sessionStorage.getItem('myCart'));
+  }
   for (let i = 0; i < myCart.length; i++) {
     if (myCart[i].name == data.name) {
       if (myCart[i].quant == 1) {
         myCart.splice(i, 1);
         break;
-      } else {
+      }
+      else {
         myCart[i].quant = myCart[i].quant - 1;
       }
     }
   }
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
 
-  let length = myCart.reduce((total, item) => total + item.quant, 0);
-  updateCartCounter(length);
+  $("#offcanvasRight").empty();
+  fillCart();
 
-  // Update the cart items dynamically
-  updateCartItems(myCart);
 }
 
+//anzahl erhöhen
 function addExistingItem(data) {
-  let myCart = [];
-  if (sessionStorage.getItem("myCart")) {
-    myCart = JSON.parse(sessionStorage.getItem("myCart"));
-  }
+
+  console.log("addExistingItem wird betreten");
+  $("#offcanvasRight").empty();
+
+  myCart = JSON.parse(sessionStorage.getItem('myCart'));
 
   for (let i = 0; i < myCart.length; i++) {
+
     if (myCart[i].name == data.name) {
+      console.log(" check ");
       myCart[i].quant = myCart[i].quant + 1;
       break;
     }
   }
 
+  //Warenkorb im Session Storage speichern.
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
-
-  // Update the cart items dynamically
-  updateCartItems(myCart);
+  fillCart();
 }
