@@ -1,11 +1,5 @@
 $(document).ready(function () {
 
-    updateCartStatus();
-
-    $(document).on('click', '#showCart', function () {
-        updateCartStatus();
-    });
-
     $(document).on('click', '#orderCart', function () {
         let isLoggedIn = !!getCookie('username');
         console.log('Bestellen...');
@@ -17,6 +11,11 @@ $(document).ready(function () {
             });
             return;
         }
+
+        // get username
+        // get all products from cart
+        // save in param and send to backend
+
         $.ajax({
             type: 'POST',
             url: '../../Backend/logic/requestHandler.php',
@@ -38,13 +37,4 @@ $(document).ready(function () {
         });
     });
 
-    // helper functions
-
-    function updateCartStatus() {
-        let cart = sessionStorage.getItem("myCart") ? JSON.parse(sessionStorage.getItem("myCart")) : false;
-        if (cart && cart.length >= 0) {
-            $('#cartMessages').empty();
-            $('#orderCart').show();
-        }
-    }
 });

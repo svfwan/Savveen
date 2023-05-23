@@ -10,7 +10,9 @@
 
 <body>
     <div id="adminDashboard" class="container">
-        <h1>Admin-Dashboard</h1>
+        <div class="text-center">
+            <h1>Admin-Dashboard</h1>
+        </div>
         <div class="card-deck">
             <div class="card">
                 <div class="card-body">
@@ -75,14 +77,17 @@
                     <div class="form-group">
                         <label for="descriptionAdd">Beschreibung:</label>
                         <textarea id="descriptionAdd" class="form-control"
-                            placeholder="Enter product description"></textarea>
+                            placeholder="Optionale Produktbeschreibung"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="pictureAdd">Bild hochladen:</label>
                         <input type="file" id="pictureAdd" class="form-control"
                             accept="image/jpeg, image/png, image/gif">
                     </div>
-                    <button type="button" id="createProduct" class="btn btn-success">Produkt hinzufügen</button>
+                    <div class="col-md-6 offset-md-3 text-center">
+                        <button type="button" id="createProduct" class="btn btn-success mt-2">Produkt
+                            hinzufügen</button>
+                    </div>
                 </form>
             </div>
         </div>

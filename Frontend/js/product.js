@@ -148,7 +148,6 @@ function displayAll(data, $row) {
     });
 }
 
-// Stock > 0?
 function addCart(product) {
     $.ajax({
         type: "GET",
@@ -250,6 +249,7 @@ function updateCartItems(myCart) {
         }
 
         $cartTotal.html(`<div class="mt-3">Gesamtpreis: ${gesamtpreis}€</div>`);
+        $('#orderCart').show();
     } else {
         $cartItems.html('<h2>Ihr Warenkorb ist leer</h2>');
         $('#orderCart').hide();
