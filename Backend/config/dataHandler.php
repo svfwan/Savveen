@@ -9,6 +9,11 @@ class dataHandler
         $this->db_obj = new mysqli($host, $user, $password, $database);
     }
 
+    public function __destruct()
+    {
+        $this->db_obj->close();
+    }
+
     public function registerUser($param)
     {
         $result = array();
@@ -193,19 +198,64 @@ class dataHandler
     public function createProduct($param)
     {
         $result = array();
+        $category = $param['category'];
+        $productName = $param['productName'];
+        $price = floatval($param['price']);
+        $stock = $param['stock'];
+        $description = $param['description'];
+        $picture = $_FILES['picture'];
+        $tmp_path = $picture['tmp_name'];
+        $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
-        $tmp_path = $param['picture']['tmp_name'];
-        $fileExtension = pathinfo($param['picture']['name'], PATHINFO_EXTENSION);
-        $filename = 'new_product.' . $fileExtension;
-        $actual_path = "C:/xampp/htdocs/WEB-SS2023/Savveen/Frontend/res/img/" . $filename;
-
-        if (move_uploaded_file($tmp_path, $actual_path)) {
-            $result['check'] = $param['picture'];
+        // Perform validation
+        if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
+            $result['error'] = 'Bitte füllen Sie alle Felder aus!';
+            return $result;
         }
 
+        if (!is_numeric($price) || !is_numeric($stock) || $price < 0 || $stock < 0) {
+            $result['error'] = 'Preis und Lagerbestand müssen valide Zahlen sein!';
+            return $result;
+        }
+
+        if (empty($picture) || !isset($picture)) {
+            $result['error'] = 'Bitte wählen Sie ein Bild für das Produkt aus!';
+            return $result;
+        }
+
+        // Check if file is an image
+        $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+        if (!in_array(strtolower($fileExtension), $allowedExtensions)) {
+            $result['error'] = 'Ungültige Dateierweiterung! Nur JPG, JPEG, PNG und GIF sind erlaubt.';
+            return $result;
+        }
+
+        // Process the file upload
+        $filename = $productName . '.jpg';
+        $actual_path = "../../Frontend/res/img/" . $filename;
+
+        // Check the connection
+        if (!$this->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        // Prepared SQL statement to insert the product into the database
+        $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`, `bestand`)
+            VALUES (?, ?, ?, ?, ?)';
+        $stmt = $this->db_obj->prepare($sql);
+        $stmt->bind_param('sssds', $category, $productName, $price, $description, $stock);
+
+        // Execute the statement and check if successful
+        if ($stmt->execute() && $stmt->affected_rows > 0 && move_uploaded_file($tmp_path, $actual_path)) {
+            $result['success'] = 'Produkt erfolgreich hinzugefügt!';
+        } else {
+            $result['error'] = 'Fehler beim Erstellen des Produkts!';
+        }
+
+        $stmt->close();
         return $result;
     }
-
 
     // helper functions
 

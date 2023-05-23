@@ -46,17 +46,11 @@ $(document).ready(function () {
     function createProduct() {
         // Get form input values
         let category = $('#categoryAdd').val();
-        console.log(category)
         let productName = $('#productNameAdd').val();
-        console.log(productName)
         let price = $('#priceAdd').val();
-        console.log(price)
         let stock = $('#stockAdd').val();
-        console.log(stock)
         let description = $('#descriptionAdd').val();
-        console.log(description)
         let picture = document.getElementById('pictureAdd').files[0];
-        console.log(picture.name)
 
         // Perform validation
         if (!category || !productName || !price || !stock || !description || !picture) {
@@ -76,8 +70,8 @@ $(document).ready(function () {
         formData.append('price', price);
         formData.append('stock', stock);
         formData.append('description', description);
-        formData.set('picture', picture, picture.name);
-        console.log(formData.getAll('picture'));
+        console.log(formData.get('description'));
+        formData.append('picture', picture, picture.name);
 
         // Send data to the backend using AJAX
         $.ajax({
@@ -87,14 +81,22 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                // Handle the response from the backend
-                console.log(response);
-                //showAlert(response.success, 'success')
-                loadProductsForAdmin();
+                if (response.success) {
+                    // empty the input fields
+                    $('#categoryAdd option:first').prop('selected', true);
+                    $('#productNameAdd').val('');
+                    $('#priceAdd').val('');
+                    $('#stockAdd').val('');
+                    $('#descriptionAdd').val('');
+                    $('#pictureAdd').val('');
+                    showAlert(response.success, 'success');
+                    loadProductsForAdmin();
+                } else {
+                    showAlert(response, 'warning');
+                }
             },
-            error: function (error) {
-                // Handle the error
-                console.log(error);
+            error: function () {
+                showAlert('Produkt konnte nicht erstellt werden', 'danger');
             }
         });
     }

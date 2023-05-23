@@ -119,7 +119,7 @@ function displayAll(data, $row) {
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="product card product-card">
         <div class="card-img-container">
-          <img src="../Backend/productpictures/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+          <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
         </div>
         <div class="card-body">
           <h5 class="card-title">${data.name}</h5>
@@ -231,7 +231,7 @@ function fillCart() {
     for (let i = 0; i < storedCart.length; i++) {
       const item = storedCart[i];
       const $item = $("<div>");
-      const $marker = $("<img>").attr("src", "../Backend/productpictures/" + item.name + ".jpg");
+      const $marker = $("<img>").attr("src", "../Frontend/res/img/" + item.name + ".jpg");
 
       $item.append("Anzahl: " + item.quant);
 
