@@ -55,8 +55,8 @@ $(document).ready(function () {
         console.log(stock)
         let description = $('#descriptionAdd').val();
         console.log(description)
-        let picture = $('#pictureAdd')[0].files[0];
-        console.log(picture)
+        let picture = document.getElementById('pictureAdd').files[0];
+        console.log(picture.name)
 
         // Perform validation
         if (!category || !productName || !price || !stock || !description || !picture) {
@@ -70,21 +70,20 @@ $(document).ready(function () {
         }
 
         let formData = new FormData();
+        formData.append('method', 'createProduct');
         formData.append('category', category);
         formData.append('productName', productName);
         formData.append('price', price);
         formData.append('stock', stock);
         formData.append('description', description);
-        formData.append('picture', picture);
+        formData.set('picture', picture, picture.name);
+        console.log(formData.getAll('picture'));
 
         // Send data to the backend using AJAX
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php', // Replace with the actual PHP file that handles the form submission
-            data: {
-                method: 'createProduct',
-                param: formData
-            },
+            data: formData,
             processData: false,
             contentType: false,
             success: function (response) {

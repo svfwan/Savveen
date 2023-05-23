@@ -194,14 +194,18 @@ class dataHandler
     {
         $result = array();
 
-        // Get the file extension
-        $fileExtension = pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION);
+        $tmp_path = $param['picture']['tmp_name'];
+        $fileExtension = pathinfo($param['picture']['name'], PATHINFO_EXTENSION);
+        $filename = 'new_product.' . $fileExtension;
+        $actual_path = "C:/xampp/htdocs/WEB-SS2023/Savveen/Frontend/res/img/" . $filename;
 
-        // Perform further processing with the file extension
-        $result['fileExt'] = $fileExtension;
-        $result['check'] = $param['category'];
+        if (move_uploaded_file($tmp_path, $actual_path)) {
+            $result['check'] = $param['picture'];
+        }
+
         return $result;
     }
+
 
     // helper functions
 
