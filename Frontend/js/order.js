@@ -42,11 +42,7 @@ $(document).ready(function () {
 
     function updateCartStatus() {
         let cart = sessionStorage.getItem("myCart") ? JSON.parse(sessionStorage.getItem("myCart")) : false;
-
-        if (!cart || cart.length === 0) {
-            $('#cartMessages').html('<h2>Ihr Warenkorb ist leer</h2>');
-            $('#orderCart').hide();
-        } else {
+        if (cart && cart.length >= 0) {
             $('#cartMessages').empty();
             $('#orderCart').show();
         }

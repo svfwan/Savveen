@@ -8,7 +8,7 @@ $(document).ready(function () {
     }
   }
 
-  $("#cartCounter").text(length);
+  updateCartCounter(length);
   $("#mainView").empty();
 
   $("#filterCategory").on("click", function () {
@@ -17,6 +17,16 @@ $(document).ready(function () {
 
   ContinuousSearch();
 
+  loadAllProducts();
+
+  fillCart();
+});
+
+function updateCartCounter(length) {
+  $("#cartCounter").text(length);
+}
+
+function loadAllProducts() {
   $.ajax({
     type: "GET",
     url: "../Backend/logic/requestHandler.php",
@@ -38,21 +48,12 @@ $(document).ready(function () {
       alert(error);
     },
   });
-});
+}
 
 function ContinuousSearch() {
-  let input = $("<input>");
-  $("#prod").append("<br>Filter: ");
-  $("#prod").append(input);
-  $("#prod").append("<br> <br>");
-
-  const i = document.querySelector("input");
-  const log = document.getElementById("prod");
-
-  i.addEventListener("input", updateValue);
-
-  function updateValue(e) {
-    console.log(e.target.value);
+  let $input = $("<input>").on("input", function (e) {
+    const value = e.target.value;
+    console.log(value);
 
     $.ajax({
       type: "GET",
@@ -60,14 +61,14 @@ function ContinuousSearch() {
       data: {
         method: "filterConSearch",
         param: JSON.stringify({
-          letter: e.target.value,
+          letter: value,
         }),
       },
       dataType: "json",
       success: function (data) {
         console.log(data);
         $("#mainView").empty();
-        if (data.length == 0 && e.target.value != "") {
+        if (data.length === 0 && value !== "") {
           window.alert("Keine Produkte gefunden");
         }
         let $row = $("<div class='row'></div>");
@@ -82,11 +83,11 @@ function ContinuousSearch() {
         window.alert("Error: Seite kann nicht geladen werden");
       },
     });
-  }
+  });
 }
 
 function displayCategory() {
-  var selectedValue = $("#category").val();
+  const selectedValue = $("#category").val();
   console.log("Kategorie: " + selectedValue);
 
   $.ajax({
@@ -119,13 +120,15 @@ function displayAll(data, $row) {
     <div class="col-sm-6 col-md-4 col-lg-3">
       <div class="product card product-card">
         <div class="card-img-container">
-          <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+          <div class="img-wrapper">
+            <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+          </div>
         </div>
-        <div class="card-body">
+        <div class="card-body product-card-body">
           <h5 class="card-title">${data.name}</h5>
           <p class="card-text">Preis: ${data.preis}</p>
           <p class="card-text">Bewertung: ${data.bewertung}/5</p>
-          <button class="btn btn-primary add-to-cart-btn">In den Warenkorb hinzufügen</button>
+          <button class="btn btn-success add-to-cart-btn">In den Warenkorb hinzufügen</button>
         </div>
       </div>
     </div>
@@ -139,8 +142,8 @@ function displayAll(data, $row) {
     $row = $("<div class='row'></div>");
   }
 
-  // Event delegation for "Add to Cart" button
-  $row.on("click", ".add-to-cart-btn", function () {
+  $row.on("click", ".add-to-cart-btn", function (event) {
+    event.stopPropagation(); // Stop event propagation
     addCart(data);
   });
 }
@@ -159,9 +162,9 @@ function addCart(product) {
     dataType: "json",
     success: function (data) {
       console.log(data);
-      for (let i in data) {
-        let cur = data[i];
-        console.log(data[i]);
+      if (data && data.length > 0) {
+        const cur = data[0]; // Assuming the response contains a single item
+        console.log(cur);
         if (cur.bestand > 0) {
           addItemtoCart(cur);
         } else {
@@ -177,85 +180,91 @@ function addCart(product) {
 }
 
 function addItemtoCart(data) {
-  let cart = false;
-  let idx = 0;
-  let anzahl = 1;
-
   let myCart = [];
   if (sessionStorage.getItem("myCart")) {
     myCart = JSON.parse(sessionStorage.getItem("myCart"));
   }
 
-  for (let i = 0; i < myCart.length; i++) {
-    if (myCart[i].name == data.name) {
-      console.log("Produkt bereits im Warenkorb");
-      cart = true;
-      idx = i;
-      anzahl = myCart[i].quant;
-      break;
-    }
-  }
+  let existingItem = myCart.find((item) => item.name === data.name);
 
-  if (cart) {
-    myCart[idx].quant = anzahl + 1;
+  if (existingItem) {
+    existingItem.quant += 1;
   } else {
     myCart.push({
       name: data.name,
       price: data.preis,
       bewertung: data.bewertung,
       cat: data.kategorie,
-      quant: anzahl,
+      quant: 1,
     });
   }
 
-  console.log(myCart);
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
 
-  let length = 0;
-  for (let i = 0; i < myCart.length; i++) {
-    length = myCart[i].quant + length;
-  }
-  $("#cartCounter").text(length);
+  let length = myCart.reduce((total, item) => total + item.quant, 0);
+  updateCartCounter(length);
 
-  fillCart();
+  // Update the cart items dynamically
+  updateCartItems(myCart);
 }
 
-function fillCart() {
-  $("#cartItems").empty();
+function updateCartItems(myCart) {
+  const $cartItems = $("#cartItems");
+  const $cartTotal = $("#cartTotal");
 
-  console.log("FILLCART");
-  if (sessionStorage.getItem("myCart")) {
-    let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
+  $cartItems.empty();
+  $cartTotal.empty();
+
+  if (myCart.length > 0) {
     let gesamtpreis = 0;
 
-    for (let i = 0; i < storedCart.length; i++) {
-      const item = storedCart[i];
-      const $item = $("<div>");
-      const $marker = $("<img>").attr("src", "../Frontend/res/img/" + item.name + ".jpg");
+    for (let i = 0; i < myCart.length; i++) {
+      const item = myCart[i];
 
-      $item.append("Anzahl: " + item.quant);
+      const $item = $(`
+        <div class="list-group-item d-flex align-items-center">
+          <img src="../Frontend/res/img/${item.name}.jpg" alt="${item.name}" class="cart-item-img">
+          <div class="flex-grow-1">
+            <div>Name: ${item.name}</div>
+            <div>Preis: ${item.price}</div>
+            <div>Anzahl: ${item.quant}</div>
+            <div class="btn-group" role="group">
+              <button class="btn btn-danger remove-btn" data-item="${i}">-</button>
+              <button class="btn btn-success add-btn" data-item="${i}">+</button>
+            </div>
+          </div>
+        </div>
+      `);
 
-      const $remove = $("<button>").text("-").on("click", function () {
+      $item.find(".remove-btn").on("click", function () {
         removeItem(item);
       });
 
-      const $add = $("<button>").text("+").on("click", function () {
+      $item.find(".add-btn").on("click", function () {
         addExistingItem(item);
       });
 
-      $item.append($marker, $remove, $add);
-      $("#cartItems").append("<br>", $item);
-
-      const $li = $("<li>").attr("id", i);
-      $li.append("Name: " + item.name + "<br>");
-      $li.append("Preis: " + item.price * item.quant + "<br>");
-      $li.append("Bewertung: " + item.bewertung + "/5 <br>");
-      $("#cartItems").append($li);
+      $cartItems.append($item);
 
       gesamtpreis += item.price * item.quant;
     }
 
-    $("#cartTotal").html("<br> Gesamtpreis: " + gesamtpreis + "€");
+    $cartTotal.html(`<div class="mt-3">Gesamtpreis: ${gesamtpreis}€</div>`);
+  } else {
+    $cartItems.html('<h2>Ihr Warenkorb ist leer</h2>');
+    $('#orderCart').hide();
+  }
+}
+
+function fillCart() {
+  const myCart = JSON.parse(sessionStorage.getItem("myCart"));
+
+  if (myCart && myCart.length > 0) {
+    updateCartItems(myCart);
+  } else {
+    $("#cartItems").html('<h2>Ihr Warenkorb ist leer</h2>');
+    $("#cartTotal").empty();
+    $("#orderCart").hide();
   }
 }
 
@@ -277,24 +286,28 @@ function removeItem(data) {
   }
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
 
-  $("#cartItems").empty();
-  fillCart();
+  let length = myCart.reduce((total, item) => total + item.quant, 0);
+  updateCartCounter(length);
+
+  // Update the cart items dynamically
+  updateCartItems(myCart);
 }
 
 function addExistingItem(data) {
-  console.log("addExistingItem wird betreten");
-  $("#cartItems").empty();
-
-  myCart = JSON.parse(sessionStorage.getItem("myCart"));
+  let myCart = [];
+  if (sessionStorage.getItem("myCart")) {
+    myCart = JSON.parse(sessionStorage.getItem("myCart"));
+  }
 
   for (let i = 0; i < myCart.length; i++) {
     if (myCart[i].name == data.name) {
-      console.log(" check ");
       myCart[i].quant = myCart[i].quant + 1;
       break;
     }
   }
 
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
-  fillCart();
+
+  // Update the cart items dynamically
+  updateCartItems(myCart);
 }
