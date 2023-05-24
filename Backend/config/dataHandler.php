@@ -7,6 +7,7 @@ class dataHandler
     {
         global $host, $user, $password, $database;
         $this->db_obj = new mysqli($host, $user, $password, $database);
+        session_start();
     }
 
     public function __destruct()
@@ -124,10 +125,12 @@ class dataHandler
                         // 30-day cookie
                         setcookie('rememberLogin', true, time() + (86400 * 30), '/');
                         setcookie('username', $username, time() + (86400 * 30), '/');
+                        setcookie('admin', $row['admin'], time() + (86400 * 30), '/');
                     } else {
                         // 1-hour cookie
                         setcookie('rememberLogin', true, time() + 3600, '/');
                         setcookie('username', $username, time() + 3600, '/');
+                        setcookie('admin', $row['admin'], time() + 3600, '/');
                     }
                 } else {
                     $result['error'] = 'Falsches Passwort!';
@@ -146,10 +149,19 @@ class dataHandler
     public function getSessionInfo()
     {
         $result = array();
-        if (!(isset($_SESSION))) {
-            session_start();
-        }
         if (isset($_SESSION['username']) && isset($_SESSION['admin'])) {
+            if ($_SESSION['admin']) {
+                $result['status'] = 'loggedInAdmin';
+            } else {
+                $result['status'] = 'loggedInUser';
+            }
+        } elseif (isset($_COOKIE['rememberLogin']) && isset($_COOKIE['username'])) {
+            // Restore the session based on the 'rememberLogin' cookie
+            if (!isset($_SESSION)) {
+                session_start();
+            }
+            $_SESSION['username'] = $_COOKIE['username'];
+            $_SESSION['admin'] = $_COOKIE['admin'] ?? false;
             if ($_SESSION['admin']) {
                 $result['status'] = 'loggedInAdmin';
             } else {
@@ -161,14 +173,10 @@ class dataHandler
         return $result;
     }
 
-
     public function logoutUser()
     {
         $result = array();
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-        if (isset($_SESSION) && isset($_SESSION['username'])) {
+        if (isset($_SESSION['username'])) {
             session_destroy();
 
             if (isset($_COOKIE['rememberLogin'])) {
@@ -177,7 +185,9 @@ class dataHandler
             if (isset($_COOKIE['username'])) {
                 setcookie('username', '', time() - 3600, '/');
             }
-
+            if (isset($_COOKIE['admin'])) {
+                setcookie('admin', '', time() - 3600, '/');
+            }
             $result['loggedIn'] = false;
         }
         return $result;

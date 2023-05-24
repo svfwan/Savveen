@@ -73,37 +73,44 @@ $(document).ready(function () {
     });
 
     function updateFeatures() {
-        // Always make an AJAX request to get the session information
-        // change to get request
-        $.ajax({
-            type: 'GET',
-            url: '../Backend/logic/requestHandler.php',
-            data: {
-                method: 'getSessionInfo',
-            },
-            dataType: 'json',
-            success: function (response) {
-                console.log(response);
-                if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
-                    let username = getCookie('username');
-                    let isAdmin = response.status === 'loggedInAdmin';
-                    updateNavbar(true, username, isAdmin);
-                    if (isAdmin) {
-                        $('#productFilter').hide();
-                        $('#mainView').load('sites/dashboard.html #adminDashboard');
+        const username = getCookie('username');
+        const rememberLogin = getCookie('rememberLogin');
+
+        if (username && rememberLogin) {
+            // User cookies are present, make the AJAX request to retrieve session information
+            $.ajax({
+                type: 'GET',
+                url: '../Backend/logic/requestHandler.php',
+                data: {
+                    method: 'getSessionInfo',
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
+                        let isAdmin = response.status === 'loggedInAdmin';
+                        updateNavbar(true, username, isAdmin);
+                        if (isAdmin) {
+                            $('#productFilter').hide();
+                            $('#mainView').load('sites/dashboard.html #adminDashboard');
+                        } else {
+                            // Load the default content for non-admin users
+                            $('#mainView').empty();
+                        }
                     } else {
-                        // Load the default content for non-admin users
+                        updateNavbar(false, '', false);
                         $('#mainView').empty();
                     }
-                } else {
-                    updateNavbar(false, '', false);
-                    $('#mainView').empty();
-                }
-            },
-            error: function (error) {
-                console.log(error);
-            },
-        });
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        } else {
+            // User is not logged in or cookies are not present, update the UI accordingly
+            updateNavbar(false, '', false);
+            $('#mainView').empty();
+        }
     }
 
     // ajax call for logout
