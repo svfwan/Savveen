@@ -101,12 +101,4 @@ $(document).ready(function () {
         });
     }
 
-    // helper functions
-
-    function loadSection(sectionID) {
-        // Empty the mainView section
-        $('#mainView').empty();
-        // Load the content of the corresponding section
-        $('#mainView').load('sites/dashboard.html #' + sectionID);
-    }
 });

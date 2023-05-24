@@ -72,47 +72,6 @@ $(document).ready(function () {
         });
     });
 
-    function updateFeatures() {
-        const username = getCookie('username');
-        const rememberLogin = getCookie('rememberLogin');
-
-        if (username && rememberLogin) {
-            // User cookies are present, make the AJAX request to retrieve session information
-            $.ajax({
-                type: 'GET',
-                url: '../Backend/logic/requestHandler.php',
-                data: {
-                    method: 'getSessionInfo',
-                },
-                dataType: 'json',
-                success: function (response) {
-                    console.log(response);
-                    if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
-                        let isAdmin = response.status === 'loggedInAdmin';
-                        updateNavbar(true, username, isAdmin);
-                        if (isAdmin) {
-                            $('#productFilter').hide();
-                            $('#mainView').load('sites/dashboard.html #adminDashboard');
-                        } else {
-                            // Load the default content for non-admin users
-                            $('#mainView').empty();
-                        }
-                    } else {
-                        updateNavbar(false, '', false);
-                        $('#mainView').empty();
-                    }
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
-        } else {
-            // User is not logged in or cookies are not present, update the UI accordingly
-            updateNavbar(false, '', false);
-            $('#mainView').empty();
-        }
-    }
-
     // ajax call for logout
     $(document).on('click', '#logoutButton', function () {
         console.log("logout button clicked")
@@ -194,6 +153,53 @@ $(document).ready(function () {
     });
 
     // helper functions
+
+    function updateFeatures() {
+        const username = getCookie('username');
+        const rememberLogin = getCookie('rememberLogin');
+
+        if (username && rememberLogin) {
+            // User cookies are present, make the AJAX request to retrieve session information
+            $.ajax({
+                type: 'GET',
+                url: '../Backend/logic/requestHandler.php',
+                data: {
+                    method: 'getSessionInfo',
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
+                        let isAdmin = response.status === 'loggedInAdmin';
+                        updateNavbar(true, username, isAdmin);
+                        if (isAdmin) {
+                            $('#productFilter').hide();
+                            $('#mainView').load('sites/dashboard.html #adminDashboard');
+                        } else {
+                            // Load the default content for non-admin users
+                            $('#productFilter').show();
+                            $('#mainView').empty();
+                            loadAllProducts();
+                        }
+                    } else {
+                        updateNavbar(false, '', false);
+                        $('#productFilter').show();
+                        $('#mainView').empty();
+                        loadAllProducts();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        } else {
+            // User is not logged in or cookies are not present, update the UI accordingly
+            updateNavbar(false, '', false);
+            $('#productFilter').show();
+            $('#mainView').empty();
+            loadAllProducts();
+        }
+    }
 
     function updateNavbar(isLoggedIn, username, isAdmin) {
         // default state - not logged in users

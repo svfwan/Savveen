@@ -16,10 +16,6 @@ $(document).ready(function () {
     });
 
     ContinuousSearch();
-
-    loadAllProducts();
-
-    fillCart();
 });
 
 function updateCartCounter(length) {

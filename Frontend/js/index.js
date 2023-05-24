@@ -1,15 +1,28 @@
-$(document).ready(function () {
+/*
+  JS-file for common (helper-) functions
 
-  /*
-    possible solution:
-    - 
-  
-    further issues/ideas/solutions:
-    - when adding product to cart 6 items are added -> possible conflict because of button naming
-    - look into using more specific IDs and Classes for styling/jQuery referencing
-  */
+  issues/problems:
+  -
 
-});
+  possible solution:
+  - 
+ 
+  further issues/ideas/solutions:
+  - when adding product to cart 6 items are added -> possible conflict because of button naming
+  - look into using more specific IDs and Classes for styling/jQuery referencing
+  - importing common/helper function:
+    import { specificFunction } from './path/to/other/file.js';
+
+    // Now you can use the imported function
+    specificFunction();
+
+    In the file that contains the specific function (./path/to/other/file.js in the example above):
+
+    export function specificFunction() {
+      // Function implementation
+    }
+*/
+
 
 // common helper functions
 
@@ -53,4 +66,11 @@ function showAlert(message, type) {
     // Add the d-none class to the alertContainer to hide it
     $('#alertContainer').addClass('d-none');
   });
+}
+
+function loadSection(sectionID) {
+  // Empty the mainView section
+  $('#mainView').empty();
+  // Load the content of the corresponding section
+  $('#mainView').load('sites/dashboard.html #' + sectionID);
 }
