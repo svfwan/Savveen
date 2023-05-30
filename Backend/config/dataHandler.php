@@ -99,7 +99,7 @@ class dataHandler
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
         }
 
-        $sql = 'SELECT `username`, `passwort`, `admin` FROM `users` WHERE `username` = ? LIMIT 1';
+        $sql = 'SELECT `id`,`username`, `passwort`, `admin` FROM `users` WHERE `username` = ? LIMIT 1';
         $stmt = $this->db_obj->prepare($sql);
         $stmt->bind_param('s', $username);
 
@@ -111,19 +111,23 @@ class dataHandler
                     $result['success'] = 'Login erfolgreich, willkommen ' . $username . '!';
                     $result['username'] = $username;
                     $result['admin'] = $row['admin'];
+                    $result['userid'] = $row['id']; 
                     if (!(isset($_SESSION))) {
                         session_start();
                     }
                     $_SESSION['username'] = $username;
                     $_SESSION['admin'] = $row['admin'];
+                    $_SESSION['userid'] = $row['id']; 
                     if (isset($param['rememberLogin']) && $param['rememberLogin']) {
                         // 30-day cookie
                         setcookie('rememberLogin', true, time() + (86400 * 30), '/');
                         setcookie('username', $username, time() + (86400 * 30), '/');
+                        setcookie('userid', $row['id'], time() + (86400 * 30), '/'); 
                     } else {
                         // 1-hour cookie
                         setcookie('rememberLogin', true, time() + 3600, '/');
                         setcookie('username', $username, time() + 3600, '/');
+                        setcookie('userid', $row['id'], time() + 3600, '/');
                     }
                 } else {
                     $result['error'] = 'Falsches Passwort!';
@@ -150,6 +154,7 @@ class dataHandler
                 $result['status'] = 'loggedInAdmin';
             } else {
                 $result['status'] = 'loggedInUser';
+                
             }
         } else {
             $result['status'] = 'notLoggedIn';
@@ -245,7 +250,7 @@ class dataHandler
 
 
               // Führe die SQL-Abfrage aus
-              $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
+              $sql = $this->db_obj->prepare("SELECT `Product_id`, `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
              $sql->bind_param('s', $n);
            //  echo "Datenbank: ". $param['Name'];
               $sql->execute();
@@ -280,7 +285,7 @@ class dataHandler
         // Führe die SQL-Abfrage aus
         $sql = $this->db_obj->prepare("UPDATE `products` SET `stock` = ?  WHERE `Name` = ? ");
         $sql->bind_param('is', $s,$n);
-      //  echo "Datenbank: ". $param['Name']  
+    
        
         //update gibt ja keine werte zurück, deswegen kann man die werte auch nicht in einem array speichern
 
@@ -329,9 +334,133 @@ class dataHandler
          }
           return $tab;
 
+    }
 
+    //Bestellung abwickeln 
+
+    function processOrder($param){
+
+        $tab = array();
+        $pid = $param['product_id'];
+        $quant = $param['quantity'];
+        $uid = $param['userid']; 
+        $recid = $param['receiptid']; 
+
+          // Prüfe die Verbindung zur Datenbank
+          if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        //sql statement
+        $sql = $this->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `user_id`, `receipt_id`) VALUES (?,?,?,?)");
+        $sql->bind_param("iiii", $pid, $quant, $uid, $recid);
+    
+
+        if ($sql->execute() && $sql->affected_rows > 0) {
+            $tab['success'] = 'Bestellung wurde abgewickelt ';
+        } else {
+            $tab['error'] = 'Bestellung konnte nicht abgewickelt werden';
+        }
+
+        $sql->close();
+        return $tab;
+
+    }
+
+    function createReceipt($param){
+
+        $tab = array();
+        $gesamt = $param['total'];
+        $uid = $param['userid']; 
+        $street = $param['adress'];
+        $plz = $param['postcode'];
+        $city = $param['ort']; 
+
+          // Prüfe die Verbindung zur Datenbank
+          if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        //sql statement
+        $sql = $this->db_obj->prepare("INSERT INTO receipts (`user_id`,`total`, `street`,`postcode`,`city`) VALUES (?,?,?,?,?)");
+        $sql->bind_param("iisis", $uid, $gesamt, $street, $plz, $city);
+    
+
+        if ($sql->execute() && $sql->affected_rows > 0) {
+            $tab['success'] = 'Rechnung wurde erstellt';
+        } else {
+            $tab['error'] = 'Rechnung konnte nicht erstellt werden. ';
+        }
+
+
+        $sql->close();
+        return $tab;
 
     }
 
 
+    function getCurrentReceipt_id(){
+
+        $tab = array();
+     
+          // Prüfe die Verbindung zur Datenbank
+          if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        
+        //sql statement
+        $sql = $this->db_obj->prepare("SELECT `receipt_id` FROM `receipts` ORDER BY `receipt_id` DESC LIMIT 1");
+
+      //  SELECT receipt_id FROM receipts ORDER BY receipt_id DESC LIMIT 1
+
+      $sql->execute();
+      $result = $sql->get_result();
+
+      // Füge die Ergebnisse in das Array ein
+      while ($row = $result->fetch_assoc()) {
+          array_push($tab, $row);
+      }
+
+        $sql->close();
+        return $tab;
+
+    }
+
+    function getAddress($param){
+
+        
+        $id = $param['uid']; 
+
+        $tab = array();
+     
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+          $tab["error"] = "Versuchen Sie es später erneut!";
+          return $tab;
+      }
+
+      
+      //sql statement
+      $sql = $this->db_obj->prepare("SELECT `adresse`, `plz` , `ort`  FROM `users` WHERE `id` = ? LIMIT 1");
+      $sql->bind_param("i", $id);
+    
+    //  SELECT receipt_id FROM receipts ORDER BY receipt_id DESC LIMIT 1
+
+    $sql->execute();
+    $result = $sql->get_result();
+
+    // Füge die Ergebnisse in das Array ein
+    while ($row = $result->fetch_assoc()) {
+        array_push($tab, $row);
+    }
+
+      $sql->close();
+      return $tab;
+
+
+    }
 }

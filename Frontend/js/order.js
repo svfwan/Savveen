@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    console.log("order.js()"); 
 
     updateCartStatus();
 
@@ -7,6 +8,7 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#orderCart', function () {
+        console.log("clicked"); 
         let isLoggedIn = !!getCookie('username');
         console.log('Bestellen...');
         if (!isLoggedIn) {
@@ -42,7 +44,7 @@ $(document).ready(function () {
 
     function updateCartStatus() {
         let cart = sessionStorage.getItem("myCart") ? JSON.parse(sessionStorage.getItem("myCart")) : false;
-
+            console.log("updateCartStatus()"); 
         if (!cart || cart.length === 0) {
             $('#cartMessages').html('<h2>Ihr Warenkorb ist leer</h2>');
             $('#orderCart').hide();

@@ -50,9 +50,23 @@ class businessLogic
             case 'filterConSearch':
                 $res = $this -> dh -> filterConSearch($param);
                 break; 
-            case 'reduceStock';
-                $res = $this->dh->reduceStock($param);
+            case 'processOrder':
+                $res = $this -> dh -> processOrder($param); 
+                break; 
+            case 'createReceipt':
+                $res = $this -> dh -> createReceipt($param); 
                 break;
+
+            case 'getCurrentReceipt_id':
+                $res = $this -> dh -> getCurrentReceipt_id();
+                break; 
+            case 'getAddress':
+                $res = $this -> dh -> getAddress($param);
+                break; 
+            
+            
+
+            
         }
         return $res;
     }

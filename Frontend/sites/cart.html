@@ -7,11 +7,46 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <title>Cart</title>
 </head>
-<body onload ="fillCart()">
-    <h1>Willkommen in deinem Warenkorb</h1>
+<body>
+    <h1 id = "header">Warenkorb</h1>
    
-
     <div id = "cart"></div>
+
+
+    <div id = "adress">
+        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Shipping adress</h1>
+                    </div>
+                    <div class="modal-body">
+                        <div id="message-container"></div>
+                        <div id="registerForm" class="container">
+                            
+                            <div class="form-group">
+                                <label for="address">Adresse</label>
+                                <input type="text" class="form-control" id="street" placeholder="Wohnstrasse 123" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="postcode">Postleitzahl</label>
+                                <input type="text" class="form-control" id="postcode" placeholder="1234" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">Ort</label>
+                                <input type="text" class="form-control" id="city" placeholder="Wien" required>
+                            </div>
+                        
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="newadrsbtn" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
-<script src = "../js/products_script.js"></script>
+<script src = "../js/orders.js"></script>
+<script src = "../js/index.js"></script>
 </html>
