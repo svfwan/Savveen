@@ -193,18 +193,6 @@ class dataHandler
         return $result;
     }
 
-    public function loadProductsForAdmin()
-    {
-        $result = array();
-
-        if (!$this->checkConnection()) {
-            $result['error'] = 'Produktkatalog kann nicht geladen werden, versuchen Sie es später erneut!';
-        }
-
-        $result['message'] = 'empty function';
-        return $result;
-    }
-
     public function createProduct($param)
     {
         $result = array();
@@ -254,7 +242,7 @@ class dataHandler
         $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`, `bestand`)
             VALUES (?, ?, ?, ?, ?)';
         $stmt = $this->db_obj->prepare($sql);
-        $stmt->bind_param('sssds', $category, $productName, $price, $description, $stock);
+        $stmt->bind_param('ssssd', $category, $productName, $price, $description, $stock);
 
         // Execute the statement and check if successful
         if ($stmt->execute() && $stmt->affected_rows > 0 && move_uploaded_file($tmp_path, $actual_path)) {
@@ -264,6 +252,82 @@ class dataHandler
         }
 
         $stmt->close();
+        return $result;
+    }
+
+    public function updateProduct($param)
+    {
+        $result = array();
+        $productID = $param['productID'];
+        $category = $param['category'];
+        $productName = $param['productName'];
+        $price = floatval($param['price']);
+        $stock = $param['stock'];
+        $description = $param['description'];
+
+        // Perform validation
+        if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
+            $result['error'] = 'Bitte füllen Sie alle Felder aus!';
+            return $result;
+        }
+
+        if (!is_numeric($price) || !is_numeric($stock) || $price < 0 || $stock < 0) {
+            $result['error'] = 'Preis und Lagerbestand müssen valide Zahlen sein!';
+            return $result;
+        }
+
+        // Check the connection
+        if (!$this->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $databaseUpdated = false;
+        $pictureMoved = false;
+
+        // Check if a new picture is provided
+        if (isset($param['picture']) && $param['picture']['size'] > 0) {
+            // Process the file upload for the new picture
+            $picture = $param['picture'];
+            $tmpPath = $picture['tmp_name'];
+            $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
+
+            $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+            if (!in_array(strtolower($fileExtension), $allowedExtensions)) {
+                $result['error'] = 'Ungültige Dateierweiterung! Nur JPG, JPEG, PNG und GIF sind erlaubt.';
+                return $result;
+            }
+
+            $newPictureFilename = $productName . '.jpg';
+            $newPicturePath = "../../Frontend/res/img/" . $newPictureFilename;
+            move_uploaded_file($tmpPath, $newPicturePath);
+            $pictureMoved = true;
+        }
+
+        // Prepared SQL statement to update the product in the database
+        $sql = 'UPDATE `products` SET `kategorie` = ?, `name` = ?, `preis` = ?, `beschreibung` = ?, `bestand` = ? WHERE `id` = ?';
+        $stmt = $this->db_obj->prepare($sql);
+        $stmt->bind_param('ssssdi', $category, $productName, $price, $description, $stock, $productID);
+
+        // Execute the statement and check if successful
+        if ($stmt->execute()) {
+            if ($stmt->affected_rows > 0) {
+                $databaseUpdated = true;
+            }
+        } else {
+            $result['error'] = 'Fehler beim Aktualisieren des Produkts!';
+            $stmt->close();
+            return $result;
+        }
+
+        $stmt->close();
+
+        if ($databaseUpdated || $pictureMoved) {
+            $result['success'] = 'Produkt erfolgreich aktualisiert!';
+        } else {
+            $result['error'] = 'Daten bereits aktuell!';
+        }
+
         return $result;
     }
 
@@ -301,7 +365,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
+        $sql = $this->db_obj->prepare("SELECT `id`,`kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products`");
         $sql->execute();
         $result = $sql->get_result();
 
@@ -311,6 +375,38 @@ class dataHandler
         }
 
         // Schließe die Verbindung und gib das Array zurück
+        $sql->close();
+        return $tab;
+    }
+
+    // load product by ID
+    public function loadProductByID($param)
+    {
+        $tab = array();
+
+        // Check the database connection
+        if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        // Prepare and execute the SQL query
+        $sql = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products` WHERE `id` = ?");
+        $sql->bind_param("i", $param);
+        $sql->execute();
+        $result = $sql->get_result();
+
+        // Check if the product was found
+        if ($result->num_rows == 1) {
+            $row = $result->fetch_assoc();
+            $tab["success"] = true;
+            $tab["data"] = $row;
+        } else {
+            $tab["success"] = false;
+            $tab["error"] = "Produkt nicht gefunden";
+        }
+
+        // Close the connection and return the array
         $sql->close();
         return $tab;
     }

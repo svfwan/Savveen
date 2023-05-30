@@ -42,11 +42,11 @@ $(document).ready(function () {
             url: '../Backend/logic/requestHandler.php',
             data: {
                 method: 'loginUser',
-                param: {
+                param: JSON.stringify({
                     username: $('#username').val(),
                     password: $('#password').val(),
                     rememberLogin: $('#remember_login').prop('checked')
-                }
+                })
             },
             dataType: 'json',
             success: function (response) {
@@ -112,7 +112,7 @@ $(document).ready(function () {
             url: '../Backend/logic/requestHandler.php',
             data: {
                 method: 'registerUser',
-                param: {
+                param: JSON.stringify({
                     formofAddress: $('#formofAddress').val(),
                     firstName: $('#firstName').val(),
                     lastName: $('#lastName').val(),
@@ -122,7 +122,7 @@ $(document).ready(function () {
                     email: $('#email').val(),
                     username: $('#username').val(),
                     password: $('#password').val(),
-                }
+                })
             },
             dataType: 'json',
             success: function (response) {

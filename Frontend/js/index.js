@@ -41,8 +41,10 @@ function showModalAlert(message, type) {
     'danger': 'alert-danger'
   };
   var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
+
   // Add the alert HTML to the message container
   $('#message-container').html(alertHtml);
+  
 }
 
 function showAlert(message, type) {
