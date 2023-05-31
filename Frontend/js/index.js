@@ -48,6 +48,7 @@ function showModalAlert(message, type) {
   // Wait for 2 seconds and then hide the alert
   setTimeout(function () {
     $('#message-container').empty();
+    console.log("emptied");
   }, 2000);
 }
 

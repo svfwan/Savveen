@@ -59,6 +59,7 @@ $(document).ready(function () {
                     showModalAlert(response.success, 'success');
                     setTimeout(function () {
                         $('#loginModal').modal('hide');
+                        $('#modal-placeholder').empty();
                     }, 2000); // 2 seconds delay
                 } else if (response.error) {
                     // Show error message above the modal content

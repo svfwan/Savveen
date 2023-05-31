@@ -203,7 +203,6 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
-            // need to correctly reset modal alerts for this modal
             success: function (response) {
                 if (response.success) {
                     showModalAlert(response.success, 'success');
@@ -229,6 +228,8 @@ $(document).ready(function () {
         $('#priceEdit').val(product.preis);
         $('#stockEdit').val(product.bewertung);
         $('#descriptionEdit').val(product.beschreibung);
+        let pictureCacheRemover = new Date().getTime();
+        $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);
         $('#changeProductModal').modal('show');
     }
 });
