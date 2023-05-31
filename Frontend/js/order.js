@@ -1,11 +1,4 @@
 $(document).ready(function () {
-    console.log("order.js()"); 
-
-    updateCartStatus();
-
-    $(document).on('click', '#showCart', function () {
-        updateCartStatus();
-    });
 
     $(document).on('click', '#orderCart', function () {
         console.log("clicked"); 
@@ -19,14 +12,19 @@ $(document).ready(function () {
             });
             return;
         }
+
+        // get username
+        // get all products from cart
+        // save in param and send to backend
+
         $.ajax({
             type: 'POST',
             url: '../../Backend/logic/requestHandler.php',
             data: {
                 method: 'processOrder',
-                param: JSON.stringify({
+                param: {
 
-                })
+                }
             },
             dataType: 'json',
             success: function (response) {
@@ -40,17 +38,4 @@ $(document).ready(function () {
         });
     });
 
-    // helper functions
-
-    function updateCartStatus() {
-        let cart = sessionStorage.getItem("myCart") ? JSON.parse(sessionStorage.getItem("myCart")) : false;
-            console.log("updateCartStatus()"); 
-        if (!cart || cart.length === 0) {
-            $('#cartMessages').html('<h2>Ihr Warenkorb ist leer</h2>');
-            $('#orderCart').hide();
-        } else {
-            $('#cartMessages').empty();
-            $('#orderCart').show();
-        }
-    }
 });

@@ -25,7 +25,6 @@ class businessLogic
             case 'registerUser':
                 $res = $this->dh->registerUser($param);
                 break;
-
             case "loginUser":
                 $res = $this->dh->loginUser($param);
                 break;
@@ -35,9 +34,6 @@ class businessLogic
             case 'logoutUser':
                 $res = $this->dh->logoutUser();
                 break;
-            default:
-                $res = null;
-                break;
             case 'loadAllProducts':
                 $res = $this->dh->loadAllProducts();
                 break;
@@ -45,16 +41,13 @@ class businessLogic
                 $res = $this->dh->checkStock($param);
                 break;
             case 'reduceStock':
-                $res = $this -> dh -> reduceStock($param);
-                break; 
+                $res = $this->dh->reduceStock($param);
+                break;
             case 'filterConSearch':
-                $res = $this -> dh -> filterConSearch($param);
-                break; 
-            case 'processOrder':
-                $res = $this -> dh -> processOrder($param); 
-                break; 
-            case 'createReceipt':
-                $res = $this -> dh -> createReceipt($param); 
+                $res = $this->dh->filterConSearch($param);
+                break;
+            case 'reduceStock';
+                $res = $this->dh->reduceStock($param);
                 break;
 
             case 'getCurrentReceipt_id':
@@ -67,6 +60,15 @@ class businessLogic
             
 
             
+            case 'loadProductsForAdmin':
+                $res = $this->dh->loadProductsForAdmin();
+                break;
+            case 'createProduct':
+                $res = $this->dh->createProduct($param);
+                break;
+            default:
+                $res = null;
+                break;
         }
         return $res;
     }

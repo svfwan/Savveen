@@ -3,9 +3,9 @@ $(document).ready(function () {
   let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
 
   //Anzahl der Produkte. soll neben dem warenkorb symbol sein -  
-  if (storedCart && storedCart.length > 0){    
-    for (let i = 0; i < storedCart.length; i++){
-      length = length + storedCart[i].quant; 
+  if (storedCart && storedCart.length > 0) {
+    for (let i = 0; i < storedCart.length; i++) {
+      length = length + storedCart[i].quant;
     }
   }
   $('#cartCounter').text(length);
@@ -13,9 +13,9 @@ $(document).ready(function () {
 
   $("#mainView").empty();
   let $btn = $("<button>");
-  $btn.attr("id","btn"); 
-  $btn.text("Search"); 
- $("#prod").append($btn); 
+  $btn.attr("id", "btn");
+  $btn.text("Search");
+  $("#prod").append($btn);
 
  
  
@@ -57,7 +57,7 @@ function ContinousSearch(){
   const i = document.querySelector("input");
   const log = document.getElementById("prod");
 
-i.addEventListener("input", updateValue);
+  i.addEventListener("input", updateValue);
 
 }
 
@@ -66,25 +66,25 @@ function updateValue(e) {
   console.log(e.target.value); 
   //ajax call - filterConSearch
 
-  $.ajax({
-    type: "GET",
-    url: "../Backend/logic/requestHandler.php",
-    data: {
-      method: "filterConSearch",
-      param: JSON.stringify({
-      letter : e.target.value,
-      }),
-    },
-    dataType: "json", //muss immer json sein
-    success: function (data) {
-      console.log(data);
-      $("#mainView").empty(); 
-      if(data.length == 4 && e.target.value != ""){ // bearbeiten
-        window.alert("Keine Produkte gefunden"); 
+    $.ajax({
+      type: "GET",
+      url: "../Backend/logic/requestHandler.php",
+      data: {
+        method: "filterConSearch",
+        param: JSON.stringify({
+          letter: e.target.value,
+        }),
+      },
+      dataType: "json", //muss immer json sein
+      success: function (data) {
+        console.log(data);
+        $("#mainView").empty();
+        if (data.length == 4 && e.target.value != "") { // bearbeiten
+          window.alert("Keine Produkte gefunden");
 
-      }
-      //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
-      for (let i in data) {
+        }
+        //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
+        for (let i in data) {
 
         console.log(data[i]);
         displayAll(data[i]); 
@@ -105,30 +105,30 @@ function updateValue(e) {
 function filterCategory(){
   console.log("filterCategory()"); 
   //Search Button
-    
+
   //Input Feld, um nach Kategorien zu filtern: 
 
-var opt1 = $("<option>");
-opt1.attr("value", "Skincare");
-opt1.attr("text","Skincare"); 
-opt1.append("Skincare"); 
-$("#Kategorie").append(opt1); 
+  var opt1 = $("<option>");
+  opt1.attr("value", "Skincare");
+  opt1.attr("text", "Skincare");
+  opt1.append("Skincare");
+  $("#Kategorie").append(opt1);
 
-var opt2 = $("<option>");
-opt2.attr("value", "MakeUp");
-opt2.attr("text","MakeUp"); 
-opt2.append("MakeUp"); 
-$("#Kategorie").append(opt2); 
+  var opt2 = $("<option>");
+  opt2.attr("value", "MakeUp");
+  opt2.attr("text", "MakeUp");
+  opt2.append("MakeUp");
+  $("#Kategorie").append(opt2);
 
-var opt3 = $("<option>");
-opt3.attr("value", "Parfum");
-opt3.attr("text","Parfum"); 
-opt3.append("Parfum");
-$("#Kategorie").append(opt3); 
+  var opt3 = $("<option>");
+  opt3.attr("value", "Parfum");
+  opt3.attr("text", "Parfum");
+  opt3.append("Parfum");
+  $("#Kategorie").append(opt3);
 
-$("#btn").on("click", function () {
-  displayCategory(); 
-});
+  $("#btn").on("click", function () {
+    displayCategory();
+  });
 }
 
 
@@ -178,19 +178,19 @@ function displayCategory(){ //onclick display category
       addCart(data);
     });
 
-    $cart.append("In den Warenkorb hinzufügen  <br>");
-    let $product = $("<div>");
-    //$product.attr("id",idx);
-    $product.append($cart);
-    let $marker = $("<img>");
-    $marker.attr("src", "../Backend/productpictures/" + data.Name + ".jpg");
-    $product.append(" <br> Name: " + data.Name + "<br>");
-    $product.append("Preis: " + data.Price + "<br>");
-    $product.append("Bewertung: " + data.Bewertung + "/5 <br>");
-    $product.append($marker);
-    $("#mainView").append($product);
-    fillCart(); 
-  }
+  $cart.append("In den Warenkorb hinzufügen  <br>");
+  let $product = $("<div>");
+  //$product.attr("id",idx);
+  $product.append($cart);
+  let $marker = $("<img>");
+  $marker.attr("src", "../Backend/productpictures/" + data.Name + ".jpg");
+  $product.append(" <br> Name: " + data.Name + "<br>");
+  $product.append("Preis: " + data.Price + "<br>");
+  $product.append("Bewertung: " + data.Bewertung + "/5 <br>");
+  $product.append($marker);
+  $("#mainView").append($product);
+  fillCart();
+}
 
   //Stcok > 0 ?
   function addCart(product) {
@@ -297,15 +297,15 @@ function displayCategory(){ //onclick display category
 
 
 //Warenkorb füllen
-function fillCart(){
-  $("#offcanvasRight").empty(); 
+function fillCart() {
+  $("#offcanvasRight").empty();
 
   console.log("fillCart()"); 
 //wenn das arr not null, dann warenkorb anzeigen 
   if(sessionStorage.getItem('myCart')){
 
-  let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
-  let gesamtpreis = 0; 
+    let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
+    let gesamtpreis = 0;
 
   //-- items erstellen
  for(let i = 0; i< storedCart.length; i++){
@@ -324,12 +324,12 @@ function fillCart(){
     removeItem(storedCart[i]);
   });
 
-  //add item to cart:
-  let $add = $("<button>");
-  $add.append("+");
-  $add.on("click", function () {
-    addExistingItem(storedCart[i]);
-  });
+      //add item to cart:
+      let $add = $("<button>");
+      $add.append("+");
+      $add.on("click", function () {
+        addExistingItem(storedCart[i]);
+      });
 
   $("#offcanvasRight").append("<br>");
  $item.append($remove); 
@@ -337,17 +337,17 @@ function fillCart(){
  $("#offcanvasRight").append("<br>");
   $("#offcanvasRight").append($item);
 
-  let $li = $("<li>"); 
-  $li.attr("id", i);
-   ($li).append("Name: " + storedCart[i].name + "<br>");
-   ($li).append("Preis: " + storedCart[i].price * storedCart[i].quant + "<br>");
-  ($li).append("Bewertung: " + storedCart[i].bewertung + "/5 <br>");
-  $("#offcanvasRight").append($li); 
-  gesamtpreis = gesamtpreis + storedCart[i].price * storedCart[i].quant; 
-}
+      let $li = $("<li>");
+      $li.attr("id", i);
+      ($li).append("Name: " + storedCart[i].name + "<br>");
+      ($li).append("Preis: " + storedCart[i].price * storedCart[i].quant + "<br>");
+      ($li).append("Bewertung: " + storedCart[i].bewertung + "/5 <br>");
+      $("#offcanvasRight").append($li);
+      gesamtpreis = gesamtpreis + storedCart[i].price * storedCart[i].quant;
+    }
 
-$("#offcanvasRight").append("<br> Gesamtpreis: " + gesamtpreis + "€"); 
- }
+    $("#offcanvasRight").append("<br> Gesamtpreis: " + gesamtpreis + "€");
+  }
 
  //order button
   
@@ -372,24 +372,24 @@ function removeItem(data){
 
   // myArray.splice(2, 1); an der Position 2, 1 item entfernen
   let myCart = [];
-  if(sessionStorage.getItem('myCart')){
+  if (sessionStorage.getItem('myCart')) {
     myCart = JSON.parse(sessionStorage.getItem('myCart'));
   }
-    for(let i = 0; i< myCart.length; i++){
-    if (myCart[i].name == data.name){
-      if (myCart[i].quant == 1){
-      myCart.splice(i,1);
-      break;
+  for (let i = 0; i < myCart.length; i++) {
+    if (myCart[i].name == data.name) {
+      if (myCart[i].quant == 1) {
+        myCart.splice(i, 1);
+        break;
       }
       else {
-        myCart[i].quant = myCart[i].quant - 1; 
+        myCart[i].quant = myCart[i].quant - 1;
       }
     }
   }
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
 
-  $("#offcanvasRight").empty(); 
-  fillCart(); 
+  $("#offcanvasRight").empty();
+  fillCart();
 
 }
 
@@ -427,7 +427,7 @@ let idx = 0;
 
   //Warenkorb im Session Storage speichern.
   sessionStorage.setItem("myCart", JSON.stringify(myCart));
-  fillCart(); 
+  fillCart();
 }
 //Bestellen
 function orderProducts(){

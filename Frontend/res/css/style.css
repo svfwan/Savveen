@@ -1,7 +1,3 @@
-#offcanvasRight {
-    overflow: auto;
-    /* Weitere CSS-Stile für das offcanvasRight-Div */
-}
 /* General Styles */
 
 body {
@@ -195,8 +191,116 @@ footer {
     background-color: #f2f2f2;
 }
 
-/* Additional Styles for Savveen */
+/* Additional Styles for Admin Dashboard */
 
-/* Customize as needed to match the design of Savveen webshop */
+.card-deck {
+    margin-top: 20px;
+}
 
-/* Example styles for product cards */
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #666;
+}
+
+/* Additional Styles for Product Cards */
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-container {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    /* Set the desired height for the image */
+    overflow: hidden;
+    /* Hide any overflowing content */
+    border-radius: 8px 8px 0 0;
+    /* Add rounded corners to the top */
+}
+
+.img-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.card-body {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 0 0 8px 8px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #006837;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.add-to-cart-btn {
+    background-color: #006837;
+    color: #fff;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #005a2d;
+}
+
+#cartItems .list-group-item {
+    display: flex;
+    align-items: center;
+}
+
+#cartItems .list-group-item .cart-item-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+#cartItems .list-group-item .flex-grow-1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

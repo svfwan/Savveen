@@ -6,10 +6,10 @@ $(document).ready(function () {
         let isLoggedIn = !!getCookie('username');
         // Define the file path and modal ID based on the login status
         var filePath = isLoggedIn ? 'sites/profile.html' : 'sites/login.html';
-        var modalId = isLoggedIn ? '#profileModal' : '#loginModal';
+        var modalID = isLoggedIn ? '#profileModal' : '#loginModal';
         // Load the content of the specified file into the modal placeholder and show the modal
         $('#modal-placeholder').load(filePath, function () {
-            $(modalId).modal('show');
+            $(modalID).modal('show');
         });
     });
 
@@ -42,11 +42,11 @@ $(document).ready(function () {
             url: '../Backend/logic/requestHandler.php',
             data: {
                 method: 'loginUser',
-                param: JSON.stringify({
+                param: {
                     username: $('#username').val(),
                     password: $('#password').val(),
                     rememberLogin: $('#remember_login').prop('checked')
-                })
+                }
             },
             dataType: 'json',
             success: function (response) {
@@ -71,32 +71,6 @@ $(document).ready(function () {
             }
         });
     });
-
-    function updateFeatures() {
-        // Always make an AJAX request to get the session information
-        // change to get request
-        $.ajax({
-            type: 'GET',
-            url: '../Backend/logic/requestHandler.php',
-            data: {
-                method: 'getSessionInfo',
-            },
-            dataType: 'json',
-            success: function (response) {
-                console.log(response);
-                if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
-                    let username = getCookie('username');
-                    let isAdmin = response.status === 'loggedInAdmin';
-                    updateNavbar(true, username, isAdmin);
-                } else {
-                    updateNavbar(false, '', false);
-                }
-            },
-            error: function (error) {
-                console.log(error);
-            },
-        });
-    }
 
     // ajax call for logout
     $(document).on('click', '#logoutButton', function () {
@@ -138,7 +112,7 @@ $(document).ready(function () {
             url: '../Backend/logic/requestHandler.php',
             data: {
                 method: 'registerUser',
-                param: JSON.stringify({
+                param: {
                     formofAddress: $('#formofAddress').val(),
                     firstName: $('#firstName').val(),
                     lastName: $('#lastName').val(),
@@ -148,7 +122,7 @@ $(document).ready(function () {
                     email: $('#email').val(),
                     username: $('#username').val(),
                     password: $('#password').val(),
-                })
+                }
             },
             dataType: 'json',
             success: function (response) {
@@ -180,31 +154,76 @@ $(document).ready(function () {
 
     // helper functions
 
+    function updateFeatures() {
+        const username = getCookie('username');
+        const rememberLogin = getCookie('rememberLogin');
+
+        if (username && rememberLogin) {
+            // User cookies are present, make the AJAX request to retrieve session information
+            $.ajax({
+                type: 'GET',
+                url: '../Backend/logic/requestHandler.php',
+                data: {
+                    method: 'getSessionInfo',
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
+                        let isAdmin = response.status === 'loggedInAdmin';
+                        updateNavbar(true, username, isAdmin);
+                        if (isAdmin) {
+                            $('#productFilter').hide();
+                            $('#mainView').load('sites/dashboard.html #adminDashboard');
+                        } else {
+                            // Load the default content for non-admin users
+                            $('#productFilter').show();
+                            $('#mainView').empty();
+                            loadAllProducts();
+                        }
+                    } else {
+                        updateNavbar(false, '', false);
+                        $('#productFilter').show();
+                        $('#mainView').empty();
+                        loadAllProducts();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        } else {
+            // User is not logged in or cookies are not present, update the UI accordingly
+            updateNavbar(false, '', false);
+            $('#productFilter').show();
+            $('#mainView').empty();
+            loadAllProducts();
+        }
+    }
+
     function updateNavbar(isLoggedIn, username, isAdmin) {
         // default state - not logged in users
         $('#usernameDisplay').text('');
         $('#usernameDisplay').hide();
         $('#showCart').show();
         $('#showOrders').hide();
-        $('#showAdminAction').hide();
+        $('#showAdminDashboard').hide();
         $('#logoutButton').hide();
 
         // if a user is logged in
         if (isLoggedIn) {
             $('#usernameDisplay').text(username);
             $('#usernameDisplay').show();
-            $('#logoutButton').show();  // show logout button
+            $('#logoutButton').show(); // show logout button
             // if the logged in user is admin
             if (isAdmin) {
                 $('#showCart').hide();
-                $('#showAdminAction').show();  // show admin dashboard
+                $('#showAdminDashboard').show(); // show admin dashboard
             } else {
-                $('#showOrders').show();  // show orders
+                $('#showOrders').show(); // show orders
             }
         }
     }
-
-
 
     function validateInput(input) {
         if (input.val().trim().length === 0) {
@@ -244,17 +263,4 @@ $(document).ready(function () {
 
         return isValid;
     }
-
-    function showModalAlert(message, type) {
-        var alertClasses = {
-            'success': 'alert-success',
-            'info': 'alert-info',
-            'warning': 'alert-warning',
-            'danger': 'alert-danger'
-        };
-        var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
-        // Add the alert HTML to the message container
-        $('#message-container').html(alertHtml);
-    }
-
 });
