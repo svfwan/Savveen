@@ -205,12 +205,11 @@ $(document).ready(function () {
             contentType: false,
             // need to correctly reset modal alerts for this modal
             success: function (response) {
-                console.log("success");
                 if (response.success) {
                     showModalAlert(response.success, 'success');
                     loadProductByID(productID);
                     loadProductsForAdmin();
-                } else {
+                } else if (response.error) {
                     showModalAlert(response.error, 'warning');
                 }
             },
@@ -232,5 +231,4 @@ $(document).ready(function () {
         $('#descriptionEdit').val(product.beschreibung);
         $('#changeProductModal').modal('show');
     }
-
 });

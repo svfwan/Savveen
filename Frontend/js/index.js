@@ -44,7 +44,11 @@ function showModalAlert(message, type) {
 
   // Add the alert HTML to the message container
   $('#message-container').html(alertHtml);
-  
+
+  // Wait for 2 seconds and then hide the alert
+  setTimeout(function () {
+    $('#message-container').empty();
+  }, 2000);
 }
 
 function showAlert(message, type) {
