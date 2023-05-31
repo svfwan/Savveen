@@ -16,6 +16,11 @@ $(document).ready(function () {
     });
 
     ContinuousSearch();
+
+    $(document).on("click", ".add-to-cart-btn", function () {
+        let productID = $(this).data('product-id');
+        addCart(productID);
+    });
 });
 
 function updateCartCounter(length) {
@@ -32,7 +37,7 @@ function loadAllProducts() {
         dataType: "json",
         success: function (data) {
             let $row = $("<div class='row'></div>");
-
+            console.log(data)
             for (let i in data) {
                 let cur = data[i];
                 displayAll(cur, $row);
@@ -94,13 +99,15 @@ function displayCategory() {
         },
         dataType: "json",
         success: function (data) {
+            $("#mainView").empty();
             let $row = $("<div class='row'></div>");
-
             for (let i in data) {
                 let cur = data[i];
-                if (selectedValue === "" || cur.category === selectedValue) {
+                if (selectedValue === "") {
                     displayAll(cur, $row);
-                    console.log("cur: " + cur);
+                } else if (cur.kategorie === selectedValue) {
+                    console.log(selectedValue)
+                    displayAll(cur, $row);
                 }
             }
             fillCart();
@@ -124,7 +131,7 @@ function displayAll(data, $row) {
             <h5 class="card-title">${data.name}</h5>
             <p class="card-text">Preis: ${data.preis}</p>
             <p class="card-text">Bewertung: ${data.bewertung}/5</p>
-            <button class="btn btn-success add-to-cart-btn">In den Warenkorb hinzufügen</button>
+            <button class="btn btn-success add-to-cart-btn" data-product-id="${data.id}">In den Warenkorb hinzufügen</button>
           </div>
         </div>
       </div>
@@ -136,39 +143,46 @@ function displayAll(data, $row) {
     if ($row.children().length === 4) {
         $("#mainView").append($row);
         $row = $("<div class='row'></div>");
+    } else {
+        $("#mainView").append($row);
     }
-
-    $row.on("click", ".add-to-cart-btn", function (event) {
-        event.stopPropagation(); // Stop event propagation
-        addCart(data);
-    });
 }
 
-function addCart(product) {
+function addCart(productID) {
+    let myCart = [];
+    let quantityInCart = 0;
+    if (sessionStorage.getItem("myCart")) {
+        myCart = JSON.parse(sessionStorage.getItem("myCart"));
+        for (let i = 0; i < myCart.length; i++) {
+            if (myCart[i].id == productID) {
+                quantityInCart = myCart[i].quant;
+                break;
+            }
+        }
+    }
+
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
         data: {
             method: "checkStock",
             param: JSON.stringify({
-                name: product.name,
+                id: productID,
             }),
         },
         dataType: "json",
-        success: function (data) {
-            console.log(data);
-            if (data && data.length > 0) {
-                const cur = data[0]; // Assuming the response contains a single item
-                console.log(cur);
-                if (cur.bestand > 0) {
-                    addItemtoCart(cur);
-                } else {
-                    window.alert("Dieses Produkt haben wir leider nicht mehr auf Lager");
-                }
+        success: function (response) {
+            console.log(response);
+            let item = response[0];
+            let stock = item.bestand;
+            if (quantityInCart + 1 <= stock) {
+                addItemtoCart(item);
+            } else {
+                window.alert("Dieses Produkt haben wir leider nicht mehr auf Lager!");
             }
         },
-        error: function (xhr, status, error) {
-            console.log(xhr, status, error);
+        error: function (error) {
+            console.log(error);
             window.alert("Error: Seite kann nicht geladen werden");
         },
     });
@@ -180,12 +194,13 @@ function addItemtoCart(data) {
         myCart = JSON.parse(sessionStorage.getItem("myCart"));
     }
 
-    let existingItem = myCart.find((item) => item.name === data.name);
+    let existingItem = myCart.find((item) => item.id === data.id);
 
     if (existingItem) {
         existingItem.quant += 1;
     } else {
         myCart.push({
+            id: data.id,
             name: data.name,
             price: data.preis,
             bewertung: data.bewertung,
@@ -236,7 +251,7 @@ function updateCartItems(myCart) {
             });
 
             $item.find(".add-btn").on("click", function () {
-                addExistingItem(item);
+                addCart(item.id);
             });
 
             $cartItems.append($item);
@@ -271,8 +286,8 @@ function removeItem(data) {
     }
 
     for (let i = 0; i < myCart.length; i++) {
-        if (myCart[i].name == data.name) {
-            if (myCart[i].quant == 1) {
+        if (myCart[i].id === data.id) { // Updated comparison
+            if (myCart[i].quant === 1) {
                 myCart.splice(i, 1);
                 break;
             } else {
@@ -296,7 +311,7 @@ function addExistingItem(data) {
     }
 
     for (let i = 0; i < myCart.length; i++) {
-        if (myCart[i].name == data.name) {
+        if (myCart[i].id === data.id) { // Updated comparison
             myCart[i].quant = myCart[i].quant + 1;
             break;
         }

@@ -104,7 +104,6 @@ $(document).ready(function () {
         formData.append('price', price);
         formData.append('stock', stock);
         formData.append('description', description);
-        console.log(formData.get('description'));
         formData.append('picture', picture, picture.name);
 
         // Send data to the backend using AJAX
@@ -187,15 +186,12 @@ $(document).ready(function () {
 
         let formData = new FormData();
         formData.append('method', 'updateProduct');
-        formData.append('param', JSON.stringify({
-            productID: productID,
-            category: category,
-            productName: productName,
-            price: price,
-            stock: stock,
-            description: description
-        }));
-
+        formData.append('productID', productID,);
+        formData.append('category', category);
+        formData.append('productName', productName);
+        formData.append('price', price);
+        formData.append('stock', stock);
+        formData.append('description', description);
         if (picture) {
             formData.append('picture', picture, picture.name);
         }
@@ -209,14 +205,17 @@ $(document).ready(function () {
             contentType: false,
             // need to correctly reset modal alerts for this modal
             success: function (response) {
+                console.log("success");
                 if (response.success) {
                     showModalAlert(response.success, 'success');
+                    loadProductByID(productID);
                     loadProductsForAdmin();
                 } else {
                     showModalAlert(response.error, 'warning');
                 }
             },
             error: function () {
+                console.log("failure");
                 showModalAlert('Fehler beim Aktualisieren des Produkts!', 'danger');
                 loadProductByID(productID);
             }

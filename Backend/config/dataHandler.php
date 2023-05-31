@@ -193,17 +193,15 @@ class dataHandler
         return $result;
     }
 
-    public function createProduct($param)
+    public function createProduct()
     {
         $result = array();
+        $param = $_POST;
         $category = $param['category'];
         $productName = $param['productName'];
         $price = floatval($param['price']);
         $stock = $param['stock'];
         $description = $param['description'];
-        $picture = $_FILES['picture'];
-        $tmp_path = $picture['tmp_name'];
-        $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
         // Perform validation
         if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
@@ -216,10 +214,14 @@ class dataHandler
             return $result;
         }
 
-        if (empty($picture) || !isset($picture)) {
+        if (!isset($_FILES['picture']) || $_FILES['picture']['size'] <= 0) {
             $result['error'] = 'Bitte wählen Sie ein Bild für das Produkt aus!';
             return $result;
         }
+
+        $picture = $_FILES['picture'];
+        $tmp_path = $picture['tmp_name'];
+        $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
         // Check if file is an image
         $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
@@ -240,7 +242,7 @@ class dataHandler
 
         // Prepared SQL statement to insert the product into the database
         $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`, `bestand`)
-            VALUES (?, ?, ?, ?, ?)';
+        VALUES (?, ?, ?, ?, ?)';
         $stmt = $this->db_obj->prepare($sql);
         $stmt->bind_param('ssssd', $category, $productName, $price, $description, $stock);
 
@@ -255,9 +257,10 @@ class dataHandler
         return $result;
     }
 
-    public function updateProduct($param)
+    public function updateProduct()
     {
         $result = array();
+        $param = $_POST;
         $productID = $param['productID'];
         $category = $param['category'];
         $productName = $param['productName'];
@@ -286,9 +289,9 @@ class dataHandler
         $pictureMoved = false;
 
         // Check if a new picture is provided
-        if (isset($param['picture']) && $param['picture']['size'] > 0) {
+        if (isset($_FILES['picture']) && $_FILES['picture']['size'] > 0) {
             // Process the file upload for the new picture
-            $picture = $param['picture'];
+            $picture = $_FILES['picture'];
             $tmpPath = $picture['tmp_name'];
             $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
@@ -420,7 +423,7 @@ class dataHandler
         // $tab = []; // Initialisiere das Array
         $tab = array();
 
-        $n = $param['name'];
+        $id = $param['id'];
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
@@ -430,8 +433,8 @@ class dataHandler
 
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `name` = ? ");
-        $sql->bind_param('s', $n);
+        $sql = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `id` = ? ");
+        $sql->bind_param('i', $id);
         //  echo "Datenbank: ". $param['Name'];
         $sql->execute();
         $result = $sql->get_result();

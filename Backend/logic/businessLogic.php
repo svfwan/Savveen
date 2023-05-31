@@ -53,10 +53,10 @@ class businessLogic
                 $res = $this->dh->reduceStock($param);
                 break;
             case 'createProduct':
-                $res = $this->dh->createProduct($param);
+                $res = $this->dh->createProduct();
                 break;
             case 'updateProduct':
-                $res = $this->dh->updateProduct($param);
+                $res = $this->dh->updateProduct();
                 break;
             default:
                 $res = null;
