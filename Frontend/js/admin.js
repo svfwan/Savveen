@@ -25,8 +25,12 @@ $(document).ready(function () {
 
     $(document).on('click', '#updateProduct', function () {
         updateProduct();
-        console.log("clicked");
     });
+
+    // need to implement deleteProduct()
+    /*$(document).on('click', '#deleteProduct', function () {
+        //deleteProduct();
+    });*/
 
     // ajax call for loading products for admin
 
