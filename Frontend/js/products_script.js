@@ -34,10 +34,13 @@ $(document).ready(function () {
     },
     dataType: "json", //muss immer json sein
     success: function (data) {
+      console.log("loadAllProducts successfull"); 
+      
       for (let i in data) {
         let cur = data[i];
-        //console.log(data[i]);
-        displayAll(cur);
+        console.log(data[i]);
+        console.log(i); 
+      //  displayAll(cur);
       }
     },
     error: function (xhr, status, error) {
@@ -168,6 +171,7 @@ function displayCategory(){ //onclick display category
       });
     } 
 
+
   function displayAll(data) {
     
     //image erstellen pro file eintrag mit jquery.
@@ -183,10 +187,10 @@ function displayCategory(){ //onclick display category
   //$product.attr("id",idx);
   $product.append($cart);
   let $marker = $("<img>");
-  $marker.attr("src", "../Backend/productpictures/" + data.Name + ".jpg");
-  $product.append(" <br> Name: " + data.Name + "<br>");
-  $product.append("Preis: " + data.Price + "<br>");
-  $product.append("Bewertung: " + data.Bewertung + "/5 <br>");
+  $marker.attr("src", "../Backend/productpictures/" + data.name + ".jpg");
+  $product.append(" <br> Name: " + data.name + "<br>");
+  $product.append("Preis: " + data.preis + "<br>");
+  $product.append("Bewertung: " + data.bewertung + "/5 <br>");
   $product.append($marker);
   $("#mainView").append($product);
   fillCart();
@@ -202,7 +206,7 @@ function displayCategory(){ //onclick display category
       data: {
         method: "checkStock",
         param: JSON.stringify({
-          Name: product.Name,
+          Name: product.name,
         }),
       },
       dataType: "json", //muss immer json sein
@@ -212,7 +216,7 @@ function displayCategory(){ //onclick display category
         for (let i in data) {
           let cur = data[i];
           console.log(data[i]);
-          if (cur.stock > 0) {
+          if (cur.bestand > 0) {
             addItemtoCart(cur);
           } else {
             window.alert(
@@ -230,6 +234,7 @@ function displayCategory(){ //onclick display category
 
   function addItemtoCart(data) {
     console.log("AddItemtoCart"); 
+    console.log(data); 
      //data aus db
     let cart = false; 
     let idx = 0; 
@@ -266,12 +271,12 @@ function displayCategory(){ //onclick display category
       console.log("Produkt nicht im Warenkorb"); 
     myCart.push({
       id: data.Product_id, 
-      name: data.Name,
-      price: data.Price,
-      bewertung: data.Bewertung,
-      cat: data.Category,
+      name: data.name,
+      price: data.preis,
+      bewertung: data.bewertung,
+      cat: data.kategorie,
       quant: 1,
-      stock: data.stock,
+      stock: data.bestand,
     });
   }
 

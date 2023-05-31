@@ -335,14 +335,13 @@ class dataHandler
 
 
     //checkStock()
-    public function checkStock($param)
-    {
+    public function checkStock($param){
 
         //überarbeiten
         // $tab = []; // Initialisiere das Array
         $tab = array();
 
-        $n = $param['name'];
+        $n = $param['Name'];
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
