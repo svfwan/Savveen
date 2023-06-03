@@ -47,16 +47,19 @@ class businessLogic
                 $res = $this->dh->searchProducts($param);
                 break;
             case 'getCurrentReceipt_id':
-                $res = $this -> dh -> getCurrentReceipt_id();
-                break; 
+                $res = $this->dh->getCurrentReceipt_id();
+                break;
             case 'getAddress':
-                $res = $this -> dh -> getAddress($param);
-                break; 
+                $res = $this->dh->getAddress($param);
+                break;
             case 'createReceipt':
-                $res = $this -> dh -> createReceipt($param);
-                break; 
+                $res = $this->dh->createReceipt($param);
+                break;
             case 'createProduct':
                 $res = $this->dh->createProduct();
+                break;
+            case 'deleteProduct':
+                $res = $this->dh->deleteProduct($param);
                 break;
             case 'updateProduct':
                 $res = $this->dh->updateProduct();
