@@ -27,6 +27,10 @@ $(document).ready(function () {
         updateProduct();
     });
 
+    $(document).on('click', '#updateProduct', function () {
+        updateProduct();
+    });
+
     // need to implement deleteProduct()
     /*$(document).on('click', '#deleteProduct', function () {
         //deleteProduct();

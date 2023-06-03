@@ -32,6 +32,7 @@ function updateCartCounter(length) {
 }
 
 function loadAllProducts() {
+    console.log("loadAllProducts()"); 
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -83,6 +84,47 @@ function searchProducts(value) {
     });
 }
 
+
+function updateValue(e) {
+    console.log(e.target.value);
+    //ajax call - filterConSearch
+
+    $.ajax({
+      type: "GET",
+      url: "../Backend/logic/requestHandler.php",
+      data: {
+        method: "filterConSearch",
+        param: JSON.stringify({
+          letter: e.target.value,
+        }),
+      },
+      dataType: "json", //muss immer json sein
+      success: function (data) {
+        let $row = $("<div class='row'></div>");
+        console.log(data);
+        $("#mainView").empty();
+        if (data.length == 4 && e.target.value != "") { // bearbeiten
+          window.alert("Keine Produkte gefunden");
+
+        }
+        //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
+        for (let i in data) {
+
+          console.log(data[i]);
+          displayAll(data[i], $row);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr, status, error);
+        window.alert("Error: Seite kann nicht geladen werden");
+      },
+    });
+    //ajax ende
+  }
+
+
+
+
 function displayCategory() {
     const selectedValue = $("#category").val();
     $.ajax({
@@ -112,6 +154,10 @@ function displayCategory() {
 }
 
 function displayAll(data, $row) {
+
+    console.log(data.name);
+    console.log(data.preis); 
+    console.log($row); 
     let productHTML = `
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product card product-card">
@@ -131,6 +177,8 @@ function displayAll(data, $row) {
     `;
 
     let $product = $(productHTML);
+    console.log($product); 
+    
     $row.append($product);
 
     if ($row.children().length === 4) {
@@ -251,7 +299,7 @@ function updateCartItems(myCart) {
             gesamtpreis += item.price * item.quant;
         }
 
-        $cartTotal.html(`<div class="mt-3">Gesamtpreis: ${gesamtpreis}€</div>`);
+        $cartTotal.html(`<div class="mt-3"> ${gesamtpreis}</div>`);
         $('#orderCart').show();
     } else {
         $cartItems.html('<h2>Ihr Warenkorb ist leer</h2>');

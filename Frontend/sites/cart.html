@@ -4,9 +4,63 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Cart</title>
 </head>
 <body>
+    <h1 id = "header">Warenkorb</h1>
+   
+
+    <div class="modal fade" id="AdressModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+
+
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Lieferadresse</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="message-container"></div>
+                    <div id="adressForm" class="container">
+                <div class="form-group">
+                    <label for="strasse">Strasse: </label>
+                    <input type="text" id="street" class="form-control" name="street"
+                        placeholder="Wohnstraße123" required>
+                </div>
+                <div class="form-group">
+                    <label for="plz">Postleitzahl: </label>
+                    <input type="plz" id="plz" class="form-control" name="plz"
+                        placeholder="1100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ort">Ort: </label>
+                    <input type="ort" id="ort" class="form-control" name="ort"
+                        placeholder="Wien" required>
+                </div>
+
+                
+            </div>
+        </div>
+
+                <div class="modal-footer">
+                    <button id="newAdrsButton" type="button" class="btn btn-success">Neue Lieferadresse</button>
+                    <button id="oldAdrsButton" type="button" class="btn btn-success">Lieferadresse beibehalten</button>
+                </div>
+        
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     
+
+   
+
+ 
+
 </body>
 </html>
