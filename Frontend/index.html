@@ -29,17 +29,9 @@
                 <button id="showOrders" class="btn me-md-2" type="button">
                     <img src="res/icons/box-seam.svg">
                 </button>
-                <div id="showAdminAction" class="dropdown">
-                    <button class="btn me-md-2 dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <img src="res/icons/gear.svg">
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-lg-end">
-                        <li><button id="showProfileManagement" class="btn dropdown-item">Kundenverwaltung</button></li>
-                        <li><button id="showProductManagement" class="btn dropdown-item">Produktverwaltung</button></li>
-                        <li><button id="showOrderManagement" class="btn dropdown-item">Bestellverwaltung</button></li>
-                    </ul>
-                </div>
+                <button id="showAdminDashboard" class="btn me-md-2" type="button">
+                    <img src="res/icons/gear.svg">
+                </button>
                 <button id="showInfo" class="btn me-md-2" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasLeft" aria-controls="offcanvasLeft">
                     <img src="res/icons/info-circle.svg">
@@ -55,21 +47,34 @@
     <div id="modal-placeholder"></div>
 
     <!--  General Alert Container  -->
-    <div class="container">
+    <!-- General Alert Container -->
+    <div id="alertContainer" class="container d-none">
         <div class="row justify-content-md-center">
             <div id="alertContent" class="col-sm">
             </div>
         </div>
     </div>
 
+    <!-- Produkt Filter Container -->
+    <div id="productFilter" class="container-fluid mt-1">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="input-group mb-3">
+                    <select id="category" class="form-select">
+                        <option value="" selected>Alle Kategorien</option>
+                        <option value="Skincare">Skincare</option>
+                        <option value="Make-Up">Make-Up</option>
+                        <option value="Parfüm">Parfüm</option>
+                    </select>
+                    <button type="button" id="filterCategory" class="btn btn-success">Filtern</button>
+                    <input type="text" id="searchTerm" class="form-control" placeholder="Suchfeld">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--  General Main Container Alle Produkte hier anzeigen  -->
-
-      <!-- filtern-->
-
-      <select id = "Kategorie">Kategorie</select>
-      <div id = "prod"></div>
-        <div id="mainView"></div>
-   
+    <div id="mainView" class="container-fluid"></div>
 
     <!--  OffCanvas for Shopping Cart  -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -78,11 +83,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div id="cartMessages"></div>
-            <div id="userCart">
+            <div class="container-fluid">
+                <div id="cartMessages"></div>
+                <div id="cartItems" class="list-group"></div>
+                <br><p>Gesamtpreis in EUR(€)</p>
+                <div id="cartTotal"></div>
             </div>
             <div class="container-fluid">
-                <button class="btn btn-success" id="orderCart" type="button">Bestellen</button>
+                <button class="btn btn-success mt-1" id="orderCart" type="button">Bestellen</button>
             </div>
         </div>
     </div>
@@ -200,8 +208,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="js/index.js"></script>
     <script src="js/profile.js"></script>
-    <script src="js/products_script.js"></script>
+    <script src="js/product.js"></script>
     <script src="js/order.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/orders.js"></script>
 </body>
 
 </html>
