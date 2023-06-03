@@ -234,7 +234,7 @@ $(document).ready(function () {
         $('#categoryEdit').val(product.kategorie);
         $('#productNameEdit').val(product.name);
         $('#priceEdit').val(product.preis);
-        $('#stockEdit').val(product.bewertung);
+        $('#stockEdit').val(product.bestand);
         $('#descriptionEdit').val(product.beschreibung);
         let pictureCacheRemover = new Date().getTime();
         $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);

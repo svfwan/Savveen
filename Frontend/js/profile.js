@@ -11,7 +11,6 @@ $(document).ready(function () {
         var modalId = isLoggedIn ? '#profileModal' : '#loginModal';
         $('#modal-placeholder').load(filePath, function () {
             if (isLoggedIn) {
-                console.log("logged in");
                 loadProfileData();
             }
             $(modalId).modal('show');
@@ -20,9 +19,8 @@ $(document).ready(function () {
 
     function changeProfileData() {
 
-        var userinfo=getCookie('username');
-        var newData={};
-        
+        let userinfo = getCookie('username');
+        let newData = [];
         newData.firstName = $('#firstNamenew').val();
         newData.lastName = $('#lastNamenew').val();
         newData.email = $('#emailnew').val();
@@ -30,10 +28,15 @@ $(document).ready(function () {
         newData.adress = $('#addressnew').val();
         newData.city = $('#citynew').val();
         newData.plz = $('#postcodenew').val();
-        newData.username=$('#usernamenew').val();
-        newData.formofAddress=$('#formofAddressnew').val();
-        newData.pw_alt=$('#pw_alt').val();
-        
+        newData.username = $('#usernamenew').val();
+        let allEmpty = Object.values(newData).every(value => value === '');
+        if (allEmpty) {
+            showModalAlert('Sie haben nichts eingegeben!', 'warning');
+            return;
+        }
+        newData.formofAddress = $('#formofAddressnew').val();
+        newData.pw_alt = $('#pw_alt').val();
+
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
@@ -51,17 +54,13 @@ $(document).ready(function () {
                     username: newData.username,
                     formofAddress: newData.formofAddress,
                     pw_alt: newData.pw_alt
-                    
-                    
                 })
             },
             dataType: 'json',
             success: function (response) {
-                console.log('Ajax-Anfrage erfolgreich');
                 console.log(response);
-
                 if (response.success) {
-                    showModalAlert('Ihre Änderungen wurden erfolgreich gespeichert!', 'success');
+                    showModalAlert(response.success, 'success');
                     $('#firstNameold').html(response.vorname);
                     $('#lastNameold').text(response.nachname);
                     $('#addressold').text(response.adress);
@@ -71,15 +70,12 @@ $(document).ready(function () {
                     $('#usernameold').text(response.username);
                     $('#formofAddressold').text(response.anrede);
                     updateFeatures();
-                   getCookie('username');
                 } else if (response.error) {
-                    console.log(response.error);
-                    showModalAlert(response.error, 'danger');
+                    showModalAlert(response.error, 'warning');
                 }
             },
             error: function (error) {
                 console.log(error);
-                console.log("Maria, du hast einen Fehler gemacht.")
             }
 
         });
@@ -99,10 +95,7 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                console.log("success");
-                console.log('Ajax-Anfrage erfolgreich');
                 console.log(response);
-
                 if (response.success) {
                     $('#firstNameold').text(response.vorname);
                     $('#lastNameold').text(response.nachname);
@@ -117,7 +110,6 @@ $(document).ready(function () {
 
             },
             error: function (error) {
-                console.log("Maria, du hast einen Fehler gemacht.");
                 console.log(error);
             }
         });
@@ -148,7 +140,6 @@ $(document).ready(function () {
 
     // ajax call for login
     $(document).on('click', '#loginButton', function () {
-        console.log('Login button clicked');
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
@@ -156,7 +147,6 @@ $(document).ready(function () {
                 method: 'loginUser',
                 param: JSON.stringify({
                     userInput: $('#userInput').val(),
-                   // email: $('#email').val(),
                     password: $('#password').val(),
                     rememberLogin: $('#remember_login').prop('checked')
                 })
@@ -180,15 +170,13 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-                $('#loadingSpinner').css('display', 'none');
-                console.log(error);
+                alert("Fehler bei der Abfrage!");
             }
         });
     });
-  
+
     // ajax call for logout
     $(document).on('click', '#logoutButton', function () {
-        console.log("logout button clicked")
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
@@ -197,21 +185,18 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                console.log(response);
                 if (response.loggedIn === false) {
-                    console.log("Logged out");
                     updateFeatures();
                 }
             },
-            error: function (error) {
-                console.log(error)
+            error: function () {
+                alert("Fehler bei der Abfrage!");
             }
         });
     });
 
     // ajax call for registration
     $(document).on('click', '#registerButton', function () {
-        console.log('button clicked');
         if (!$('#termsCheck').prop('checked')) {
             $('#termsCheck').addClass('is-invalid');
             showModalAlert('Bitte stimmen Sie den Nutzungsbedingungen zu!', 'warning');
@@ -240,8 +225,6 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                console.log(response);
-                $('#loadingSpinner').css('display', 'none');
                 if (response.success) {
                     // reset form inputs after success
                     $('#formofAddress option:first').prop('selected', true);
@@ -260,8 +243,7 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-                $('#loadingSpinner').css('display', 'none');
-                console.log(error);
+                alert("Fehler bei der Abfrage!");
             }
         });
     });
@@ -303,8 +285,8 @@ $(document).ready(function () {
                         loadAllProducts();
                     }
                 },
-                error: function (error) {
-                    console.log(error);
+                error: function () {
+                    alert("Fehler bei der Abfrage!");
                 },
             });
         } else {

@@ -32,7 +32,6 @@ function updateCartCounter(length) {
 }
 
 function loadAllProducts() {
-    console.log("loadAllProducts()"); 
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -42,7 +41,6 @@ function loadAllProducts() {
         dataType: "json",
         success: function (data) {
             let $row = $("<div class='row'></div>");
-            console.log(data)
             for (let i in data) {
                 let cur = data[i];
                 displayAll(cur, $row);
@@ -84,47 +82,6 @@ function searchProducts(value) {
     });
 }
 
-
-function updateValue(e) {
-    console.log(e.target.value);
-    //ajax call - filterConSearch
-
-    $.ajax({
-      type: "GET",
-      url: "../Backend/logic/requestHandler.php",
-      data: {
-        method: "filterConSearch",
-        param: JSON.stringify({
-          letter: e.target.value,
-        }),
-      },
-      dataType: "json", //muss immer json sein
-      success: function (data) {
-        let $row = $("<div class='row'></div>");
-        console.log(data);
-        $("#mainView").empty();
-        if (data.length == 4 && e.target.value != "") { // bearbeiten
-          window.alert("Keine Produkte gefunden");
-
-        }
-        //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
-        for (let i in data) {
-
-          console.log(data[i]);
-          displayAll(data[i], $row);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log(xhr, status, error);
-        window.alert("Error: Seite kann nicht geladen werden");
-      },
-    });
-    //ajax ende
-  }
-
-
-
-
 function displayCategory() {
     const selectedValue = $("#category").val();
     $.ajax({
@@ -142,6 +99,7 @@ function displayCategory() {
                 if (selectedValue === "") {
                     displayAll(cur, $row);
                 } else if (cur.kategorie === selectedValue) {
+                    console.log(cur.beschreibung);
                     displayAll(cur, $row);
                 }
             }
@@ -154,31 +112,27 @@ function displayCategory() {
 }
 
 function displayAll(data, $row) {
-
-    console.log(data.name);
-    console.log(data.preis); 
-    console.log($row); 
     let productHTML = `
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="product card product-card">
-          <div class="card-img-container">
-            <div class="img-wrapper">
-              <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="product card product-card">
+            <div class="card-img-container">
+                <div class="img-wrapper">
+                <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+                </div>
             </div>
-          </div>
-          <div class="card-body product-card-body">
-            <h5 class="card-title">${data.name}</h5>
-            <p class="card-text">Preis: ${data.preis}</p>
-            <p class="card-text">Bewertung: ${data.bewertung}/5</p>
-            <button class="btn btn-success add-to-cart-btn" data-product-id="${data.id}">In den Warenkorb hinzufügen</button>
-          </div>
+            <div class="card-body product-card-body">
+                <h5 class="card-title">${data.name}</h5>
+                <p class="card-text price">${data.preis}€</p>
+                <p class="card-text description text-sm text-break">${data.beschreibung}</p>
+                <button class="btn btn-success add-to-cart-btn" data-product-id="${data.id}">In den Warenkorb hinzufügen</button>
+            </div>
+            </div>
         </div>
-      </div>
     `;
 
+
     let $product = $(productHTML);
-    console.log($product); 
-    
+
     $row.append($product);
 
     if ($row.children().length === 4) {
@@ -213,7 +167,6 @@ function addCart(productID) {
         },
         dataType: "json",
         success: function (response) {
-            console.log(response);
             let item = response;
             let stock = item.bestand;
             if (quantityInCart + 1 <= stock) {
@@ -243,7 +196,7 @@ function addItemtoCart(data) {
             id: data.id,
             name: data.name,
             price: data.preis,
-            bewertung: data.bewertung,
+            beschreibung: data.beschreibung,
             cat: data.kategorie,
             quant: 1,
         });
@@ -299,7 +252,8 @@ function updateCartItems(myCart) {
             gesamtpreis += item.price * item.quant;
         }
 
-        $cartTotal.html(`<div class="mt-3"> ${gesamtpreis}</div>`);
+
+        $cartTotal.html(`<div class="mt-3">Gesamtpreis: ${gesamtpreis}€</div>`);
         $('#orderCart').show();
     } else {
         $cartItems.html('<h2>Ihr Warenkorb ist leer</h2>');
