@@ -43,14 +43,8 @@ class businessLogic
             case 'checkStock':
                 $res = $this->dh->checkStock($param);
                 break;
-            case 'reduceStock':
-                $res = $this->dh->reduceStock($param);
-                break;
             case 'searchProducts':
                 $res = $this->dh->searchProducts($param);
-                break;
-            case 'reduceStock';
-                $res = $this->dh->reduceStock($param);
                 break;
             case 'getCurrentReceipt_id':
                 $res = $this -> dh -> getCurrentReceipt_id();
@@ -61,9 +55,6 @@ class businessLogic
             case 'createReceipt':
                 $res = $this -> dh -> createReceipt($param);
                 break; 
-            case 'loadProductsForAdmin':
-                $res = $this->dh->loadProductsForAdmin();
-                break;
             case 'createProduct':
                 $res = $this->dh->createProduct();
                 break;
