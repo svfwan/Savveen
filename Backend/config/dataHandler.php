@@ -104,7 +104,7 @@ class dataHandler
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
         }
 
-        $sql = 'SELECT `id`,`username`, `passwort`, `admin` FROM `users` WHERE `username` = ? AND `active` = ? LIMIT 1';
+        $sql = 'SELECT `username`, `passwort`, `admin` FROM `users` WHERE `username` = ? AND `active` = ? LIMIT 1';
         $stmt = $this->db_obj->prepare($sql);
         $stmt->bind_param('si', $username, $active);
 
@@ -116,25 +116,21 @@ class dataHandler
                     $result['success'] = 'Login erfolgreich, willkommen ' . $username . '!';
                     $result['username'] = $username;
                     $result['admin'] = $row['admin'];
-                    $result['userid'] = $row['id']; 
                     if (!(isset($_SESSION))) {
                         session_start();
                     }
                     $_SESSION['username'] = $username;
                     $_SESSION['admin'] = $row['admin'];
-                    $_SESSION['userid'] = $row['id']; 
                     if (isset($param['rememberLogin']) && $param['rememberLogin']) {
                         // 30-day cookie
                         setcookie('rememberLogin', true, time() + (86400 * 30), '/');
                         setcookie('username', $username, time() + (86400 * 30), '/');
                         setcookie('admin', $row['admin'], time() + (86400 * 30), '/');
-                        setcookie('userid', $row['id'], time() + (86400 * 30), '/'); 
                     } else {
                         // 1-hour cookie
                         setcookie('rememberLogin', true, time() + 3600, '/');
                         setcookie('username', $username, time() + 3600, '/');
                         setcookie('admin', $row['admin'], time() + 3600, '/');
-                        setcookie('userid', $row['id'], time() + 3600, '/');
                     }
                 } else {
                     $result['error'] = 'Falsches Passwort!';
@@ -158,20 +154,6 @@ class dataHandler
                 $result['status'] = 'loggedInAdmin';
             } else {
                 $result['status'] = 'loggedInUser';
-                
-            }
-        } elseif (isset($_COOKIE['rememberLogin']) && isset($_COOKIE['username'])) {
-            // Restore the session based on the 'rememberLogin' cookie
-            if (!isset($_SESSION)) {
-                session_start();
-            }
-            $_SESSION['username'] = $_COOKIE['username'];
-            $_SESSION['admin'] = $_COOKIE['admin'] ?? false;
-            if ($_SESSION['admin']) {
-                $result['status'] = 'loggedInAdmin';
-            } else {
-                $result['status'] = 'loggedInUser';
-                
             }
         } elseif (isset($_COOKIE['rememberLogin']) && isset($_COOKIE['username'])) {
             // Restore the session based on the 'rememberLogin' cookie
@@ -211,29 +193,15 @@ class dataHandler
         return $result;
     }
 
-    public function loadProductsForAdmin()
+    public function createProduct()
     {
         $result = array();
-
-        if (!$this->checkConnection()) {
-            $result['error'] = 'Produktkatalog kann nicht geladen werden, versuchen Sie es später erneut!';
-        }
-
-        $result['message'] = 'empty function';
-        return $result;
-    }
-
-    public function createProduct($param)
-    {
-        $result = array();
+        $param = $_POST;
         $category = $param['category'];
         $productName = $param['productName'];
         $price = floatval($param['price']);
         $stock = $param['stock'];
         $description = $param['description'];
-        $picture = $_FILES['picture'];
-        $tmp_path = $picture['tmp_name'];
-        $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
         // Perform validation
         if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
@@ -246,10 +214,14 @@ class dataHandler
             return $result;
         }
 
-        if (empty($picture) || !isset($picture)) {
+        if (!isset($_FILES['picture']) || $_FILES['picture']['size'] <= 0) {
             $result['error'] = 'Bitte wählen Sie ein Bild für das Produkt aus!';
             return $result;
         }
+
+        $picture = $_FILES['picture'];
+        $tmp_path = $picture['tmp_name'];
+        $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
         // Check if file is an image
         $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
@@ -270,9 +242,9 @@ class dataHandler
 
         // Prepared SQL statement to insert the product into the database
         $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`, `bestand`)
-            VALUES (?, ?, ?, ?, ?)';
+        VALUES (?, ?, ?, ?, ?)';
         $stmt = $this->db_obj->prepare($sql);
-        $stmt->bind_param('sssds', $category, $productName, $price, $description, $stock);
+        $stmt->bind_param('ssssd', $category, $productName, $price, $description, $stock);
 
         // Execute the statement and check if successful
         if ($stmt->execute() && $stmt->affected_rows > 0 && move_uploaded_file($tmp_path, $actual_path)) {
@@ -282,6 +254,83 @@ class dataHandler
         }
 
         $stmt->close();
+        return $result;
+    }
+
+    public function updateProduct()
+    {
+        $result = array();
+        $param = $_POST;
+        $productID = $param['productID'];
+        $category = $param['category'];
+        $productName = $param['productName'];
+        $price = floatval($param['price']);
+        $stock = $param['stock'];
+        $description = $param['description'];
+
+        // Perform validation
+        if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
+            $result['error'] = 'Bitte füllen Sie alle Felder aus!';
+            return $result;
+        }
+
+        if (!is_numeric($price) || !is_numeric($stock) || $price < 0 || $stock < 0) {
+            $result['error'] = 'Preis und Lagerbestand müssen valide Zahlen sein!';
+            return $result;
+        }
+
+        // Check the connection
+        if (!$this->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $databaseUpdated = false;
+        $pictureMoved = false;
+
+        // Check if a new picture is provided
+        if (isset($_FILES['picture']) && $_FILES['picture']['size'] > 0) {
+            // Process the file upload for the new picture
+            $picture = $_FILES['picture'];
+            $tmpPath = $picture['tmp_name'];
+            $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
+
+            $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+            if (!in_array(strtolower($fileExtension), $allowedExtensions)) {
+                $result['error'] = 'Ungültige Dateierweiterung! Nur JPG, JPEG, PNG und GIF sind erlaubt.';
+                return $result;
+            }
+
+            $newPictureFilename = $productName . '.jpg';
+            $newPicturePath = "../../Frontend/res/img/" . $newPictureFilename;
+            move_uploaded_file($tmpPath, $newPicturePath);
+            $pictureMoved = true;
+        }
+
+        // Prepared SQL statement to update the product in the database
+        $sql = 'UPDATE `products` SET `kategorie` = ?, `name` = ?, `preis` = ?, `beschreibung` = ?, `bestand` = ? WHERE `id` = ?';
+        $stmt = $this->db_obj->prepare($sql);
+        $stmt->bind_param('ssssdi', $category, $productName, $price, $description, $stock, $productID);
+
+        // Execute the statement and check if successful
+        if ($stmt->execute()) {
+            if ($stmt->affected_rows > 0) {
+                $databaseUpdated = true;
+            }
+        } else {
+            $result['error'] = 'Fehler beim Aktualisieren des Produkts!';
+            $stmt->close();
+            return $result;
+        }
+
+        $stmt->close();
+
+        if ($databaseUpdated || $pictureMoved) {
+            $result['success'] = 'Produkt erfolgreich aktualisiert!';
+        } else {
+            $result['error'] = 'Daten bereits aktuell!';
+        }
+
         return $result;
     }
 
@@ -319,7 +368,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
+        $sql = $this->db_obj->prepare("SELECT `id`,`kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products`");
         $sql->execute();
         $result = $sql->get_result();
 
@@ -333,15 +382,48 @@ class dataHandler
         return $tab;
     }
 
+    // load product by ID
+    public function loadProductByID($param)
+    {
+        $tab = array();
+
+        // Check the database connection
+        if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        // Prepare and execute the SQL query
+        $sql = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products` WHERE `id` = ?");
+        $sql->bind_param("i", $param);
+        $sql->execute();
+        $result = $sql->get_result();
+
+        // Check if the product was found
+        if ($result->num_rows == 1) {
+            $row = $result->fetch_assoc();
+            $tab["success"] = true;
+            $tab["data"] = $row;
+        } else {
+            $tab["success"] = false;
+            $tab["error"] = "Produkt nicht gefunden";
+        }
+
+        // Close the connection and return the array
+        $sql->close();
+        return $tab;
+    }
+
 
     //checkStock()
-    public function checkStock($param){
+    public function checkStock($param)
+    {
 
         //überarbeiten
         // $tab = []; // Initialisiere das Array
         $tab = array();
 
-        $n = $param['Name'];
+        $id = $param['id'];
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
@@ -351,8 +433,8 @@ class dataHandler
 
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `name` = ? ");
-        $sql->bind_param('s', $n);
+        $sql = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `id` = ? ");
+        $sql->bind_param('i', $id);
         //  echo "Datenbank: ". $param['Name'];
         $sql->execute();
         $result = $sql->get_result();
@@ -400,6 +482,98 @@ class dataHandler
         $sql->close();
         return $tab;
     }
+ //Rechnungsid bekommen
+ function getCurrentReceipt_id(){
+
+    $tab = array();
+ 
+      // Prüfe die Verbindung zur Datenbank
+      if (!$this->checkConnection()) {
+        $tab["error"] = "Versuchen Sie es später erneut!";
+        return $tab;
+    }
+
+    
+    //sql statement
+    $sql = $this->db_obj->prepare("SELECT `receipt_id` FROM `receipts` ORDER BY `receipt_id` DESC LIMIT 1");
+
+  //  SELECT receipt_id FROM receipts ORDER BY receipt_id DESC LIMIT 1
+
+  $sql->execute();
+  $result = $sql->get_result();
+
+  // Füge die Ergebnisse in das Array ein
+  while ($row = $result->fetch_assoc()) {
+      array_push($tab, $row);
+  }
+
+    $sql->close();
+    return $tab;
+
+}
+
+    //Rechnung erstellen
+    function createReceipt($param){
+
+        $tab = array();
+        $gesamt = $param['total'];
+        $un = $param['username']; 
+        $street = $param['adress'];
+        $plz = $param['postcode'];
+        $city = $param['ort']; 
+    
+          // Prüfe die Verbindung zur Datenbank
+          if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+    
+        //sql statement
+        $sql = $this->db_obj->prepare("INSERT INTO receipts (`username`,`total`, `street`,`postcode`,`city`) VALUES (?,?,?,?,?)");
+        $sql->bind_param("sisis", $un, $gesamt, $street, $plz, $city);
+    
+    
+        if ($sql->execute() && $sql->affected_rows > 0) {
+            $tab['success'] = 'Rechnung wurde erstellt';
+        } else {
+            $tab['error'] = 'Rechnung konnte nicht erstellt werden. ';
+        }
+    
+    
+        $sql->close();
+        return $tab;
+    
+    }
+    //add order to db
+    function processOrder($param){
+
+        $tab = array();
+        $pid = $param['product_id'];
+        $quant = $param['quantity'];
+        $u = $param['username']; 
+        $recid = $param['receiptid']; 
+
+          // Prüfe die Verbindung zur Datenbank
+          if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+        //sql statement
+        $sql = $this->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `username`, `receipt_id`) VALUES (?,?,?,?)");
+        $sql->bind_param("iisi", $pid, $quant, $u, $recid);
+    
+
+        if ($sql->execute() && $sql->affected_rows > 0) {
+            $tab['success'] = 'Bestellung wurde abgewickelt ';
+        } else {
+            $tab['error'] = 'Bestellung konnte nicht abgewickelt werden';
+        }
+
+        $sql->close();
+        return $tab;
+
+    }
 
     //nach Buchstaben filtern 
     function filterConSearch($param)
@@ -417,7 +591,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
+        $sql = $this->db_obj->prepare("SELECT `id`,`kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products`");
         $sql->execute();
         $result = $sql->get_result();
 
@@ -426,116 +600,23 @@ class dataHandler
             if (strpos($row['name'], $a) !== false) { //wenn name buchstaben enthälten
                 array_push($tab, $row);
             }
-            array_push($full,$row); 
-          }
-  
-          // Schließe die Verbindung und gib das Array zurück
-          $sql->close();
-         if (count($tab) == 0){
-            return $full; 
-         }
-          return $tab;
-
-    }
-
-    //Bestellung abwickeln 
-
-    function processOrder($param){
-
-        $tab = array();
-        $pid = $param['product_id'];
-        $quant = $param['quantity'];
-        $uid = $param['userid']; 
-        $recid = $param['receiptid']; 
-
-          // Prüfe die Verbindung zur Datenbank
-          if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
+            array_push($full, $row);
         }
 
-        //sql statement
-        $sql = $this->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `user_id`, `receipt_id`) VALUES (?,?,?,?)");
-        $sql->bind_param("iiii", $pid, $quant, $uid, $recid);
-    
-
-        if ($sql->execute() && $sql->affected_rows > 0) {
-            $tab['success'] = 'Bestellung wurde abgewickelt ';
-        } else {
-            $tab['error'] = 'Bestellung konnte nicht abgewickelt werden';
-        }
-
+        // Schließe die Verbindung und gib das Array zurück
         $sql->close();
-        return $tab;
-
-    }
-
-    function createReceipt($param){
-
-        $tab = array();
-        $gesamt = $param['total'];
-        $uid = $param['userid']; 
-        $street = $param['adress'];
-        $plz = $param['postcode'];
-        $city = $param['ort']; 
-
-          // Prüfe die Verbindung zur Datenbank
-          if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
+        if (count($tab) == 0) {
+            return $full;
         }
-
-        //sql statement
-        $sql = $this->db_obj->prepare("INSERT INTO receipts (`user_id`,`total`, `street`,`postcode`,`city`) VALUES (?,?,?,?,?)");
-        $sql->bind_param("iisis", $uid, $gesamt, $street, $plz, $city);
-    
-
-        if ($sql->execute() && $sql->affected_rows > 0) {
-            $tab['success'] = 'Rechnung wurde erstellt';
-        } else {
-            $tab['error'] = 'Rechnung konnte nicht erstellt werden. ';
-        }
-
-
-        $sql->close();
         return $tab;
-
     }
 
 
-    function getCurrentReceipt_id(){
-
-        $tab = array();
-     
-          // Prüfe die Verbindung zur Datenbank
-          if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
-        }
-
-        
-        //sql statement
-        $sql = $this->db_obj->prepare("SELECT `receipt_id` FROM `receipts` ORDER BY `receipt_id` DESC LIMIT 1");
-
-      //  SELECT receipt_id FROM receipts ORDER BY receipt_id DESC LIMIT 1
-
-      $sql->execute();
-      $result = $sql->get_result();
-
-      // Füge die Ergebnisse in das Array ein
-      while ($row = $result->fetch_assoc()) {
-          array_push($tab, $row);
-      }
-
-        $sql->close();
-        return $tab;
-
-    }
 
     function getAddress($param){
 
         
-        $id = $param['uid']; 
+        $username = $param['un']; 
 
         $tab = array();
      
@@ -547,8 +628,8 @@ class dataHandler
 
       
       //sql statement
-      $sql = $this->db_obj->prepare("SELECT `adresse`, `plz` , `ort`  FROM `users` WHERE `id` = ? LIMIT 1");
-      $sql->bind_param("i", $id);
+      $sql = $this->db_obj->prepare("SELECT `adresse`, `plz` , `ort`  FROM `users` WHERE `username` = ? LIMIT 1");
+      $sql->bind_param("s", $username);
     
     //  SELECT receipt_id FROM receipts ORDER BY receipt_id DESC LIMIT 1
 
@@ -565,4 +646,138 @@ class dataHandler
 
 
     }
+
+    
+
+    //Bestellung anzeigen:
+
+    function getOrderInfo($param){
+
+        $username = $param['username']; 
+
+        $tab = array();
+     
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+          $tab["error"] = "Versuchen Sie es später erneut!";
+          return $tab;
+      }
+
+      
+      //sql statement
+      $sql = $this->db_obj->prepare("SELECT `product_id`, `quantity`, `receipt_id`  FROM `orders` WHERE `username` = ? ");
+      $sql->bind_param("s", $username);
+    
+    $sql->execute();
+    $result = $sql->get_result();
+
+    // Füge die Ergebnisse in das Array ein
+    while ($row = $result->fetch_assoc()) {
+        array_push($tab, $row);
+    }
+
+      $sql->close();
+      return $tab;
+
+
+    }
+
+
+    function getProductPrice($param){
+
+        $product_id = $param['id']; 
+
+        $tab = array();
+     
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+          $tab["error"] = "Versuchen Sie es später erneut!";
+          return $tab;
+      }
+
+      
+      //sql statement
+      $sql = $this->db_obj->prepare("SELECT `preis`, `name` FROM `products` WHERE `id` = ? ");
+      $sql->bind_param("i", $product_id);
+    
+    $sql->execute();
+    $result = $sql->get_result();
+
+    // Füge die Ergebnisse in das Array ein
+    while ($row = $result->fetch_assoc()) {
+        array_push($tab, $row);
+    }
+
+      $sql->close();
+      return $tab;
+
+
+    }
+
+    //getTotal
+
+    function getTotal($param){
+
+        $id = $param['id']; 
+
+        $tab = array();
+     
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+          $tab["error"] = "Versuchen Sie es später erneut!";
+          return $tab;
+      }
+
+      
+      //sql statement
+      $sql = $this->db_obj->prepare("SELECT `total` FROM `receipts` WHERE `receipt_id` = ?  ");
+      $sql->bind_param("i", $id);
+    
+    $sql->execute();
+    $result = $sql->get_result();
+
+    // Füge die Ergebnisse in das Array ein
+    while ($row = $result->fetch_assoc()) {
+        array_push($tab, $row);
+    }
+
+      $sql->close();
+      return $tab;
+
+
+    }
+
+    function getOrders($param){
+        $username = $param['username']; 
+
+        $tab = array();
+      
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+          $tab["error"] = "Versuchen Sie es später erneut!";
+          return $tab;
+        }
+      
+        // SQL statement
+        $sql = $this->db_obj->prepare("SELECT `receipts`.`receipt_id`, `receipts`.`total`, `receipts`.`street`, `receipts`.`postcode`, `receipts`.`city`, `orders`.`quantity`, `orders`.`product_id` FROM `receipts` INNER JOIN `orders` ON `receipts`.`username` = `orders`.`username` AND `receipts`.`receipt_id` = `orders`.`receipt_id` WHERE `receipts`.`username` = ? ORDER BY `receipts`.`receipt_id` ASC");
+        $sql->bind_param("s", $username);
+        $sql->execute();
+        $result = $sql->get_result();
+      
+        // Füge die Ergebnisse in das Array ein
+        while ($row = $result->fetch_assoc()) {
+          array_push($tab, $row);
+        }
+      
+        $sql->close();
+        return $tab;
+
+
 }
+
+    }
+
+
+
+
+

@@ -11,9 +11,7 @@ switch ($requestType) {
         break;
     case 'POST':
         isset($_POST['method']) ? $method = $_POST['method'] : false;
-        isset($_POST['param']) ? $param = $_POST['param'] : false;
-        isset($_FILES['picture']) ? $param = $_POST : false;
-        isset($_FILES['picture']) ? $param['picture'] = $_FILES['picture'] : false;
+        isset($_POST['param']) ? $param = json_decode($_POST['param'], true) : false;
         break;
     default:
         http_response_code(400);

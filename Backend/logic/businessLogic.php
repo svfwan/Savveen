@@ -56,9 +56,11 @@ class businessLogic
             case 'getAddress':
                 $res = $this -> dh -> getAddress($param);
                 break; 
-            
-            
 
+            case 'createReceipt':
+                $res = $this -> dh -> createReceipt($param);
+                break; 
+            
             
             case 'loadProductsForAdmin':
                 $res = $this->dh->loadProductsForAdmin();
@@ -66,6 +68,36 @@ class businessLogic
             case 'createProduct':
                 $res = $this->dh->createProduct($param);
                 break;
+
+            case 'processOrder':
+                $res = $this->dh->processOrder($param);
+                break;
+
+            
+            case 'getOrderInfo':
+                $res = $this->dh->getOrderInfo($param);
+                break;
+
+            case 'getProductPrice':
+                $res = $this->dh->getProductPrice($param);
+                break;
+
+            case 'getTotal':
+                $res = $this->dh->getTotal($param);
+                break;
+
+            
+            case 'getOrders':
+                $res = $this->dh->getOrders($param);
+                break;
+        
+    
+
+            
+               
+           
+                
+
             default:
                 $res = null;
                 break;

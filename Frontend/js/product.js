@@ -16,6 +16,11 @@ $(document).ready(function () {
     });
 
     ContinuousSearch();
+
+    $(document).on("click", ".add-to-cart-btn", function () {
+        let productID = $(this).data('product-id');
+        addCart(productID);
+    });
 });
 
 function updateCartCounter(length) {
@@ -23,6 +28,7 @@ function updateCartCounter(length) {
 }
 
 function loadAllProducts() {
+    console.log("loadAllProducts()"); 
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -32,7 +38,7 @@ function loadAllProducts() {
         dataType: "json",
         success: function (data) {
             let $row = $("<div class='row'></div>");
-
+            console.log(data)
             for (let i in data) {
                 let cur = data[i];
                 displayAll(cur, $row);
@@ -47,40 +53,53 @@ function loadAllProducts() {
 }
 
 function ContinuousSearch() {
-    let $input = $("<input>").on("input", function (e) {
-        const value = e.target.value;
-        console.log(value);
+    console.log("continuousSearch"); 
 
-        $.ajax({
-            type: "GET",
-            url: "../Backend/logic/requestHandler.php",
-            data: {
-                method: "filterConSearch",
-                param: JSON.stringify({
-                    letter: value,
-                }),
-            },
-            dataType: "json",
-            success: function (data) {
-                console.log(data);
-                $("#mainView").empty();
-                if (data.length === 0 && value !== "") {
-                    window.alert("Keine Produkte gefunden");
-                }
-                let $row = $("<div class='row'></div>");
-                for (let i in data) {
-                    console.log(data[i]);
-                    displayAll(data[i], $row);
-                }
-                fillCart();
-            },
-            error: function (xhr, status, error) {
-                console.log(xhr, status, error);
-                window.alert("Error: Seite kann nicht geladen werden");
-            },
-        });
-    });
+    const i = document.querySelector("input");
+
+    i.addEventListener("input", updateValue);
 }
+
+
+function updateValue(e) {
+    console.log(e.target.value);
+    //ajax call - filterConSearch
+
+    $.ajax({
+      type: "GET",
+      url: "../Backend/logic/requestHandler.php",
+      data: {
+        method: "filterConSearch",
+        param: JSON.stringify({
+          letter: e.target.value,
+        }),
+      },
+      dataType: "json", //muss immer json sein
+      success: function (data) {
+        let $row = $("<div class='row'></div>");
+        console.log(data);
+        $("#mainView").empty();
+        if (data.length == 4 && e.target.value != "") { // bearbeiten
+          window.alert("Keine Produkte gefunden");
+
+        }
+        //eig wird immer nur ein Datensatz weitergegeben, also sollte es ohne Schleife funktionieren
+        for (let i in data) {
+
+          console.log(data[i]);
+          displayAll(data[i], $row);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr, status, error);
+        window.alert("Error: Seite kann nicht geladen werden");
+      },
+    });
+    //ajax ende
+  }
+
+
+
 
 function displayCategory() {
     const selectedValue = $("#category").val();
@@ -94,13 +113,15 @@ function displayCategory() {
         },
         dataType: "json",
         success: function (data) {
+            $("#mainView").empty();
             let $row = $("<div class='row'></div>");
-
             for (let i in data) {
                 let cur = data[i];
-                if (selectedValue === "" || cur.category === selectedValue) {
+                if (selectedValue === "") {
                     displayAll(cur, $row);
-                    console.log("cur: " + cur);
+                } else if (cur.kategorie === selectedValue) {
+                    console.log(selectedValue)
+                    displayAll(cur, $row);
                 }
             }
             fillCart();
@@ -112,6 +133,10 @@ function displayCategory() {
 }
 
 function displayAll(data, $row) {
+
+    console.log(data.name);
+    console.log(data.preis); 
+    console.log($row); 
     let productHTML = `
       <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="product card product-card">
@@ -124,51 +149,61 @@ function displayAll(data, $row) {
             <h5 class="card-title">${data.name}</h5>
             <p class="card-text">Preis: ${data.preis}</p>
             <p class="card-text">Bewertung: ${data.bewertung}/5</p>
-            <button class="btn btn-success add-to-cart-btn">In den Warenkorb hinzufügen</button>
+            <button class="btn btn-success add-to-cart-btn" data-product-id="${data.id}">In den Warenkorb hinzufügen</button>
           </div>
         </div>
       </div>
     `;
 
     let $product = $(productHTML);
+    console.log($product); 
+    
     $row.append($product);
 
     if ($row.children().length === 4) {
         $("#mainView").append($row);
         $row = $("<div class='row'></div>");
+    } else {
+        $("#mainView").append($row);
     }
-
-    $row.on("click", ".add-to-cart-btn", function (event) {
-        event.stopPropagation(); // Stop event propagation
-        addCart(data);
-    });
 }
 
-function addCart(product) {
+function addCart(productID) {
+    console.log(productID); 
+    let myCart = [];
+    let quantityInCart = 0;
+    if (sessionStorage.getItem("myCart")) {
+        myCart = JSON.parse(sessionStorage.getItem("myCart"));
+        for (let i = 0; i < myCart.length; i++) {
+            if (myCart[i].id == productID) {
+                quantityInCart = myCart[i].quant;
+                break;
+            }
+        }
+    }
+
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
         data: {
             method: "checkStock",
             param: JSON.stringify({
-                name: product.name,
+                id: productID,
             }),
         },
         dataType: "json",
-        success: function (data) {
-            console.log(data);
-            if (data && data.length > 0) {
-                const cur = data[0]; // Assuming the response contains a single item
-                console.log(cur);
-                if (cur.bestand > 0) {
-                    addItemtoCart(cur);
-                } else {
-                    window.alert("Dieses Produkt haben wir leider nicht mehr auf Lager");
-                }
+        success: function (response) {
+            console.log(response);
+            let item = response[0];
+            let stock = item.bestand;
+            if (quantityInCart + 1 <= stock) {
+                addItemtoCart(item);
+            } else {
+                window.alert("Dieses Produkt haben wir leider nicht mehr auf Lager!");
             }
         },
-        error: function (xhr, status, error) {
-            console.log(xhr, status, error);
+        error: function (error) {
+            console.log(error);
             window.alert("Error: Seite kann nicht geladen werden");
         },
     });
@@ -180,12 +215,13 @@ function addItemtoCart(data) {
         myCart = JSON.parse(sessionStorage.getItem("myCart"));
     }
 
-    let existingItem = myCart.find((item) => item.name === data.name);
+    let existingItem = myCart.find((item) => item.id === data.id);
 
     if (existingItem) {
         existingItem.quant += 1;
     } else {
         myCart.push({
+            id: data.id,
             name: data.name,
             price: data.preis,
             bewertung: data.bewertung,
@@ -236,7 +272,7 @@ function updateCartItems(myCart) {
             });
 
             $item.find(".add-btn").on("click", function () {
-                addExistingItem(item);
+                addCart(item.id);
             });
 
             $cartItems.append($item);
@@ -244,7 +280,7 @@ function updateCartItems(myCart) {
             gesamtpreis += item.price * item.quant;
         }
 
-        $cartTotal.html(`<div class="mt-3">Gesamtpreis: ${gesamtpreis}€</div>`);
+        $cartTotal.html(`<div class="mt-3"> ${gesamtpreis}</div>`);
         $('#orderCart').show();
     } else {
         $cartItems.html('<h2>Ihr Warenkorb ist leer</h2>');
@@ -271,8 +307,8 @@ function removeItem(data) {
     }
 
     for (let i = 0; i < myCart.length; i++) {
-        if (myCart[i].name == data.name) {
-            if (myCart[i].quant == 1) {
+        if (myCart[i].id === data.id) { // Updated comparison
+            if (myCart[i].quant === 1) {
                 myCart.splice(i, 1);
                 break;
             } else {
@@ -296,7 +332,7 @@ function addExistingItem(data) {
     }
 
     for (let i = 0; i < myCart.length; i++) {
-        if (myCart[i].name == data.name) {
+        if (myCart[i].id === data.id) { // Updated comparison
             myCart[i].quant = myCart[i].quant + 1;
             break;
         }

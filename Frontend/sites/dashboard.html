@@ -17,7 +17,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Kundenverwaltung</h5>
-                    <p class="card-text">Kundenprofile und Informationen verwalten.</p>
+                    <p class="card-text">Kundenprofile und Kundenbestellungen verwalten.</p>
                     <button type="button" id="showProfileManagement" class="btn btn-success">Zur
                         Kundenverwaltung</button>
                 </div>
@@ -30,14 +30,6 @@
                         Produktverwaltung</button>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Bestellverwaltung</h5>
-                    <p class="card-text">Kundenbestellungen verwalten und bearbeiten.</p>
-                    <button type="button" id="showOrderManagement" class="btn btn-success">Zur
-                        Bestellverwaltung</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -47,7 +39,7 @@
 
     <div id="productManagement" class="container">
         <div class="row">
-            <div class="col-md-6 offset-md-3">
+            <div class="col-md-6 offset-md-3 text-center">
                 <h2>Produktverwaltung</h2>
             </div>
         </div>
@@ -92,11 +84,11 @@
             </div>
         </div>
         <div class="row mt-2">
-            <div class="col-md-6 offset-md-3">
+            <div class="col-md-6 offset-md-3 text-center">
                 <h2>Produktkatalog</h2>
             </div>
         </div>
-        <div id="productListAdmin"></div>
+        <div id="productListAdmin" class="container-fluid"></div>
         <div class="modal fade" id="changeProductModal" tabindex="-1" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -106,56 +98,55 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <div id="message-container"></div>
                         <div class="container">
-                            <div class="form-group">
-                                <label for="productID">ID:</label>
-                                <input type="number" id="productID" class="form-control" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for="categoryEdit">Kategorie:</label>
-                                <select id="categoryEdit" class="form-control">
-                                    <option value="Skincare">Skincare</option>
-                                    <option value="Make-Up">Make-Up</option>
-                                    <option value="Parfüm">Parfüm</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="productNameEdit">Name:</label>
-                                <input type="text" id="productNameEdit" class="form-control" placeholder="Produktname">
-                            </div>
-                            <div class="form-group">
-                                <label for="priceEdit">Preis:</label>
-                                <input type="number" id="priceEdit" class="form-control" placeholder="Produktpreis">
-                            </div>
-                            <div class="form-group">
-                                <label for="stockEdit">Lagerbestand:</label>
-                                <input type="number" id="stockEdit" class="form-control"
-                                    placeholder="Produktlagerbestand">
-                            </div>
-                            <div class="form-group">
-                                <label for="descriptionEdit">Beschreibung:</label>
-                                <textarea id="descriptionEdit" class="form-control"
-                                    placeholder="Enter product description"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="pictureEdit">Bild hochladen:</label>
-                                <input type="file" id="pictureEdit" class="form-control"
-                                    accept="image/jpeg, image/png, image/gif">
-                            </div>
+                            <form enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="productID">ID:</label>
+                                    <input type="number" id="productID" class="form-control" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="categoryEdit">Kategorie:</label>
+                                    <select id="categoryEdit" class="form-control">
+                                        <option value="Skincare">Skincare</option>
+                                        <option value="Make-Up">Make-Up</option>
+                                        <option value="Parfüm">Parfüm</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productNameEdit">Name:</label>
+                                    <input type="text" id="productNameEdit" class="form-control"
+                                        placeholder="Produktname">
+                                </div>
+                                <div class="form-group">
+                                    <label for="priceEdit">Preis:</label>
+                                    <input type="number" id="priceEdit" class="form-control" placeholder="Produktpreis">
+                                </div>
+                                <div class="form-group">
+                                    <label for="stockEdit">Lagerbestand:</label>
+                                    <input type="number" id="stockEdit" class="form-control"
+                                        placeholder="Produktlagerbestand">
+                                </div>
+                                <div class="form-group">
+                                    <label for="descriptionEdit">Beschreibung:</label>
+                                    <textarea id="descriptionEdit" class="form-control"
+                                        placeholder="Produktbeschreibung"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pictureEdit">Bild hochladen:</label>
+                                    <input type="file" id="pictureEdit" class="form-control"
+                                        accept="image/jpeg, image/png, image/gif">
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success">Produkt ändern</button>
+                        <button id="updateProduct" type="button" class="btn btn-success">Produkt ändern</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="orderManagement" class="container">
-
-    </div>
-
 </body>
 
 </html>
