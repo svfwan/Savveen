@@ -49,55 +49,42 @@ class businessLogic
             case 'reduceStock';
                 $res = $this->dh->reduceStock($param);
                 break;
-
             case 'getCurrentReceipt_id':
                 $res = $this -> dh -> getCurrentReceipt_id();
                 break; 
             case 'getAddress':
                 $res = $this -> dh -> getAddress($param);
                 break; 
-
             case 'createReceipt':
                 $res = $this -> dh -> createReceipt($param);
                 break; 
-            
-            
             case 'loadProductsForAdmin':
                 $res = $this->dh->loadProductsForAdmin();
                 break;
             case 'createProduct':
                 $res = $this->dh->createProduct($param);
                 break;
-
             case 'processOrder':
                 $res = $this->dh->processOrder($param);
                 break;
-
-            
             case 'getOrderInfo':
                 $res = $this->dh->getOrderInfo($param);
                 break;
-
             case 'getProductPrice':
                 $res = $this->dh->getProductPrice($param);
                 break;
-
             case 'getTotal':
                 $res = $this->dh->getTotal($param);
                 break;
-
-            
             case 'getOrders':
                 $res = $this->dh->getOrders($param);
                 break;
-        
-    
-
-            
-               
-           
-                
-
+            case 'updateUserData';
+                $res = $this->dh->updateUserData($param);
+                break;
+            case 'getProfileData';
+                $res = $this->dh->getProfileData();
+                break;
             default:
                 $res = null;
                 break;
