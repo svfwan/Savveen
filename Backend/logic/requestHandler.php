@@ -1,4 +1,6 @@
 <?php
+
+
 include('./businessLogic.php');
 $requestType = $_SERVER['REQUEST_METHOD'];
 $method = '';

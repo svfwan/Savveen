@@ -1,17 +1,130 @@
+
+
 $(document).ready(function () {
 
     updateFeatures();
 
+
     $(document).on('click', '#profileAction', function () {
         let isLoggedIn = !!getCookie('username');
-        // Define the file path and modal ID based on the login status
         var filePath = isLoggedIn ? 'sites/profile.html' : 'sites/login.html';
         var modalId = isLoggedIn ? '#profileModal' : '#loginModal';
-        // Load the content of the specified file into the modal placeholder and show the modal
+
         $('#modal-placeholder').load(filePath, function () {
+            if (isLoggedIn) {
+                console.log("logged in");
+                loadProfileData();
+            }
             $(modalId).modal('show');
         });
     });
+
+    function changeProfileData() {
+
+        var userinfo=getCookie('username');
+        var newData={};
+        
+        newData.firstName = $('#firstNamenew').val();
+        newData.lastName = $('#lastNamenew').val();
+        newData.email = $('#emailnew').val();
+        newData.password = $('#passwordnew').val();
+        newData.adress = $('#addressnew').val();
+        newData.city = $('#citynew').val();
+        newData.plz = $('#postcodenew').val();
+        newData.username=$('#usernamenew').val();
+        newData.formofAddress=$('#formofAddressnew').val();
+        newData.pw_alt=$('#pw_alt').val();
+        
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'updateUserData',
+                param: JSON.stringify({
+                    actualusername: userinfo,
+                    firstName: newData.firstName,
+                    lastName: newData.lastName,
+                    email: newData.email,
+                    pw: newData.pw,
+                    adress: newData.adress,
+                    city: newData.city,
+                    postcode: newData.plz,
+                    username: newData.username,
+                    formofAddress: newData.formofAddress,
+                    pw_alt: newData.pw_alt
+                    
+                    
+                })
+            },
+            dataType: 'json',
+            success: function (response) {
+                console.log('Ajax-Anfrage erfolgreich');
+                console.log(response);
+
+                if (response.success) {
+                    showModalAlert('Ihre Änderungen wurden erfolgreich gespeichert!', 'success');
+                    $('#firstNameold').html(response.vorname);
+                    $('#lastNameold').text(response.nachname);
+                    $('#addressold').text(response.adress);
+                    $('#postcodeold').text(response.postcode);
+                    $('#cityold').text(response.city);
+                    $('#emailold').text(response.email);
+                    $('#usernameold').text(response.username);
+                    $('#formofAddressold').text(response.anrede);
+                    updateFeatures();
+                   getCookie('username');
+                } else if (response.error) {
+                    console.log(response.error);
+                    showModalAlert(response.error, 'danger');
+                }
+            },
+            error: function (error) {
+                console.log(error);
+                console.log("Maria, du hast einen Fehler gemacht.")
+            }
+
+        });
+
+    }
+
+
+    function loadProfileData() {
+        let userinfo = getCookie('username');
+
+        $.ajax({
+            type: 'GET',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'getProfileData',
+                param: userinfo
+            },
+            dataType: 'json',
+            success: function (response) {
+                console.log("success");
+                console.log('Ajax-Anfrage erfolgreich');
+                console.log(response);
+
+                if (response.success) {
+                    $('#firstNameold').text(response.vorname);
+                    $('#lastNameold').text(response.nachname);
+                    $('#addressold').text(response.adresse);
+                    $('#postcodeold').text(response.plz);
+                    $('#cityold').text(response.ort);
+                    $('#emailold').text(response.email);
+                    $('#usernameold').text(response.username);
+                    $('#formofAddressold').text(response.anrede);
+
+                }
+
+            },
+            error: function (error) {
+                console.log("Maria, du hast einen Fehler gemacht.");
+                console.log(error);
+            }
+        });
+    }
+    $(document).on('click', '#changeButton', changeProfileData);
+
 
     $(document).on('click', '#openRegisterModal', function (event) {
         event.preventDefault();  // Prevent the default action
@@ -43,7 +156,8 @@ $(document).ready(function () {
             data: {
                 method: 'loginUser',
                 param: JSON.stringify({
-                    username: $('#username').val(),
+                    userInput: $('#userInput').val(),
+                   // email: $('#email').val(),
                     password: $('#password').val(),
                     rememberLogin: $('#remember_login').prop('checked')
                 })
@@ -90,6 +204,7 @@ $(document).ready(function () {
                     updateNavbar(true, username, isAdmin);
                 } else {
                     updateNavbar(false, '', false);
+
                 }
             },
             error: function (error) {
@@ -177,6 +292,7 @@ $(document).ready(function () {
             }
         });
     });
+
 
     // helper functions
 

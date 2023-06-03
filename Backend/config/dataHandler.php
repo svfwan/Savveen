@@ -79,7 +79,7 @@ class dataHandler
             echo "SUCCESS";
         } else {
             $result['error'] = 'Benutzername existiert bereits!';
-            echo "ERROR"; 
+            echo "ERROR";
         }
 
         $stmt->close();
@@ -90,41 +90,47 @@ class dataHandler
     public function loginUser($param)
     {
         $result = array();
-        $username = $param['username'];
+        $userInput = $param['userInput'];
         $password = $param['password'];
         $active = 1;
-
-        // need to add validation of input still
-
+        $input = null;
+    
         if (!$this->checkConnection()) {
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
         }
-
-        $sql = 'SELECT `username`, `passwort`, `admin` FROM `users` WHERE `username` = ? AND `active` = ? LIMIT 1';
-        $stmt = $this->db_obj->prepare($sql);
-        $stmt->bind_param('si', $username, $active);
-
+    
+        if (empty($userInput)) {
+            $result['error'] = 'Um dich einzuloggen, muss E-Mail oder Username angegeben werden';
+            return $result;
+        } else {
+            $sql = 'SELECT `email`, `username`, `passwort`, `admin` FROM `users`
+                     WHERE (`username`=? OR `email` = ?) AND `active` = ?';
+            $stmt = $this->db_obj->prepare($sql);
+            $stmt->bind_param('ssi', $userInput, $userInput, $active);
+        }
+        
         if ($stmt->execute()) {
             $user = $stmt->get_result();
             if ($user->num_rows == 1) {
                 $row = $user->fetch_assoc();
+    
                 if (password_verify($password, $row['passwort'])) {
-                    $result['success'] = 'Login erfolgreich, willkommen ' . $username . '!';
-                    $result['username'] = $username;
+                    $result['success'] = 'Login erfolgreich, willkommen ' . $input . '!';
+                    $result['username'] = $row['username'];
                     $result['admin'] = $row['admin'];
                     if (!(isset($_SESSION))) {
                         session_start();
                     }
-                    $_SESSION['username'] = $username;
+                    $_SESSION['username'] = $row['username'];
                     $_SESSION['admin'] = $row['admin'];
                     if (isset($param['rememberLogin']) && $param['rememberLogin']) {
                         // 30-day cookie
                         setcookie('rememberLogin', true, time() + (86400 * 30), '/');
-                        setcookie('username', $username, time() + (86400 * 30), '/');
+                        setcookie('username', $row['username'], time() + (86400 * 30), '/');
                     } else {
                         // 1-hour cookie
                         setcookie('rememberLogin', true, time() + 3600, '/');
-                        setcookie('username', $username, time() + 3600, '/');
+                        setcookie('username', $row['username'], time() + 3600, '/');
                     }
                 } else {
                     $result['error'] = 'Falsches Passwort!';
@@ -135,11 +141,12 @@ class dataHandler
         } else {
             $result['error'] = 'Login nicht möglich, versuchen Sie es später erneut!';
         }
-
+    
         $stmt->close();
         return $result;
     }
-
+    
+    
     public function getSessionInfo()
     {
         $result = array();
@@ -227,13 +234,14 @@ class dataHandler
         $sql->close();
         return $tab;
     }
-  
+
 
     //checkStock()
-      public function checkStock($param){
+    public function checkStock($param)
+    {
 
         //überarbeiten
-       // $tab = []; // Initialisiere das Array
+        // $tab = []; // Initialisiere das Array
         $tab = array();
 
         $n = $param['Name'];
@@ -245,44 +253,44 @@ class dataHandler
         }
 
 
-              // Führe die SQL-Abfrage aus
-              $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
-             $sql->bind_param('s', $n);
-           //  echo "Datenbank: ". $param['Name'];
-              $sql->execute();
-              $result = $sql->get_result();
-      
-              // Füge die Ergebnisse in das Array ein
-              while ($row = $result->fetch_assoc()) {
-                  array_push($tab, $row);
-              }
-      
-              // Schließe die Verbindung und gib das Array zurück
-              $sql->close();
-              return $tab;
+        // Führe die SQL-Abfrage aus
+        $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung`,  `stock` FROM `products` WHERE `Name` = ? ");
+        $sql->bind_param('s', $n);
+        //  echo "Datenbank: ". $param['Name'];
+        $sql->execute();
+        $result = $sql->get_result();
 
+        // Füge die Ergebnisse in das Array ein
+        while ($row = $result->fetch_assoc()) {
+            array_push($tab, $row);
+        }
+
+        // Schließe die Verbindung und gib das Array zurück
+        $sql->close();
+        return $tab;
     }
 
 
-    public function reduceStock($param){
+    public function reduceStock($param)
+    {
         //arr erstellen für die ergebnisse
-       $tab = array();
+        $tab = array();
 
-       $n = $param['Name'];
-       $s = $param['Stock'] - 1; 
-     
+        $n = $param['Name'];
+        $s = $param['Stock'] - 1;
 
-       // Prüfe die Verbindung zur Datenbank
-       if (!$this->checkConnection()) {
-           $tab["error"] = "Versuchen Sie es später erneut!";
-           return $tab;
-       }
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
 
         // Führe die SQL-Abfrage aus
         $sql = $this->db_obj->prepare("UPDATE `products` SET `stock` = ?  WHERE `Name` = ? ");
-        $sql->bind_param('is', $s,$n);
-      //  echo "Datenbank: ". $param['Name']  
-       
+        $sql->bind_param('is', $s, $n);
+        //  echo "Datenbank: ". $param['Name']  
+
         //update gibt ja keine werte zurück, deswegen kann man die werte auch nicht in einem array speichern
 
         if ($sql->execute() && $sql->affected_rows > 0) {
@@ -290,49 +298,188 @@ class dataHandler
         } else {
             $tab['error'] = 'Stock konnte nicht runtergesetzt werden.';
         }
- 
-             // Schließe die Verbindung und gib das Array zurück
-             $sql->close();
-             return $tab;
+
+        // Schließe die Verbindung und gib das Array zurück
+        $sql->close();
+        return $tab;
     }
 
     //nach Buchstaben filtern 
-    function filterConSearch($param){
+    function filterConSearch($param)
+    {
 
-        $tab = array(); 
-        $full = array(); 
+        $tab = array();
+        $full = array();
 
-         $a = $param['letter']; 
+        $a = $param['letter'];
 
-         //verbindung zur db prüfen
-         if (!$this->checkConnection()) {
+        //verbindung zur db prüfen
+        if (!$this->checkConnection()) {
             $tab["error"] = "Versuchen Sie es später erneut!";
             return $tab;
         }
 
-          // Führe die SQL-Abfrage aus
-          $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung` FROM `products`");
-          $sql->execute();
-          $result = $sql->get_result();
-  
-          // Füge die Ergebnisse in das Array ein
-          while ($row = $result->fetch_assoc()) {
-            if(strpos($row['Name'], $a) !== false){ //wenn name buchstaben enthälten
-              array_push($tab, $row);
+        // Führe die SQL-Abfrage aus
+        $sql = $this->db_obj->prepare("SELECT `Category`, `Name`, `Price`, `Bewertung` FROM `products`");
+        $sql->execute();
+        $result = $sql->get_result();
+
+        // Füge die Ergebnisse in das Array ein
+        while ($row = $result->fetch_assoc()) {
+            if (strpos($row['Name'], $a) !== false) { //wenn name buchstaben enthälten
+                array_push($tab, $row);
             }
-            array_push($full,$row); 
-          }
-  
-          // Schließe die Verbindung und gib das Array zurück
-          $sql->close();
-         if (count($tab) == 0){
-            return $full; 
-         }
-          return $tab;
+            array_push($full, $row);
+        }
 
-
-
+        // Schließe die Verbindung und gib das Array zurück
+        $sql->close();
+        if (count($tab) == 0) {
+            return $full;
+        }
+        return $tab;
     }
 
+
+    function getProfileData()
+    {
+        $param=$_GET['param'];
+        $sql = 'SELECT anrede,vorname, nachname, adresse, plz, ort, email, username, passwort FROM users WHERE username = ?';
+        $stmt = $this->db_obj->prepare($sql);
+        $stmt->bind_param('s', $param);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = array();
+        if ($result->num_rows == 1) {
+            $data = $result->fetch_assoc();
+            $data['success'] = true;
+        }
+        $stmt->close();
+        return $data;
+    }
+
+    function updateUserData($param)
+    {
+        $sql = 'SELECT anrede,vorname, nachname, adresse, plz, ort, email, username, passwort FROM users WHERE username = ?';
+        $stmt = $this->db_obj->prepare($sql);
+ 
+        $stmt->bind_param('s', $param['actualusername']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = array();
+
+        $sql2='SELECT username FROM users where username=?';
+        $stmt2=$this->db_obj->prepare($sql2);
+        $stmt2->bind_param('s', $param['username']);
+        $stmt2->execute();
+        $result2=$stmt2->get_result();
+
+        while($row2=$result2->fetch_assoc()){
+            if($row2['username']==$param['username']){
+            $data['error']="Der Username muss unique sein.";
+            $data['success']=false;
+           return $data;
+             }
+
+        }
+        $stmt2->close();
+        
+        while ($row = $result->fetch_assoc()) {
+            if(empty($param['pw_alt'])){
+                $data['error']="Sie haben Ihr altes Passwort nicht eingegeben.";
+                $data['success']=false;
+               
+    
+            }
+         elseif (!password_verify($param['pw_alt'], $row['passwort'])) {
+           
+            $data['error']="Das eingegebene Passwort ist nicht korrekt. Bitte probieren Sie es noch einmal.";
+            $data['success']=false;
+            return $data;}
+        
+        
+        else{
+            if(!empty($param['firstName'])){
+                $data['vorname']=$param['firstName'];
+                }
+            else{
+                 $data['vorname']=$row['vorname'];  
+                }
+            if(!empty($param['lastName'])){
+                $data['nachname']=$param['lastName'];
+                }else{
+                $data['nachname']=$row['nachname'];
+                }
+
+            if(!empty($param['adress'])){
+                    $data['adress']=$param['adress'];
+                }else{
+                    $data['adress']=$row['adresse'];
+                    }
+            
+            if(!empty($param['postcode'])){
+                    $data['postcode']=$param['postcode'];
+                }else{
+                    $data['postcode']=$row['plz'];
+                    }
+            
+            if(!empty($param['city'])){
+                    $data['city']=$param['city'];
+                }else{
+                    $data['city']=$row['ort'];
+                    }
+            
+            if(!empty($param['email'])){
+                $data['email']=$param['email'];
+            }else{
+                $data['email']=$row['email'];
+                }
+           if(!empty($param['username'])){
+                $data['username']=$param['username'];
+            }else{
+                $data['username']=$row['username'];
+                }
+            if(!empty($param['pw'])){
+                $data['pw']=$param['pw'];
+            }else{
+                $data['pw']=$row['passwort'];
+                //$pw = $row['passwort'];
+                }
+            if(!empty($param['formofAddress'])){
+                $data['formofAddress']=$param['formofAddress'];
+            }else{
+                $data['formofAddress']=$row['anrede'];
+                    }
+                    $data['success']=true; 
+                   setcookie('username');
+                   
+                }
+                  
+        }
+     
+        $stmt->close();
+     
+        $sqlUpdate = 'UPDATE users SET anrede = ?, vorname = ?, nachname = ?, adresse = ?, plz = ?, ort = ?, email = ?, passwort = ?,username=? 
+        WHERE username = ?';
+   
+        $stmtUpdate = $this->db_obj->prepare($sqlUpdate);
+        $stmtUpdate->bind_param('ssssssssss', $data['formofAddress'], $data['vorname'], $data['nachname'], $data['adress'],
+                                $data['postcode'], $data['city'], $data['email'], $data['pw'], $data['username'], $param['actualusername']);
+        $stmtUpdate->execute();
+        $stmtUpdate->close();
+        /*
+        $stmtInsert = $this->db_obj->prepare($sqlUpdate);
+
+        $stmtInsert->bind_param('sssssssss', $data['formofAddress'],$data['vorname'], $data['nachname'], 
+                                $data['adress'], $data['postcode'], $data['city'], $data['email'], $data['pw'],$data['username']);
+        $stmtInsert->execute();
+        $stmtInsert->close();*/
+        
+        
+        
+        return $data;
+    }
 
 }

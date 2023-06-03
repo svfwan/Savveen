@@ -35,9 +35,6 @@ class businessLogic
             case 'logoutUser':
                 $res = $this->dh->logoutUser();
                 break;
-            default:
-                $res = null;
-                break;
             case 'loadAllProducts':
                 $res = $this->dh->loadAllProducts();
                 break;
@@ -45,13 +42,22 @@ class businessLogic
                 $res = $this->dh->checkStock($param);
                 break;
             case 'reduceStock':
-                $res = $this -> dh -> reduceStock($param);
-                break; 
+                $res = $this->dh->reduceStock($param);
+                break;
             case 'filterConSearch':
-                $res = $this -> dh -> filterConSearch($param);
-                break; 
+                $res = $this->dh->filterConSearch($param);
+                break;
             case 'reduceStock';
                 $res = $this->dh->reduceStock($param);
+                break;
+            case 'updateUserData';
+                $res = $this->dh->updateUserData($param);
+                break;
+            case 'getProfileData';
+                $res = $this->dh->getProfileData();
+                break;
+            default:
+                $res = null;
                 break;
         }
         return $res;
