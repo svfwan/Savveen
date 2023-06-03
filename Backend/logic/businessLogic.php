@@ -37,14 +37,17 @@ class businessLogic
             case 'loadAllProducts':
                 $res = $this->dh->loadAllProducts();
                 break;
+            case 'loadProductByID':
+                $res = $this->dh->loadProductByID($param);
+                break;
             case 'checkStock':
                 $res = $this->dh->checkStock($param);
                 break;
             case 'reduceStock':
                 $res = $this->dh->reduceStock($param);
                 break;
-            case 'filterConSearch':
-                $res = $this->dh->filterConSearch($param);
+            case 'searchProducts':
+                $res = $this->dh->searchProducts($param);
                 break;
             case 'reduceStock';
                 $res = $this->dh->reduceStock($param);
@@ -62,7 +65,10 @@ class businessLogic
                 $res = $this->dh->loadProductsForAdmin();
                 break;
             case 'createProduct':
-                $res = $this->dh->createProduct($param);
+                $res = $this->dh->createProduct();
+                break;
+            case 'updateProduct':
+                $res = $this->dh->updateProduct();
                 break;
             case 'processOrder':
                 $res = $this->dh->processOrder($param);

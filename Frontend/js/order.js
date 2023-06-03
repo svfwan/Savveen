@@ -5,6 +5,7 @@ $(document).ready(function () {
         console.log("clicked"); 
         let isLoggedIn = !!getCookie('username');
         console.log('Bestellen...');
+
         if (!isLoggedIn) {
             alert("Bitte melden Sie sich an, um zu bestellen!");
             // Load the content of login.html into the modal placeholder and show the login modal
@@ -12,7 +13,10 @@ $(document).ready(function () {
                 $('#loginModal').modal('show');
             });
             return;
-        }
+        } else if (isLoggedIn) {
+            $('#modal-placeholder').load('sites/cart.html', function () {
+                $('#cartModal').modal('show');
+            });
 
 
         //get userdata: 
