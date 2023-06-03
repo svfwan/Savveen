@@ -8,19 +8,7 @@
   - 
  
   further issues/ideas/solutions:
-  - when adding product to cart 6 items are added -> possible conflict because of button naming
-  - look into using more specific IDs and Classes for styling/jQuery referencing
-  - importing common/helper function:
-    import { specificFunction } from './path/to/other/file.js';
-
-    // Now you can use the imported function
-    specificFunction();
-
-    In the file that contains the specific function (./path/to/other/file.js in the example above):
-
-    export function specificFunction() {
-      // Function implementation
-    }
+  
 */
 
 
@@ -48,7 +36,6 @@ function showModalAlert(message, type) {
   // Wait for 2 seconds and then hide the alert
   setTimeout(function () {
     $('#message-container').empty();
-    console.log("emptied");
   }, 2000);
 }
 
