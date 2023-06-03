@@ -46,8 +46,8 @@ class businessLogic
             case 'reduceStock':
                 $res = $this->dh->reduceStock($param);
                 break;
-            case 'filterConSearch':
-                $res = $this->dh->filterConSearch($param);
+            case 'searchProducts':
+                $res = $this->dh->searchProducts($param);
                 break;
             case 'reduceStock';
                 $res = $this->dh->reduceStock($param);

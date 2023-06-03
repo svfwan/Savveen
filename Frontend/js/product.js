@@ -15,7 +15,11 @@ $(document).ready(function () {
         displayCategory();
     });
 
-    ContinuousSearch();
+    $(document).on('input', '#searchTerm', function (e) {
+        const value = e.target.value.trim();
+        $("#category").val("");
+        searchProducts(value);
+    });
 
     $(document).on("click", ".add-to-cart-btn", function () {
         let productID = $(this).data('product-id');
@@ -51,46 +55,36 @@ function loadAllProducts() {
     });
 }
 
-function ContinuousSearch() {
-    let $input = $("<input>").on("input", function (e) {
-        const value = e.target.value;
-        console.log(value);
-
-        $.ajax({
-            type: "GET",
-            url: "../Backend/logic/requestHandler.php",
-            data: {
-                method: "filterConSearch",
-                param: JSON.stringify({
-                    letter: value,
-                }),
-            },
-            dataType: "json",
-            success: function (data) {
-                console.log(data);
+function searchProducts(value) {
+    $.ajax({
+        type: "GET",
+        url: "../Backend/logic/requestHandler.php",
+        data: {
+            method: "searchProducts",
+            param: JSON.stringify({
+                letter: value,
+            }),
+        },
+        dataType: "json",
+        success: function (response) {
+            if (response.error) {
+                alert(response.error);
+            } else {
                 $("#mainView").empty();
-                if (data.length === 0 && value !== "") {
-                    alert("Keine Produkte gefunden");
-                }
                 let $row = $("<div class='row'></div>");
-                for (let i in data) {
-                    console.log(data[i]);
-                    displayAll(data[i], $row);
+                for (let i in response) {
+                    displayAll(response[i], $row);
                 }
-                fillCart();
-            },
-            error: function (error) {
-                console.log(error);
-                alert("Error: Seite kann nicht geladen werden");
-            },
-        });
+            }
+        },
+        error: function (error) {
+            alert("Fehler bei der Abfrage");
+        },
     });
 }
 
 function displayCategory() {
     const selectedValue = $("#category").val();
-    console.log("Kategorie: " + selectedValue);
-
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -106,7 +100,6 @@ function displayCategory() {
                 if (selectedValue === "") {
                     displayAll(cur, $row);
                 } else if (cur.kategorie === selectedValue) {
-                    console.log(selectedValue)
                     displayAll(cur, $row);
                 }
             }
@@ -173,7 +166,7 @@ function addCart(productID) {
         dataType: "json",
         success: function (response) {
             console.log(response);
-            let item = response[0];
+            let item = response;
             let stock = item.bestand;
             if (quantityInCart + 1 <= stock) {
                 addItemtoCart(item);
@@ -181,9 +174,8 @@ function addCart(productID) {
                 alert("Dieses Produkt haben wir leider nicht mehr auf Lager!");
             }
         },
-        error: function (error) {
-            console.log(error);
-            alert("Error: Seite kann nicht geladen werden");
+        error: function () {
+            alert("Fehler bei der Abfrage!");
         },
     });
 }

@@ -359,163 +359,128 @@ class dataHandler
         //hier werden die fkt reingeschrieben. 
 
 
-        $tab = []; // Initialisiere das Array
+        $result = array(); // Initialisiere das Array
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `id`,`kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products`");
-        $sql->execute();
-        $result = $sql->get_result();
-
-        // Füge die Ergebnisse in das Array ein
-        while ($row = $result->fetch_assoc()) {
-            array_push($tab, $row);
+        $stmt = $this->db_obj->prepare("SELECT `id`,`kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products`");
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            while ($row = $queryResult->fetch_assoc()) {
+                array_push($result, $row);
+            }
+        } else {
+            $result["error"] = "Versuchen Sie es später erneut!";
         }
 
         // Schließe die Verbindung und gib das Array zurück
-        $sql->close();
-        return $tab;
+        $stmt->close();
+        return $result;
     }
 
     // load product by ID
     public function loadProductByID($param)
     {
-        $tab = array();
+        $result = array();
 
         // Check the database connection
         if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
         }
 
         // Prepare and execute the SQL query
-        $sql = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products` WHERE `id` = ?");
-        $sql->bind_param("i", $param);
-        $sql->execute();
-        $result = $sql->get_result();
-
-        // Check if the product was found
-        if ($result->num_rows == 1) {
-            $row = $result->fetch_assoc();
-            $tab["success"] = true;
-            $tab["data"] = $row;
+        $stmt = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `beschreibung`, `bewertung` FROM `products` WHERE `id` = ?");
+        $stmt->bind_param("i", $param);
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            $row = $queryResult->fetch_assoc();
+            if ($row) {
+                $result["success"] = true;
+                $result["data"] = $row;
+            } else {
+                $result["success"] = false;
+                $result["error"] = "Produkt nicht gefunden";
+            }
         } else {
-            $tab["success"] = false;
-            $tab["error"] = "Produkt nicht gefunden";
+            $result["error"] = "Versuchen Sie es später erneut!";
         }
-
         // Close the connection and return the array
-        $sql->close();
-        return $tab;
+        $stmt->close();
+        return $result;
     }
-
 
     //checkStock()
     public function checkStock($param)
     {
-
-        //überarbeiten
-        // $tab = []; // Initialisiere das Array
-        $tab = array();
-
+        $result = array();
         $id = $param['id'];
 
-        // Prüfe die Verbindung zur Datenbank
+        // Check the database connection
         if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
         }
 
+        // Prepare and execute the SQL query
+        $stmt = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `id` = ?");
+        $stmt->bind_param('i', $id);
 
-        // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `bewertung`,  `bestand` FROM `products` WHERE `id` = ? ");
-        $sql->bind_param('i', $id);
-        //  echo "Datenbank: ". $param['Name'];
-        $sql->execute();
-        $result = $sql->get_result();
-
-        // Füge die Ergebnisse in das Array ein
-        while ($row = $result->fetch_assoc()) {
-            array_push($tab, $row);
-        }
-
-        // Schließe die Verbindung und gib das Array zurück
-        $sql->close();
-        return $tab;
-    }
-
-
-    public function reduceStock($param)
-    {
-        //arr erstellen für die ergebnisse
-        $tab = array();
-
-        $n = $param['Name'];
-        $s = $param['Stock'] - 1;
-
-
-        // Prüfe die Verbindung zur Datenbank
-        if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
-        }
-
-        // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("UPDATE `products` SET `bestand` = ?  WHERE `name` = ? ");
-        $sql->bind_param('is', $s, $n);
-        //  echo "Datenbank: ". $param['Name']  
-
-        //update gibt ja keine werte zurück, deswegen kann man die werte auch nicht in einem array speichern
-
-        if ($sql->execute() && $sql->affected_rows > 0) {
-            $tab['success'] = 'Stock wurde runtergesetzt!';
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            $row = $queryResult->fetch_assoc();
+            if ($row) {
+                $result = $row;
+            } else {
+                $result["error"] = "Produkt nicht gefunden";
+            }
         } else {
-            $tab['error'] = 'Stock konnte nicht runtergesetzt werden.';
+            $result["error"] = "Versuchen Sie es später erneut!";
         }
 
-        // Schließe die Verbindung und gib das Array zurück
-        $sql->close();
-        return $tab;
+        // Close the connection and return the array
+        $stmt->close();
+        return $result;
     }
 
     //nach Buchstaben filtern 
-    function filterConSearch($param)
+    function searchProducts($param)
     {
+        $result = array();
+        $searchTerm = $param['letter'];
 
-        $tab = array();
-        $full = array();
-
-        $a = $param['letter'];
-
-        //verbindung zur db prüfen
+        // Verbindung zur DB prüfen
         if (!$this->checkConnection()) {
-            $tab["error"] = "Versuchen Sie es später erneut!";
-            return $tab;
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
         }
 
         // Führe die SQL-Abfrage aus
-        $sql = $this->db_obj->prepare("SELECT `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
-        $sql->execute();
-        $result = $sql->get_result();
-
-        // Füge die Ergebnisse in das Array ein
-        while ($row = $result->fetch_assoc()) {
-            if (strpos($row['name'], $a) !== false) { //wenn name buchstaben enthälten
-                array_push($tab, $row);
+        $stmt = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `bewertung` FROM `products`");
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            // Füge die Ergebnisse in das Array ein
+            while ($row = $queryResult->fetch_assoc()) {
+                // Convert both the search term and name to lowercase for case-insensitive comparison
+                if (stripos(strtolower($row['name']), strtolower($searchTerm)) !== false) {
+                    array_push($result, $row);
+                }
             }
-            array_push($full, $row);
+            // Check if any products were found
+            if (count($result) === 0) {
+                $result["error"] = "Kein Produkt gefunden!";
+            }
+        } else {
+            $result["error"] = "Versuchen Sie es später erneut!";
         }
 
         // Schließe die Verbindung und gib das Array zurück
-        $sql->close();
-        if (count($tab) == 0) {
-            return $full;
-        }
-        return $tab;
+        $stmt->close();
+        return $result;
     }
 }
