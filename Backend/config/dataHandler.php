@@ -272,6 +272,7 @@ class dataHandler
         $price = floatval($param['price']);
         $stock = $param['stock'];
         $description = $param['description'];
+        $currentPicturePath = $param['currentPicture'];
 
         // Perform validation
         if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
@@ -310,6 +311,12 @@ class dataHandler
             $newPicturePath = "../../Frontend/res/img/" . $newPictureFilename;
             move_uploaded_file($tmpPath, $newPicturePath);
             $pictureMoved = true;
+        } else {
+            $renamedPicturePath = "../../Frontend/res/img/" . $productName . ".jpg";
+            if (!rename($currentPicturePath, $renamedPicturePath)) {
+                $result['error'] = 'Fehler beim Aktualisieren des Bildnamens!';
+                return $result;
+            }
         }
 
         // Prepared SQL statement to update the product in the database
@@ -396,7 +403,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $stmt = $this->db_obj->prepare("SELECT `id`,`kategorie`, `name`, `preis`, `beschreibung` FROM `products`");
+        $stmt = $this->db_obj->prepare("SELECT * FROM `products`");
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
             while ($row = $queryResult->fetch_assoc()) {
@@ -423,7 +430,7 @@ class dataHandler
         }
 
         // Prepare and execute the SQL query
-        $stmt = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `beschreibung`, `bestand` FROM `products` WHERE `id` = ?");
+        $stmt = $this->db_obj->prepare("SELECT * FROM `products` WHERE `id` = ?");
         $stmt->bind_param("i", $param);
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
@@ -456,7 +463,7 @@ class dataHandler
         }
 
         // Prepare and execute the SQL query
-        $stmt = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`,  `bestand` FROM `products` WHERE `id` = ?");
+        $stmt = $this->db_obj->prepare("SELECT * FROM `products` WHERE `id` = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -581,7 +588,7 @@ class dataHandler
         }
 
         // Führe die SQL-Abfrage aus
-        $stmt = $this->db_obj->prepare("SELECT `id`, `kategorie`, `name`, `preis`, `beschreibung` FROM `products`");
+        $stmt = $this->db_obj->prepare("SELECT * FROM `products`");
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
             // Füge die Ergebnisse in das Array ein

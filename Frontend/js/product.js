@@ -112,18 +112,27 @@ function displayCategory() {
 }
 
 function displayAll(data, $row) {
+    let starsHTML = '';
+    for (let i = 0; i < data.bewertung; i++) {
+        starsHTML += '<span class="fa fa-star checked"></span>';
+    }
+    for (let i = data.bewertung; i < 5; i++) {
+        starsHTML += '<span class="fa fa-star"></span>';
+    }
+    let pictureCacheRemover = new Date().getTime();
     let productHTML = `
         <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="product card product-card">
             <div class="card-img-container">
                 <div class="img-wrapper">
-                <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+                <img src="../Frontend/res/img/${data.name}.jpg?${pictureCacheRemover}" class="card-img-top product-img" alt="${data.name}">
                 </div>
             </div>
             <div class="card-body product-card-body">
                 <h5 class="card-title">${data.name}</h5>
                 <p class="card-text price">${data.preis}€</p>
                 <p class="card-text description text-sm text-break">${data.beschreibung}</p>
+                <p class="card-text stars">${starsHTML}</p>
                 <button class="btn btn-success add-to-cart-btn" data-product-id="${data.id}">In den Warenkorb hinzufügen</button>
             </div>
             </div>

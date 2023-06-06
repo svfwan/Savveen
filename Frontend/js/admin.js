@@ -36,6 +36,7 @@ $(document).ready(function () {
     // ajax call for loading products for admin
 
     function loadProductsForAdmin() {
+        let pictureCacheRemover = new Date().getTime();
         $.ajax({
             type: 'GET',
             url: '../Backend/logic/requestHandler.php',
@@ -56,7 +57,7 @@ $(document).ready(function () {
                             <div class="product card product-card">
                                 <div class="card-img-container">
                                     <div class="img-wrapper">
-                                        <img src="../Frontend/res/img/${product.name}.jpg" class="card-img-top product-img" alt="${product.name}">
+                                        <img src="../Frontend/res/img/${product.name}.jpg?${pictureCacheRemover}" class="card-img-top product-img" alt="${product.name}">
                                     </div>
                                 </div>
                                 <div class="card-body product-card-body">
@@ -175,6 +176,7 @@ $(document).ready(function () {
         let stock = $('#stockEdit').val();
         let description = $('#descriptionEdit').val();
         let picture = document.getElementById('pictureEdit').files[0];
+        let currentPicture = "../" + $('#currentPicturePreviewImg').attr('src').split('?')[0];
 
         // Perform validation
         if (!category || !productName || !price || !stock || !description) {
@@ -200,6 +202,7 @@ $(document).ready(function () {
         if (picture) {
             formData.append('picture', picture, picture.name);
         }
+        formData.append('currentPicture', currentPicture);
 
         // Send data to the backend using AJAX
         $.ajax({
@@ -210,6 +213,7 @@ $(document).ready(function () {
             contentType: false,
             success: function (response) {
                 if (response.success) {
+                    $('#pictureEdit').val('');
                     showModalAlert(response.success, 'success');
                     loadProductByID(productID);
                     loadProductsForAdmin();
@@ -218,7 +222,6 @@ $(document).ready(function () {
                 }
             },
             error: function () {
-                console.log("failure");
                 showModalAlert('Fehler beim Aktualisieren des Produkts!', 'danger');
                 loadProductByID(productID);
             }
@@ -256,6 +259,7 @@ $(document).ready(function () {
 
     // shows modal for selected product
     function showEditModal(product) {
+        $('#pictureEdit').val('');
         $('#productID').val(product.id);
         $('#categoryEdit').val(product.kategorie);
         $('#productNameEdit').val(product.name);
