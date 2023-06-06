@@ -339,6 +339,29 @@ class dataHandler
         return $result;
     }
 
+    public function deleteProduct($param)
+    {
+        $result = array();
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->checkConnection()) {
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
+        }
+
+        // Prepare and execute the SQL query
+        $stmt = $this->db_obj->prepare("DELETE FROM `products` WHERE `id` = ?");
+        $stmt->bind_param("i", $param);
+        if ($stmt->execute()) {
+            $result['success'] = "Produkt wurde erfolgreich gelöscht";
+        } else {
+            $result["error"] = "Produkt konnte nicht gelöscht werden!";
+        }
+        // Close the connection and return the array
+        $stmt->close();
+        return $result;
+    }
+
     // helper functions
 
     private function checkConnection()

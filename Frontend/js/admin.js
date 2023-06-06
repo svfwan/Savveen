@@ -27,14 +27,11 @@ $(document).ready(function () {
         updateProduct();
     });
 
-    $(document).on('click', '#updateProduct', function () {
-        updateProduct();
-    });
-
     // need to implement deleteProduct()
-    /*$(document).on('click', '#deleteProduct', function () {
-        //deleteProduct();
-    });*/
+    $(document).on('click', '#deleteProduct', function () {
+        let id = $('#productID').val();
+        deleteProduct(id);
+    })
 
     // ajax call for loading products for admin
 
@@ -64,7 +61,7 @@ $(document).ready(function () {
                                 </div>
                                 <div class="card-body product-card-body">
                                     <h5 class="card-title">${product.name}</h5>
-                                    <button id="editProduct" class="btn btn-success" data-product-id="${product.id}">Bearbeiten</button>
+                                    <button id="editProduct" class="btn btn-success" data-product-id="${product.id}"">Bearbeiten</button>
                                 </div>
                             </div>
                         </div>
@@ -224,6 +221,35 @@ $(document).ready(function () {
                 console.log("failure");
                 showModalAlert('Fehler beim Aktualisieren des Produkts!', 'danger');
                 loadProductByID(productID);
+            }
+        });
+    }
+
+    function deleteProduct(id) {
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'deleteProduct',
+                param: id
+            },
+            dataType: 'json',
+            success: function (response) {
+                // Handle the response and update the modal with the product data
+                if (response.success) {
+                    loadProductsForAdmin();
+                    showModalAlert(response.success, 'success');
+                    $('#updateProductForm').hide();
+                    $('#editProductFooter').hide();
+                    setTimeout(function () {
+                        $('#changeProductModal').modal('hide');
+                    }, 2000);
+                } else if (response.error) {
+                    showModalAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showModalAlert('Fehler bei der Abfrage!', 'danger');
             }
         });
     }
