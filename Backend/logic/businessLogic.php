@@ -25,7 +25,6 @@ class businessLogic
             case 'registerUser':
                 $res = $this->dh->registerUser($param);
                 break;
-
             case "loginUser":
                 $res = $this->dh->loginUser($param);
                 break;
@@ -35,23 +34,56 @@ class businessLogic
             case 'logoutUser':
                 $res = $this->dh->logoutUser();
                 break;
-            default:
-                $res = null;
-                break;
             case 'loadAllProducts':
                 $res = $this->dh->loadAllProducts();
+                break;
+            case 'loadProductByID':
+                $res = $this->dh->loadProductByID($param);
                 break;
             case 'checkStock':
                 $res = $this->dh->checkStock($param);
                 break;
-            case 'reduceStock':
-                $res = $this -> dh -> reduceStock($param);
+            case 'searchProducts':
+                $res = $this->dh->searchProducts($param);
+                break;
+            case 'getCurrentReceipt_id':
+                $res = $this -> dh -> getCurrentReceipt_id();
                 break; 
-            case 'filterConSearch':
-                $res = $this -> dh -> filterConSearch($param);
+            case 'getAddress':
+                $res = $this -> dh -> getAddress($param);
                 break; 
-            case 'reduceStock';
-                $res = $this->dh->reduceStock($param);
+            case 'createReceipt':
+                $res = $this -> dh -> createReceipt($param);
+                break; 
+            case 'createProduct':
+                $res = $this->dh->createProduct();
+                break;
+            case 'updateProduct':
+                $res = $this->dh->updateProduct();
+                break;
+            case 'processOrder':
+                $res = $this->dh->processOrder($param);
+                break;
+            case 'getOrderInfo':
+                $res = $this->dh->getOrderInfo($param);
+                break;
+            case 'getProductPrice':
+                $res = $this->dh->getProductPrice($param);
+                break;
+            case 'getTotal':
+                $res = $this->dh->getTotal($param);
+                break;
+            case 'getOrders':
+                $res = $this->dh->getOrders($param);
+                break;
+            case 'updateUserData';
+                $res = $this->dh->updateUserData($param);
+                break;
+            case 'getProfileData';
+                $res = $this->dh->getProfileData();
+                break;
+            default:
+                $res = null;
                 break;
         }
         return $res;

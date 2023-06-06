@@ -1,17 +1,121 @@
+
+
 $(document).ready(function () {
 
     updateFeatures();
 
+
     $(document).on('click', '#profileAction', function () {
         let isLoggedIn = !!getCookie('username');
-        // Define the file path and modal ID based on the login status
         var filePath = isLoggedIn ? 'sites/profile.html' : 'sites/login.html';
         var modalId = isLoggedIn ? '#profileModal' : '#loginModal';
-        // Load the content of the specified file into the modal placeholder and show the modal
         $('#modal-placeholder').load(filePath, function () {
+            if (isLoggedIn) {
+                loadProfileData();
+            }
             $(modalId).modal('show');
         });
     });
+
+    function changeProfileData() {
+
+        let userinfo = getCookie('username');
+        let newData = [];
+        newData.firstName = $('#firstNamenew').val();
+        newData.lastName = $('#lastNamenew').val();
+        newData.email = $('#emailnew').val();
+        newData.password = $('#passwordnew').val();
+        newData.adress = $('#addressnew').val();
+        newData.city = $('#citynew').val();
+        newData.plz = $('#postcodenew').val();
+        newData.username = $('#usernamenew').val();
+        let allEmpty = Object.values(newData).every(value => value === '');
+        if (allEmpty) {
+            showModalAlert('Sie haben nichts eingegeben!', 'warning');
+            return;
+        }
+        newData.formofAddress = $('#formofAddressnew').val();
+        newData.pw_alt = $('#pw_alt').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'updateUserData',
+                param: JSON.stringify({
+                    actualusername: userinfo,
+                    firstName: newData.firstName,
+                    lastName: newData.lastName,
+                    email: newData.email,
+                    pw: newData.pw,
+                    adress: newData.adress,
+                    city: newData.city,
+                    postcode: newData.plz,
+                    username: newData.username,
+                    formofAddress: newData.formofAddress,
+                    pw_alt: newData.pw_alt
+                })
+            },
+            dataType: 'json',
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    showModalAlert(response.success, 'success');
+                    $('#firstNameold').html(response.vorname);
+                    $('#lastNameold').text(response.nachname);
+                    $('#addressold').text(response.adress);
+                    $('#postcodeold').text(response.postcode);
+                    $('#cityold').text(response.city);
+                    $('#emailold').text(response.email);
+                    $('#usernameold').text(response.username);
+                    $('#formofAddressold').text(response.anrede);
+                    updateFeatures();
+                } else if (response.error) {
+                    showModalAlert(response.error, 'warning');
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+
+        });
+
+    }
+
+
+    function loadProfileData() {
+        let userinfo = getCookie('username');
+
+        $.ajax({
+            type: 'GET',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'getProfileData',
+                param: userinfo
+            },
+            dataType: 'json',
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    $('#firstNameold').text(response.vorname);
+                    $('#lastNameold').text(response.nachname);
+                    $('#addressold').text(response.adresse);
+                    $('#postcodeold').text(response.plz);
+                    $('#cityold').text(response.ort);
+                    $('#emailold').text(response.email);
+                    $('#usernameold').text(response.username);
+                    $('#formofAddressold').text(response.anrede);
+
+                }
+
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+    $(document).on('click', '#changeButton', changeProfileData);
+
 
     $(document).on('click', '#openRegisterModal', function (event) {
         event.preventDefault();  // Prevent the default action
@@ -36,14 +140,13 @@ $(document).ready(function () {
 
     // ajax call for login
     $(document).on('click', '#loginButton', function () {
-        console.log('Login button clicked');
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
             data: {
                 method: 'loginUser',
                 param: JSON.stringify({
-                    username: $('#username').val(),
+                    userInput: $('#userInput').val(),
                     password: $('#password').val(),
                     rememberLogin: $('#remember_login').prop('checked')
                 })
@@ -59,6 +162,7 @@ $(document).ready(function () {
                     showModalAlert(response.success, 'success');
                     setTimeout(function () {
                         $('#loginModal').modal('hide');
+                        $('#modal-placeholder').empty();
                     }, 2000); // 2 seconds delay
                 } else if (response.error) {
                     // Show error message above the modal content
@@ -66,41 +170,13 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-                $('#loadingSpinner').css('display', 'none');
-                console.log(error);
+                alert("Fehler bei der Abfrage!");
             }
         });
     });
 
-    function updateFeatures() {
-        // Always make an AJAX request to get the session information
-        // change to get request
-        $.ajax({
-            type: 'GET',
-            url: '../Backend/logic/requestHandler.php',
-            data: {
-                method: 'getSessionInfo',
-            },
-            dataType: 'json',
-            success: function (response) {
-                console.log(response);
-                if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
-                    let username = getCookie('username');
-                    let isAdmin = response.status === 'loggedInAdmin';
-                    updateNavbar(true, username, isAdmin);
-                } else {
-                    updateNavbar(false, '', false);
-                }
-            },
-            error: function (error) {
-                console.log(error);
-            },
-        });
-    }
-
     // ajax call for logout
     $(document).on('click', '#logoutButton', function () {
-        console.log("logout button clicked")
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
@@ -109,21 +185,18 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                console.log(response);
                 if (response.loggedIn === false) {
-                    console.log("Logged out");
                     updateFeatures();
                 }
             },
-            error: function (error) {
-                console.log(error)
+            error: function () {
+                alert("Fehler bei der Abfrage!");
             }
         });
     });
 
     // ajax call for registration
     $(document).on('click', '#registerButton', function () {
-        console.log('button clicked');
         if (!$('#termsCheck').prop('checked')) {
             $('#termsCheck').addClass('is-invalid');
             showModalAlert('Bitte stimmen Sie den Nutzungsbedingungen zu!', 'warning');
@@ -152,8 +225,6 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                console.log(response);
-                $('#loadingSpinner').css('display', 'none');
                 if (response.success) {
                     // reset form inputs after success
                     $('#formofAddress option:first').prop('selected', true);
@@ -172,13 +243,60 @@ $(document).ready(function () {
                 }
             },
             error: function (error) {
-                $('#loadingSpinner').css('display', 'none');
-                console.log(error);
+                alert("Fehler bei der Abfrage!");
             }
         });
     });
 
+
     // helper functions
+
+    function updateFeatures() {
+        const username = getCookie('username');
+        const rememberLogin = getCookie('rememberLogin');
+
+        if (username && rememberLogin) {
+            // User cookies are present, make the AJAX request to retrieve session information
+            $.ajax({
+                type: 'GET',
+                url: '../Backend/logic/requestHandler.php',
+                data: {
+                    method: 'getSessionInfo',
+                },
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                    if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
+                        let isAdmin = response.status === 'loggedInAdmin';
+                        updateNavbar(true, username, isAdmin);
+                        if (isAdmin) {
+                            $('#productFilter').hide();
+                            $('#mainView').load('sites/dashboard.html #adminDashboard');
+                        } else {
+                            // Load the default content for non-admin users
+                            $('#productFilter').show();
+                            $('#mainView').empty();
+                            loadAllProducts();
+                        }
+                    } else {
+                        updateNavbar(false, '', false);
+                        $('#productFilter').show();
+                        $('#mainView').empty();
+                        loadAllProducts();
+                    }
+                },
+                error: function () {
+                    alert("Fehler bei der Abfrage!");
+                },
+            });
+        } else {
+            // User is not logged in or cookies are not present, update the UI accordingly
+            updateNavbar(false, '', false);
+            $('#productFilter').show();
+            $('#mainView').empty();
+            loadAllProducts();
+        }
+    }
 
     function updateNavbar(isLoggedIn, username, isAdmin) {
         // default state - not logged in users
@@ -186,25 +304,23 @@ $(document).ready(function () {
         $('#usernameDisplay').hide();
         $('#showCart').show();
         $('#showOrders').hide();
-        $('#showAdminAction').hide();
+        $('#showAdminDashboard').hide();
         $('#logoutButton').hide();
 
         // if a user is logged in
         if (isLoggedIn) {
             $('#usernameDisplay').text(username);
             $('#usernameDisplay').show();
-            $('#logoutButton').show();  // show logout button
+            $('#logoutButton').show(); // show logout button
             // if the logged in user is admin
             if (isAdmin) {
                 $('#showCart').hide();
-                $('#showAdminAction').show();  // show admin dashboard
+                $('#showAdminDashboard').show(); // show admin dashboard
             } else {
-                $('#showOrders').show();  // show orders
+                $('#showOrders').show(); // show orders
             }
         }
     }
-
-
 
     function validateInput(input) {
         if (input.val().trim().length === 0) {
@@ -244,17 +360,4 @@ $(document).ready(function () {
 
         return isValid;
     }
-
-    function showModalAlert(message, type) {
-        var alertClasses = {
-            'success': 'alert-success',
-            'info': 'alert-info',
-            'warning': 'alert-warning',
-            'danger': 'alert-danger'
-        };
-        var alertHtml = '<div class="alert ' + alertClasses[type] + '" role="alert">' + message + '</div>';
-        // Add the alert HTML to the message container
-        $('#message-container').html(alertHtml);
-    }
-
 });
