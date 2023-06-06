@@ -4,11 +4,11 @@ $(document).ready(function () {
 
     updateFeatures();
 
-
     $(document).on('click', '#profileAction', function () {
         let isLoggedIn = !!getCookie('username');
         var filePath = isLoggedIn ? 'sites/profile.html' : 'sites/login.html';
         var modalId = isLoggedIn ? '#profileModal' : '#loginModal';
+        $('#modal-placeholder').empty();
         $('#modal-placeholder').load(filePath, function () {
             if (isLoggedIn) {
                 loadProfileData();
@@ -17,9 +17,13 @@ $(document).ready(function () {
         });
     });
 
-    function changeProfileData() {
+    $(document).on('click', '#changeButton', function () {
+        changeProfileData();
+    });
 
-        let userinfo = getCookie('username');
+    function changeProfileData() {
+        // client-side validation
+        let username = getCookie('username');
         let newData = [];
         newData.firstName = $('#firstNamenew').val();
         newData.lastName = $('#lastNamenew').val();
@@ -29,13 +33,14 @@ $(document).ready(function () {
         newData.city = $('#citynew').val();
         newData.plz = $('#postcodenew').val();
         newData.username = $('#usernamenew').val();
+        newData.pw_alt = $('#pw_alt').val();
         let allEmpty = Object.values(newData).every(value => value === '');
-        if (allEmpty) {
+        let oldFormOfAddress = $('#formofAddressold').text();
+        newData.formofAddress = $('#formofAddressnew').val();
+        if (allEmpty && (oldFormOfAddress == newData.formofAddress)) {
             showModalAlert('Sie haben nichts eingegeben!', 'warning');
             return;
         }
-        newData.formofAddress = $('#formofAddressnew').val();
-        newData.pw_alt = $('#pw_alt').val();
 
         $.ajax({
             type: 'POST',
@@ -43,7 +48,7 @@ $(document).ready(function () {
             data: {
                 method: 'updateUserData',
                 param: JSON.stringify({
-                    actualusername: userinfo,
+                    actualusername: username,
                     firstName: newData.firstName,
                     lastName: newData.lastName,
                     email: newData.email,
@@ -60,8 +65,9 @@ $(document).ready(function () {
             success: function (response) {
                 console.log(response);
                 if (response.success) {
+                    // todo: reset values of form after success
                     showModalAlert(response.success, 'success');
-                    $('#firstNameold').html(response.vorname);
+                    $('#firstNameold').text(response.vorname);
                     $('#lastNameold').text(response.nachname);
                     $('#addressold').text(response.adress);
                     $('#postcodeold').text(response.postcode);
@@ -114,8 +120,6 @@ $(document).ready(function () {
             }
         });
     }
-    $(document).on('click', '#changeButton', changeProfileData);
-
 
     $(document).on('click', '#openRegisterModal', function (event) {
         event.preventDefault();  // Prevent the default action
@@ -163,10 +167,10 @@ $(document).ready(function () {
                     setTimeout(function () {
                         $('#loginModal').modal('hide');
                         $('#modal-placeholder').empty();
-                    }, 2000); // 2 seconds delay
+                    }, 1000); // 1 second delay
                 } else if (response.error) {
                     // Show error message above the modal content
-                    $('#message-container').html('<div class="alert alert-danger" role="alert">' + response.error + '</div>');
+                    showModalAlert(response.error, 'warning');
                 }
             },
             error: function (error) {

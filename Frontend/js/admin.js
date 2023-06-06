@@ -30,7 +30,8 @@ $(document).ready(function () {
     // need to implement deleteProduct()
     $(document).on('click', '#deleteProduct', function () {
         let id = $('#productID').val();
-        deleteProduct(id);
+        let path = $('#currentPicturePreviewImg').attr('src').split('?')[0];
+        deleteProduct(id, path);
     })
 
     // ajax call for loading products for admin
@@ -176,7 +177,7 @@ $(document).ready(function () {
         let stock = $('#stockEdit').val();
         let description = $('#descriptionEdit').val();
         let picture = document.getElementById('pictureEdit').files[0];
-        let currentPicture = "../" + $('#currentPicturePreviewImg').attr('src').split('?')[0];
+        let currentPicture = $('#currentPicturePreviewImg').attr('src').split('?')[0];
 
         // Perform validation
         if (!category || !productName || !price || !stock || !description) {
@@ -228,13 +229,16 @@ $(document).ready(function () {
         });
     }
 
-    function deleteProduct(id) {
+    function deleteProduct(id, path) {
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
             data: {
                 method: 'deleteProduct',
-                param: id
+                param: JSON.stringify({
+                    id: id,
+                    currentPicture: path
+                })
             },
             dataType: 'json',
             success: function (response) {
@@ -259,15 +263,28 @@ $(document).ready(function () {
 
     // shows modal for selected product
     function showEditModal(product) {
-        $('#pictureEdit').val('');
-        $('#productID').val(product.id);
-        $('#categoryEdit').val(product.kategorie);
-        $('#productNameEdit').val(product.name);
-        $('#priceEdit').val(product.preis);
-        $('#stockEdit').val(product.bestand);
-        $('#descriptionEdit').val(product.beschreibung);
         let pictureCacheRemover = new Date().getTime();
-        $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);
-        $('#changeProductModal').modal('show');
+        if ($('#changeProductModal').is(':visible')) {
+            $('#pictureEdit').val('');
+            $('#productID').val(product.id);
+            $('#categoryEdit').val(product.kategorie);
+            $('#productNameEdit').val(product.name);
+            $('#priceEdit').val(product.preis);
+            $('#stockEdit').val(product.bestand);
+            $('#descriptionEdit').val(product.beschreibung);
+            $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);
+        } else {
+            $('#modal-placeholder').load("sites/dashboard.html #changeProductModal", function () {
+                $('#pictureEdit').val('');
+                $('#productID').val(product.id);
+                $('#categoryEdit').val(product.kategorie);
+                $('#productNameEdit').val(product.name);
+                $('#priceEdit').val(product.preis);
+                $('#stockEdit').val(product.bestand);
+                $('#descriptionEdit').val(product.beschreibung);
+                $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);
+                $('#changeProductModal').modal('show');
+            });
+        }
     }
 });

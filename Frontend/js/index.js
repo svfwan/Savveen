@@ -60,6 +60,10 @@ function showAlert(message, type) {
     // Add the d-none class to the alertContainer to hide it
     $('#alertContainer').addClass('d-none');
   });
+
+  setTimeout(function () {
+    $('#alertContainer').addClass('d-none');
+  }, 3000);
 }
 
 function loadSection(sectionID) {

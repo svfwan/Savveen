@@ -40,6 +40,7 @@ function loadAllProducts() {
         },
         dataType: "json",
         success: function (data) {
+            $("#category").val("");
             let $row = $("<div class='row'></div>");
             for (let i in data) {
                 let cur = data[i];

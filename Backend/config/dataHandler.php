@@ -272,7 +272,7 @@ class dataHandler
         $price = floatval($param['price']);
         $stock = $param['stock'];
         $description = $param['description'];
-        $currentPicturePath = $param['currentPicture'];
+        $currentPicturePath = "../" . $param['currentPicture'];
 
         // Perform validation
         if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
@@ -349,6 +349,8 @@ class dataHandler
     public function deleteProduct($param)
     {
         $result = array();
+        $id = $param['id'];
+        $currentPicturePath = "../" . $param['currentPicture'];
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
@@ -358,8 +360,8 @@ class dataHandler
 
         // Prepare and execute the SQL query
         $stmt = $this->db_obj->prepare("DELETE FROM `products` WHERE `id` = ?");
-        $stmt->bind_param("i", $param);
-        if ($stmt->execute()) {
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute() && unlink($currentPicturePath)) {
             $result['success'] = "Produkt wurde erfolgreich gelöscht";
         } else {
             $result["error"] = "Produkt konnte nicht gelöscht werden!";
