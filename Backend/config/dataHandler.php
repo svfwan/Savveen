@@ -1,7 +1,7 @@
 <?php
 class dataHandler
 {
-    private $db_obj;
+    public $db_obj;
 
     public function __construct()
     {
