@@ -3,6 +3,7 @@ include('../config/dbaccess.php');
 include('../config/dataHandler.php');
 include('./profileLogic.php');
 include('./productLogic.php');
+include('./orderLogic.php');
 include('./adminLogic.php');
 class businessLogic
 {
