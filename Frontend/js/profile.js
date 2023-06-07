@@ -221,6 +221,7 @@ $(document).ready(function () {
                     email: $('#email').val(),
                     username: $('#username').val(),
                     password: $('#password').val(),
+                    paymentMethod: $('payment-method').val()
                 })
             },
             dataType: 'json',
