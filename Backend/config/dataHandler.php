@@ -1,4 +1,5 @@
 <?php
+include('dbaccess.php');
 class dataHandler
 {
     public $db_obj;
