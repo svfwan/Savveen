@@ -517,10 +517,10 @@ class dataHandler
     //Rechnung erstellen
     function createReceipt($param)
     {
-
         $tab = array();
-        $gesamt = $param['total'];
-        $un = $param['username'];
+
+        $id = $param['userid'];
+        $gesamt = $param['gesamt'];
         $street = $param['adress'];
         $plz = $param['postcode'];
         $city = $param['ort'];
@@ -532,8 +532,10 @@ class dataHandler
         }
 
         //sql statement
-        $sql = $this->db_obj->prepare("INSERT INTO receipts (`username`,`total`, `street`,`postcode`,`city`) VALUES (?,?,?,?,?)");
-        $sql->bind_param("sisis", $un, $gesamt, $street, $plz, $city);
+        $sql = $this->db_obj->prepare("INSERT INTO receipts (`user_id`,`total`, `street`,`postcode`,`city`) VALUES (?,?,?,?,?)");
+        $sql->bind_param("iisis", $id, $gesamt, $street, $plz, $city);
+
+
 
 
         if ($sql->execute() && $sql->affected_rows > 0) {
@@ -544,6 +546,8 @@ class dataHandler
 
 
         $sql->close();
+
+
         return $tab;
     }
     //add order to db
@@ -553,7 +557,7 @@ class dataHandler
         $tab = array();
         $pid = $param['product_id'];
         $quant = $param['quantity'];
-        $u = $param['username'];
+        $id = $param['userid'];
         $recid = $param['receiptid'];
 
         // Prüfe die Verbindung zur Datenbank
@@ -562,9 +566,13 @@ class dataHandler
             return $tab;
         }
 
-        //sql statement
-        $sql = $this->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `username`, `receipt_id`) VALUES (?,?,?,?)");
-        $sql->bind_param("iisi", $pid, $quant, $u, $recid);
+
+        // SQL statement
+        $sql = $this->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `user_id`, `receipt_id`, `price`,`productname` )
+    SELECT ?, ?, ?, ?, preis, `name`  FROM products WHERE `id` = ?");
+        $sql->bind_param("iiiii", $pid, $quant, $id, $recid, $pid);
+
+
 
 
         if ($sql->execute() && $sql->affected_rows > 0) {
@@ -619,7 +627,7 @@ class dataHandler
     {
 
 
-        $username = $param['un'];
+        $id = $param['userid'];
 
         $tab = array();
 
@@ -631,8 +639,8 @@ class dataHandler
 
 
         //sql statement
-        $sql = $this->db_obj->prepare("SELECT `adresse`, `plz` , `ort`  FROM `users` WHERE `username` = ? LIMIT 1");
-        $sql->bind_param("s", $username);
+        $sql = $this->db_obj->prepare("SELECT `adresse`, `plz` , `ort`  FROM `users` WHERE `id` = ? LIMIT 1");
+        $sql->bind_param("i", $id);
 
         //  SELECT receipt_id FROM receipts ORDER BY receipt_id DESC LIMIT 1
 
@@ -769,9 +777,12 @@ class dataHandler
 
     function getOrders($param)
     {
-        $username = $param['username'];
+        $userid = $param['userid'];
 
         $tab = array();
+        $idx = 0;
+        $cur = 0;
+        $arr = array();
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->checkConnection()) {
@@ -780,16 +791,28 @@ class dataHandler
         }
 
         // SQL statement
-        $sql = $this->db_obj->prepare("SELECT `receipts`.`receipt_id`, `receipts`.`total`, `receipts`.`street`, `receipts`.`postcode`, `receipts`.`city`, `orders`.`quantity`, `orders`.`product_id` FROM `receipts` INNER JOIN `orders` ON `receipts`.`username` = `orders`.`username` AND `receipts`.`receipt_id` = `orders`.`receipt_id` WHERE `receipts`.`username` = ? ORDER BY `receipts`.`receipt_id` ASC");
-        $sql->bind_param("s", $username);
+        $sql = $this->db_obj->prepare("SELECT `receipts`.`receipt_id`, `receipts`.`total`, `receipts`.`street`, `receipts`.`postcode`, `receipts`.`city`, `orders`.`quantity`, `orders`.`product_id`,`orders`.`price`, `orders`.`productname` FROM `receipts` INNER JOIN `orders` ON `receipts`.`user_id` = `orders`.`user_id` AND `receipts`.`receipt_id` = `orders`.`receipt_id` WHERE `receipts`.`user_id` = ? ORDER BY `receipts`.`receipt_id` ASC");
+        $sql->bind_param("i", $userid);
         $sql->execute();
         $result = $sql->get_result();
 
         // Füge die Ergebnisse in das Array ein
         while ($row = $result->fetch_assoc()) {
-            array_push($tab, $row);
+            if ($idx == 0) {
+                $cur = $row['receipt_id'];
+            }
+            if ($row['receipt_id'] == $cur) { //alte receipt_id
+                array_push($arr, $row);
+            } else { //neue receipt id
+                array_push($tab, $arr); //alte Werte werden auf tab gepushed
+                $arr = array(); //array leeren für neue werte
+                array_push($arr, $row); //aktuellen wert auf das zwischenstand array pushen
+                $cur = $row['receipt_id']; //aktuelle receipt id aktualisieren
+            }
+            $idx++;
         }
 
+        array_push($tab, $arr);
         $sql->close();
         return $tab;
     }
@@ -921,5 +944,34 @@ class dataHandler
         }
         $stmt2->close();
         return $data;
+    }
+
+    function getUserid($param)
+    {
+         //get userid from certain username
+         //$username = $param['un'];
+    
+        $username= $param['un']; 
+         $tab = array();
+ 
+         // Prüfe die Verbindung zur Datenbank
+         if (!$this->checkConnection()) {
+             $tab["error"] = "Versuchen Sie es später erneut!";
+             return $tab;
+         }
+ 
+         // SQL statement
+         $sql = $this->db_obj->prepare("SELECT `id` FROM `users`  WHERE `username` = ? ");
+         $sql->bind_param("s", $username);
+         $sql->execute();
+         $result = $sql->get_result();
+ 
+         // Füge die Ergebnisse in das Array ein
+         while ($row = $result->fetch_assoc()) {
+             array_push($tab, $row);
+         }
+ 
+         $sql->close();
+         return $tab;
     }
 }

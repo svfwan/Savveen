@@ -1,7 +1,4 @@
-
-
 $(document).ready(function () {
-
     updateFeatures();
 
     $(document).on('click', '#profileAction', function () {
@@ -87,38 +84,35 @@ $(document).ready(function () {
         });
 
     }
-
-
+  
     function loadProfileData() {
-        let userinfo = getCookie('username');
-
-        $.ajax({
-            type: 'GET',
-            url: '../Backend/logic/requestHandler.php',
-            data: {
-                method: 'getProfileData',
-                param: userinfo
-            },
-            dataType: 'json',
-            success: function (response) {
-                console.log(response);
-                if (response.success) {
-                    $('#firstNameold').text(response.vorname);
-                    $('#lastNameold').text(response.nachname);
-                    $('#addressold').text(response.adresse);
-                    $('#postcodeold').text(response.plz);
-                    $('#cityold').text(response.ort);
-                    $('#emailold').text(response.email);
-                    $('#usernameold').text(response.username);
-                    $('#formofAddressold').text(response.anrede);
-
-                }
-
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
+      let userinfo = getCookie("username");
+  
+      $.ajax({
+        type: "GET",
+        url: "../Backend/logic/requestHandler.php",
+        data: {
+          method: "getProfileData",
+          param: userinfo,
+        },
+        dataType: "json",
+        success: function (response) {
+          console.log(response);
+          if (response.success) {
+            $("#firstNameold").text(response.vorname);
+            $("#lastNameold").text(response.nachname);
+            $("#addressold").text(response.adresse);
+            $("#postcodeold").text(response.plz);
+            $("#cityold").text(response.ort);
+            $("#emailold").text(response.email);
+            $("#usernameold").text(response.username);
+            $("#formofAddressold").text(response.anrede);
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
     }
 
     $(document).on('click', '#openRegisterModal', function (event) {
@@ -130,18 +124,17 @@ $(document).ready(function () {
             $('#registerModal').modal('show');  // Assume the id of the register modal is 'registerModal'
         });
     });
-
-    $(document).on('click', '#openLoginModal', function (event) {
-        event.preventDefault();  // Prevent the default action
-        $('#registerModal').modal('hide');  // Hide the register modal
-
-        // Load the content of login.html into the modal placeholder and show the login modal
-        $('#modal-placeholder').load('sites/login.html', function () {
-            $('#loginModal').modal('show');
-        });
+  
+    $(document).on("click", "#openLoginModal", function (event) {
+      event.preventDefault(); // Prevent the default action
+      $("#registerModal").modal("hide"); // Hide the register modal
+  
+      // Load the content of login.html into the modal placeholder and show the login modal
+      $("#modal-placeholder").load("sites/login.html", function () {
+        $("#loginModal").modal("show");
+      });
     });
-
-
+  
     // ajax call for login
     $(document).on('click', '#loginButton', function () {
         $.ajax({
@@ -178,190 +171,201 @@ $(document).ready(function () {
             }
         });
     });
-
+  
     // ajax call for logout
-    $(document).on('click', '#logoutButton', function () {
-        $.ajax({
-            type: 'POST',
-            url: '../Backend/logic/requestHandler.php',
-            data: {
-                method: 'logoutUser'
-            },
-            dataType: 'json',
-            success: function (response) {
-                if (response.loggedIn === false) {
-                    updateFeatures();
-                }
-            },
-            error: function () {
-                alert("Fehler bei der Abfrage!");
-            }
-        });
+    $(document).on("click", "#logoutButton", function () {
+      $.ajax({
+        type: "POST",
+        url: "../Backend/logic/requestHandler.php",
+        data: {
+          method: "logoutUser",
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.loggedIn === false) {
+            updateFeatures();
+          }
+        },
+        error: function () {
+          alert("Fehler bei der Abfrage!");
+        },
+      });
     });
-
+  
     // ajax call for registration
-    $(document).on('click', '#registerButton', function () {
-        if (!$('#termsCheck').prop('checked')) {
-            $('#termsCheck').addClass('is-invalid');
-            showModalAlert('Bitte stimmen Sie den Nutzungsbedingungen zu!', 'warning');
-            return;
-        }
-        if (!validateRegisterForm()) {
-            showModalAlert('Bitte beachten Sie die Anforderungen für die Registrierung!', 'warning');
-            return;
-        }
-        $.ajax({
-            type: 'POST',
-            url: '../Backend/logic/requestHandler.php',
-            data: {
-                method: 'registerUser',
-                param: JSON.stringify({
-                    formofAddress: $('#formofAddress').val(),
-                    firstName: $('#firstName').val(),
-                    lastName: $('#lastName').val(),
-                    address: $('#address').val(),
-                    postcode: $('#postcode').val(),
-                    city: $('#city').val(),
-                    email: $('#email').val(),
-                    username: $('#username').val(),
-                    password: $('#password').val(),
-                })
-            },
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    // reset form inputs after success
-                    $('#formofAddress option:first').prop('selected', true);
-                    $('#firstName').val('');
-                    $('#lastName').val('');
-                    $('#address').val('');
-                    $('#postcode').val('');
-                    $('#city').val('');
-                    $('#email').val('');
-                    $('#username').val('');
-                    $('#password').val('');
-                    $('#termCheck').prop('checked', false);
-                    showModalAlert('Registrierung erfolgreich, Sie können sich nun einloggen!', 'success');
-                } else if (response.error) {
-                    showModalAlert(response.error, 'danger');
-                }
-            },
-            error: function (error) {
-                alert("Fehler bei der Abfrage!");
-            }
-        });
+    $(document).on("click", "#registerButton", function () {
+      if (!$("#termsCheck").prop("checked")) {
+        $("#termsCheck").addClass("is-invalid");
+        showModalAlert(
+          "Bitte stimmen Sie den Nutzungsbedingungen zu!",
+          "warning"
+        );
+        return;
+      }
+      if (!validateRegisterForm()) {
+        showModalAlert(
+          "Bitte beachten Sie die Anforderungen für die Registrierung!",
+          "warning"
+        );
+        return;
+      }
+      $.ajax({
+        type: "POST",
+        url: "../Backend/logic/requestHandler.php",
+        data: {
+          method: "registerUser",
+          param: JSON.stringify({
+            formofAddress: $("#formofAddress").val(),
+            firstName: $("#firstName").val(),
+            lastName: $("#lastName").val(),
+            address: $("#address").val(),
+            postcode: $("#postcode").val(),
+            city: $("#city").val(),
+            email: $("#email").val(),
+            username: $("#username").val(),
+            password: $("#password").val(),
+          }),
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.success) {
+            // reset form inputs after success
+            $("#formofAddress option:first").prop("selected", true);
+            $("#firstName").val("");
+            $("#lastName").val("");
+            $("#address").val("");
+            $("#postcode").val("");
+            $("#city").val("");
+            $("#email").val("");
+            $("#username").val("");
+            $("#password").val("");
+            $("#termCheck").prop("checked", false);
+            showModalAlert(
+              "Registrierung erfolgreich, Sie können sich nun einloggen!",
+              "success"
+            );
+          } else if (response.error) {
+            showModalAlert(response.error, "danger");
+          }
+        },
+        error: function (error) {
+          alert("Fehler bei der Abfrage!");
+        },
+      });
     });
-
-
+  
     // helper functions
-
+  
     function updateFeatures() {
-        const username = getCookie('username');
-        const rememberLogin = getCookie('rememberLogin');
-
-        if (username && rememberLogin) {
-            // User cookies are present, make the AJAX request to retrieve session information
-            $.ajax({
-                type: 'GET',
-                url: '../Backend/logic/requestHandler.php',
-                data: {
-                    method: 'getSessionInfo',
-                },
-                dataType: 'json',
-                success: function (response) {
-                    console.log(response);
-                    if (response.status === 'loggedInAdmin' || response.status === 'loggedInUser') {
-                        let isAdmin = response.status === 'loggedInAdmin';
-                        updateNavbar(true, username, isAdmin);
-                        if (isAdmin) {
-                            $('#productFilter').hide();
-                            $('#mainView').load('sites/dashboard.html #adminDashboard');
-                        } else {
-                            // Load the default content for non-admin users
-                            $('#productFilter').show();
-                            $('#mainView').empty();
-                            loadAllProducts();
-                        }
-                    } else {
-                        updateNavbar(false, '', false);
-                        $('#productFilter').show();
-                        $('#mainView').empty();
-                        loadAllProducts();
-                    }
-                },
-                error: function () {
-                    alert("Fehler bei der Abfrage!");
-                },
-            });
-        } else {
-            // User is not logged in or cookies are not present, update the UI accordingly
-            updateNavbar(false, '', false);
-            $('#productFilter').show();
-            $('#mainView').empty();
-            loadAllProducts();
-        }
-    }
-
-    function updateNavbar(isLoggedIn, username, isAdmin) {
-        // default state - not logged in users
-        $('#usernameDisplay').text('');
-        $('#usernameDisplay').hide();
-        $('#showCart').show();
-        $('#showOrders').hide();
-        $('#showAdminDashboard').hide();
-        $('#logoutButton').hide();
-
-        // if a user is logged in
-        if (isLoggedIn) {
-            $('#usernameDisplay').text(username);
-            $('#usernameDisplay').show();
-            $('#logoutButton').show(); // show logout button
-            // if the logged in user is admin
-            if (isAdmin) {
-                $('#showCart').hide();
-                $('#showAdminDashboard').show(); // show admin dashboard
+      const username = getCookie("username");
+      const rememberLogin = getCookie("rememberLogin");
+  
+      if (username && rememberLogin) {
+        // User cookies are present, make the AJAX request to retrieve session information
+        $.ajax({
+          type: "GET",
+          url: "../Backend/logic/requestHandler.php",
+          data: {
+            method: "getSessionInfo",
+          },
+          dataType: "json",
+          success: function (response) {
+            console.log(response);
+            if (
+              response.status === "loggedInAdmin" ||
+              response.status === "loggedInUser"
+            ) {
+              let isAdmin = response.status === "loggedInAdmin";
+              updateNavbar(true, username, isAdmin);
+              if (isAdmin) {
+                $("#productFilter").hide();
+                $("#mainView").load("sites/dashboard.html #adminDashboard");
+              } else {
+                // Load the default content for non-admin users
+                $("#productFilter").show();
+                $("#mainView").empty();
+                loadAllProducts();
+              }
             } else {
-                $('#showOrders').show(); // show orders
+              updateNavbar(false, "", false);
+              $("#productFilter").show();
+              $("#mainView").empty();
+              loadAllProducts();
             }
-        }
+          },
+          error: function () {
+            alert("Fehler bei der Abfrage!");
+          },
+        });
+      } else {
+        // User is not logged in or cookies are not present, update the UI accordingly
+        updateNavbar(false, "", false);
+        $("#productFilter").show();
+        $("#mainView").empty();
+        loadAllProducts();
+      }
     }
-
+  
+    function updateNavbar(isLoggedIn, username, isAdmin) {
+      // default state - not logged in users
+      $("#usernameDisplay").text("");
+      $("#usernameDisplay").hide();
+      $("#showCart").show();
+      $("#showOrders").hide();
+      $("#showAdminDashboard").hide();
+      $("#logoutButton").hide();
+  
+      // if a user is logged in
+      if (isLoggedIn) {
+        $("#usernameDisplay").text(username);
+        $("#usernameDisplay").show();
+        $("#logoutButton").show(); // show logout button
+        // if the logged in user is admin
+        if (isAdmin) {
+          $("#showCart").hide();
+          $("#showAdminDashboard").show(); // show admin dashboard
+        } else {
+          $("#showOrders").show(); // show orders
+        }
+      }
+    }
+  
     function validateInput(input) {
-        if (input.val().trim().length === 0) {
-            input.addClass('is-invalid');
-            return false;
-        } else {
-            input.removeClass('is-invalid');
-            return true;
-        }
+      if (input.val().trim().length === 0) {
+        input.addClass("is-invalid");
+        return false;
+      } else {
+        input.removeClass("is-invalid");
+        return true;
+      }
     }
-
+  
     function validateRegisterForm() {
-        let isValid = true;
-
-        isValid = validateInput($('#firstName')) && isValid;
-        isValid = validateInput($('#lastName')) && isValid;
-        isValid = validateInput($('#address')) && isValid;
-        isValid = validateInput($('#postcode')) && isValid;
-        isValid = validateInput($('#city')) && isValid;
-
-        let email = $('#email').val().trim();
-        if (email.length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            $('#email').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#email').removeClass('is-invalid');
-        }
-
-        isValid = validateInput($('#username')) && isValid;
-
-        if ($('#password').val().trim().length < 8) {
-            $('#password').addClass('is-invalid');
-            isValid = false;
-        } else {
-            $('#password').removeClass('is-invalid');
-        }
-
-        return isValid;
+      let isValid = true;
+  
+      isValid = validateInput($("#firstName")) && isValid;
+      isValid = validateInput($("#lastName")) && isValid;
+      isValid = validateInput($("#address")) && isValid;
+      isValid = validateInput($("#postcode")) && isValid;
+      isValid = validateInput($("#city")) && isValid;
+  
+      let email = $("#email").val().trim();
+      if (email.length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        $("#email").addClass("is-invalid");
+        isValid = false;
+      } else {
+        $("#email").removeClass("is-invalid");
+      }
+  
+      isValid = validateInput($("#username")) && isValid;
+  
+      if ($("#password").val().trim().length < 8) {
+        $("#password").addClass("is-invalid");
+        isValid = false;
+      } else {
+        $("#password").removeClass("is-invalid");
+      }
+  
+      return isValid;
     }
-});
+  });
