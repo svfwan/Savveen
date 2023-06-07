@@ -5,6 +5,7 @@ $(document).ready(function () {
     console.log("username" + getCookie("username"));
 
     $("#modal-placeholder").empty();
+    $('#message-container').empty();
     $("#modal-placeholder").load("sites/orders.html #OrdersModal", function () {
       $("#OrdersModal").modal("show"); //dar
       goGetIt();
@@ -57,8 +58,14 @@ function getOrderInfo(id) {
     dataType: "json",
     success: function (response) {
       console.log(response);
-      for (let i in response) {
-        displayOrder(response[i]);
+      if (Array.isArray(response) && response.length === 1 && Array.isArray(response[0]) && response[0].length === 0) {
+        $('#ordersTable').hide();
+        $('#message-container').html('<div class="alert alert-warning" role="alert">Sie haben keine Bestellungen!</div>')
+      } else {
+        $('#ordersTable').show();
+        for (let i in response) {
+          displayOrder(response[i]);
+        }
       }
     },
     error: function (error) {
@@ -92,12 +99,12 @@ function displayOrder(arr) {
       let td3 = $("<td>");
       td3.append(
         "Lieferadresse:       " +
-          arr[i].street +
-          " " +
-          arr[i].postcode +
-          " " +
-          arr[i].city +
-          "<br>"
+        arr[i].street +
+        " " +
+        arr[i].postcode +
+        " " +
+        arr[i].city +
+        "<br>"
       );
       tr2.append(td3);
 
