@@ -85,6 +85,9 @@ class businessLogic
             case 'getProfileData';
                 $res = $this->dh->getProfileData();
                 break;
+            case 'getUserid';
+                $res = $this->dh->getUserid($param);
+                break;
             default:
                 $res = null;
                 break;
