@@ -1,5 +1,4 @@
 <?php
-include('../config/dataHandler.php');
 class productLogic
 {
     private $dh;

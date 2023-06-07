@@ -1,5 +1,4 @@
 <?php
-include('../config/dataHandler.php');
 class profileLogic
 {
     private $dh;
@@ -163,6 +162,7 @@ class profileLogic
             $_SESSION['admin'] = $_COOKIE['admin'] ?? false;
             if ($_SESSION['admin']) {
                 $result['status'] = 'loggedInAdmin';
+                $result['check'] = 'newDataHandler works';
             } else {
                 $result['status'] = 'loggedInUser';
             }
