@@ -8,6 +8,22 @@ class adminLogic
         $this->dh = $dh;
     }
 
+    public function loadAllUsers()
+    {
+        $result = array();
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $sql = 'SELECT `id`, `` from `users` WHERE `admin` = ?';
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('i', 0);
+
+
+    }
+
     public function createProduct()
     {
         $result = array();

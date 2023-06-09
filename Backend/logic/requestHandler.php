@@ -30,7 +30,7 @@ if ($result == null) {
 function response($request, $httpStatus, $data)
 {
     header('Content-Type: application/json');
-    if (in_array($request, array('GET', 'POST', 'PUT', 'DELETE'))) {
+    if (in_array($request, array('GET', 'POST'))) {
         http_response_code($httpStatus);
         echo (json_encode($data));
     } else {

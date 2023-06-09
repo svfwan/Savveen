@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#showProfileManagement', function () {
         loadSection('userManagement');
-        //loadUsersForAdmin();
+        loadUsersForAdmin();
     });
 
     $(document).on('click', '#showProductManagement', function () {
@@ -33,6 +33,33 @@ $(document).ready(function () {
         let path = $('#currentPicturePreviewImg').attr('src').split('?')[0];
         deleteProduct(id, path);
     })
+
+    // ajax call for loading all users for admin
+    function loadUsersForAdmin() {
+        $.ajax({
+            type: 'GET',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'loadAllUsers',
+            },
+            dataType: 'json',
+            success: function (response) {
+                let $userListAdmin = $('#userListAdmin');
+                $userListAdmin.empty();
+
+                for (let i = 0; i < response.length; i++) {
+                    let user = response[i];
+                    let $row = $('<div class="row"></div>');
+                    $row.text(user);
+                    $userListAdmin.append($row);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
+    }
 
     // ajax call for loading products for admin
 

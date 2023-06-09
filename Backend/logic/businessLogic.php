@@ -1,20 +1,20 @@
 <?php
 include('../config/dataHandler.php');
-include('./profileLogic.php');
-include('./productLogic.php');
-include('./orderLogic.php');
-include('./adminLogic.php');
+include('profileLogic.php');
+include('productLogic.php');
+include('orderLogic.php');
+include('adminLogic.php');
 class businessLogic
 {
-    private $profileLogic;
     private $productLogic;
+    private $profileLogic;
     private $orderLogic;
     private $adminLogic;
     function __construct()
     {
         $dh = new dataHandler();
-        $this->profileLogic = new profileLogic($dh);
         $this->productLogic = new productLogic($dh);
+        $this->profileLogic = new profileLogic($dh);
         $this->orderLogic = new orderLogic($dh);
         $this->adminLogic = new adminLogic($dh);
         session_start();
@@ -51,18 +51,6 @@ class businessLogic
             case 'searchProducts':
                 $res = $this->productLogic->searchProducts($param);
                 break;
-            case 'createProduct':
-                $res = $this->adminLogic->createProduct();
-                break;
-            case 'loadProductByID':
-                $res = $this->adminLogic->loadProductByID($param);
-                break;
-            case 'updateProduct':
-                $res = $this->adminLogic->updateProduct();
-                break;
-            case 'deleteProduct':
-                $res = $this->adminLogic->deleteProduct($param);
-                break;
             case 'getCurrentReceipt_id':
                 $res = $this->orderLogic->getCurrentReceipt_id();
                 break;
@@ -89,6 +77,18 @@ class businessLogic
                 break;
             case 'getUserid';
                 $res = $this->orderLogic->getUserid($param);
+                break;
+            case 'createProduct':
+                $res = $this->adminLogic->createProduct();
+                break;
+            case 'loadProductByID':
+                $res = $this->adminLogic->loadProductByID($param);
+                break;
+            case 'updateProduct':
+                $res = $this->adminLogic->updateProduct();
+                break;
+            case 'deleteProduct':
+                $res = $this->adminLogic->deleteProduct($param);
                 break;
             default:
                 $res = null;
