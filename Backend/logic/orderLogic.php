@@ -49,6 +49,7 @@ class orderLogic
         $street = $param['adress'];
         $plz = $param['postcode'];
         $city = $param['ort'];
+        $time = date('Y-m-d');  // Aktuelles Datum im Format 'yyyy-mm-dd'
 
         // Prüfe die Verbindung zur Datenbank
         if (!$this->dh->checkConnection()) {
@@ -57,8 +58,8 @@ class orderLogic
         }
 
         //sql statement
-        $sql = $this->dh->db_obj->prepare("INSERT INTO receipts (`user_id`,`total`, `street`,`postcode`,`city`) VALUES (?,?,?,?,?)");
-        $sql->bind_param("iisis", $id, $gesamt, $street, $plz, $city);
+        $sql = $this->dh->db_obj->prepare("INSERT INTO receipts (`user_id`,`total`, `street`,`postcode`,`city`, `timestamp`) VALUES (?,?,?,?,?,?)");
+        $sql->bind_param("iisiss", $id, $gesamt, $street, $plz, $city, $time);
 
 
 
@@ -75,6 +76,7 @@ class orderLogic
 
         return $tab;
     }
+
     //add order to db
     function processOrder($param)
     {
@@ -93,7 +95,7 @@ class orderLogic
 
 
         // SQL statement
-        $sql = $this->dh->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `user_id`, `receipt_id`, `price`,`productname` )
+        $sql = $this->dh->db_obj->prepare("INSERT INTO orders(`product_id`, `quantity`, `user_id`, `receipt_id`, `price`,`productname`)
         SELECT ?, ?, ?, ?, preis, `name`  FROM products WHERE `id` = ?");
         $sql->bind_param("iiiii", $pid, $quant, $id, $recid, $pid);
 
@@ -261,7 +263,7 @@ class orderLogic
         }
 
         // SQL statement
-        $sql = $this->dh->db_obj->prepare("SELECT `receipts`.`receipt_id`, `receipts`.`total`, `receipts`.`street`, `receipts`.`postcode`, `receipts`.`city`, `orders`.`quantity`, `orders`.`product_id`,`orders`.`price`, `orders`.`productname` FROM `receipts` INNER JOIN `orders` ON `receipts`.`user_id` = `orders`.`user_id` AND `receipts`.`receipt_id` = `orders`.`receipt_id` WHERE `receipts`.`user_id` = ? ORDER BY `receipts`.`receipt_id` ASC");
+        $sql = $this->dh->db_obj->prepare("SELECT `receipts`.`timestamp`,`receipts`.`receipt_id`, `receipts`.`total`, `receipts`.`street`, `receipts`.`postcode`, `receipts`.`city`, `orders`.`quantity`, `orders`.`product_id`,`orders`.`price`, `orders`.`productname` FROM `receipts` INNER JOIN `orders` ON `receipts`.`user_id` = `orders`.`user_id` AND `receipts`.`receipt_id` = `orders`.`receipt_id` WHERE `receipts`.`user_id` = ? ORDER BY `receipts`.`timestamp`,`receipts`.`receipt_id`  ASC");
         $sql->bind_param("i", $userid);
         $sql->execute();
         $result = $sql->get_result();
@@ -287,8 +289,6 @@ class orderLogic
         return $tab;
     }
 
-
-
     function getUserid($param)
     {
         //get userid from certain username
@@ -312,6 +312,36 @@ class orderLogic
         // Füge die Ergebnisse in das Array ein
         while ($row = $result->fetch_assoc()) {
             array_push($tab, $row);
+        }
+
+        $sql->close();
+        return $tab;
+    }
+
+    function reduceStock($param)
+    {
+        $id = $param['product_id'];
+        $quant = $param['quantity'];
+
+
+        $tab = array();
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->dh->checkConnection()) {
+            $tab["error"] = "Versuchen Sie es später erneut!";
+            return $tab;
+        }
+
+
+        // SQL statement
+        $sql = $this->dh->db_obj->prepare("UPDATE `products` SET `bestand` = `bestand` - ? WHERE `id` = ?");
+        $sql->bind_param("ii", $quant, $id);
+        $sql->execute();
+
+        if ($sql->affected_rows > 0) {
+            $tab["success"] = "Stock reduced successfully.";
+        } else {
+            $tab["error"] = "Failed to reduce stock.";
         }
 
         $sql->close();

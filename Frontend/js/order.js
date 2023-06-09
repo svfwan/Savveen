@@ -1,4 +1,5 @@
 var un = "undefined";
+//warenkorb bestellen
 $(document).ready(function () {
 
     $(document).on('click', '#orderCart', function () {
@@ -19,33 +20,38 @@ $(document).ready(function () {
             });
 
 
-            //get userdata: 
+            //get userid: 
+            let username = getCookie("username");
 
             $.ajax({
-                type: 'GET',
-                url: '../Backend/logic/requestHandler.php',
+                type: "GET",
+                url: "../Backend/logic/requestHandler.php",
                 data: {
-                    method: 'getSessionInfo',
+                    method: "getUserid",
+                    param: JSON.stringify({
+                        un: username,
+                    }),
                 },
-                dataType: 'json',
+                dataType: "json",
                 success: function (response) {
                     console.log(response);
 
-                    un = getCookie('username');
-                    console.log("USERID:" + un);
+                    for (let i in response) {
+                        console.log("Userid: " + response[i].id);
+                        askAdress(response[i].id);
+                    }
+
                     //Artikel im Warenkorb anzeigen
-                    askAdress(un);
-
-
                 },
                 error: function (error) {
                     console.log(error);
                 },
-            });//ajax call ende
+            }); //ajax call ende
+
         }
     });
 
-    function askAdress(un) {
+    function askAdress(id) {
         //ask for adress
         $('#modal-placeholder').load('sites/cart.html', function () {
             $('#AdressModal').modal('show');
@@ -55,15 +61,19 @@ $(document).ready(function () {
             console.log(total);
 
 
+
             $("#newAdrsButton").on("click", function () {
                 console.log("neue Adresse");
-                createAdress(un, total);
+                createAdress(id, total);
 
             })
 
             $("#oldAdrsButton").on("click", function () {
                 console.log("alte Adresse");
-                getOriginalAddress(un, total);
+
+                getOriginalAddress(id, total);
+
+
 
             })
             return;
@@ -74,7 +84,7 @@ $(document).ready(function () {
 
     //alte Lieferadresse: 
     //Alte Lieferadresse:
-    function getOriginalAddress(username, gesamtpreis) {  //überarbeiten
+    function getOriginalAddress(id, total) {  //überarbeiten
         console.log("getOriginalAddress");
 
         $.ajax({
@@ -84,7 +94,7 @@ $(document).ready(function () {
             data: {
                 method: "getAddress",
                 param: JSON.stringify({
-                    un: username
+                    userid: id
                 }),
             },
             dataType: 'json',
@@ -93,7 +103,7 @@ $(document).ready(function () {
                 console.log(response);
                 for (let i in response) {
                     console.log(response[i].adresse + response[i].plz + response[i].ort);
-                    createReceipt(username, gesamtpreis, response[i].adresse, response[i].plz, response[i].ort);
+                    createReceipt(id, total, response[i].adresse, response[i].plz, response[i].ort);
                 }
 
 
@@ -107,7 +117,7 @@ $(document).ready(function () {
     }
 
     //neue Lieferadresse: 
-    function createAdress(un, total) {
+    function createAdress(id, total) {
         let correct = true;
         console.log("createAdress()");
         //adresse, plz, ort in db
@@ -130,12 +140,18 @@ $(document).ready(function () {
 
         if (correct == true) {
             //in db einfügen.
-            createReceipt(un, total, street, postcode, ort);
+            createReceipt(id, total, street, postcode, ort);
         }
     }
 
     //Rechnung erstellen
-    function createReceipt(un, gesamtpreis, street, plz, city) {
+    function createReceipt(id, gesamtpreis, street, plz, city) {
+
+        //timestamp 
+        const jetzt = new Date();
+        const zeitstempel = jetzt.toISOString().split('T')[0];
+        console.log(zeitstempel);
+
         //hier einen ajax call für id machen oder usernamen eingeben
         $.ajax({
             type: 'POST',
@@ -143,8 +159,8 @@ $(document).ready(function () {
             data: {
                 method: 'createReceipt',
                 param: JSON.stringify({
-                    total: gesamtpreis,
-                    username: un,
+                    gesamt: gesamtpreis,
+                    userid: id,
                     adress: street,
                     postcode: plz,
                     ort: city,
@@ -153,7 +169,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (response) {
                 // handle success
-                getReceiptID(un);
+                getReceiptID(id);
                 console.log("success");
             },
             error: function (xhr, status, error) {
@@ -163,7 +179,7 @@ $(document).ready(function () {
             }
         });
     }
-    function getReceiptID(un) {
+    function getReceiptID(id) {
         console.log("getReceiptID");
         $.ajax({
             type: 'GET',
@@ -175,7 +191,7 @@ $(document).ready(function () {
             success: function (response) {
                 //receipt id weitergeben:
                 console.log(response[0].receipt_id);
-                orderCart(un, response[0].receipt_id);
+                orderCart(id, response[0].receipt_id);
 
             },
             error: function (xhr, status, error) {
@@ -189,7 +205,7 @@ $(document).ready(function () {
 
 
     //process order
-    function orderCart(uname, receipt_id) {
+    function orderCart(id, receipt_id) {
         console.log("orderCart()");
         //Daten zum Einfügen in die Datenbank 
         let storedCart = JSON.parse(sessionStorage.getItem("myCart"));
@@ -207,7 +223,7 @@ $(document).ready(function () {
                     param: JSON.stringify({
                         product_id: storedCart[i].id,
                         quantity: storedCart[i].quant,
-                        username: uname,
+                        userid: id,
                         receiptid: receipt_id,
 
                     })
@@ -248,6 +264,34 @@ $(document).ready(function () {
 
                 }
             });
+
+            //bestand reduzieren
+
+            $.ajax({
+                type: 'POST',
+                url: '../Backend/logic/requestHandler.php',
+                data: {
+                    method: 'reduceStock',
+                    param: JSON.stringify({
+                        product_id: storedCart[i].id,
+                        quantity: storedCart[i].quant,
+
+                    })
+                },
+                dataType: 'json',
+                success: function (response) {
+
+                    console.log("bestand aktualisiert");
+
+                },
+                error: function (xhr, status, error) {
+                    // show error
+                    console.log("error");
+
+                }
+            });
+
+
         }
     }
 

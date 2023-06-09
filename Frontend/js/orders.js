@@ -5,7 +5,6 @@ $(document).ready(function () {
     console.log("username" + getCookie("username"));
 
     $("#modal-placeholder").empty();
-    $('#message-container').empty();
     $("#modal-placeholder").load("sites/orders.html #OrdersModal", function () {
       $("#OrdersModal").modal("show"); //dar
       goGetIt();
@@ -76,6 +75,7 @@ function getOrderInfo(id) {
 
 function displayOrder(arr) {
   for (let i = 0; i < arr.length; i++) {
+
     console.log(arr[i]);
 
     let tr = $("<tr>");
@@ -105,10 +105,10 @@ function displayOrder(arr) {
         " " +
         arr[i].city +
         "<br>"
+
       );
       tr2.append(td3);
 
-      $("#product").append(tr2);
 
       //rechnungsnummer:
 
@@ -129,6 +129,19 @@ function displayOrder(arr) {
       tr3.append(td4);
 
       $("#product").append(tr3);
+
+      //rechnungsnummer:
+
+      let tr5 = $("<tr>");
+      let td5 = $("<td>");
+
+      td5.append("Datum: ", arr[i].timestamp);
+      tr5.append(td5);
+
+      $("#product").append(tr5);
+
+
+
     }
   }
   /*

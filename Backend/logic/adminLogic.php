@@ -33,12 +33,12 @@ class adminLogic
                 $result['users'] = $users;
             } else {
                 $result['error'] = 'Keine Benutzer vorhanden!';
-                return $result;
             }
         } else {
             $result['error'] = 'Fehler bei der Abfrage!';
-            return $result;
         }
+
+        $stmt->close();
 
         return $result;
     }
