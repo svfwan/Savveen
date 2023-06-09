@@ -78,6 +78,9 @@ class businessLogic
             case 'getUserid';
                 $res = $this->orderLogic->getUserid($param);
                 break;
+            case 'loadAllUsers':
+                $res = $this->adminLogic->loadAllUsers();
+                break;
             case 'createProduct':
                 $res = $this->adminLogic->createProduct();
                 break;

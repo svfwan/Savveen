@@ -11,17 +11,36 @@ class adminLogic
     public function loadAllUsers()
     {
         $result = array();
+        $notAdmin = 0;
 
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
-        $sql = 'SELECT `id`, `` from `users` WHERE `admin` = ?';
+        $sql = 'SELECT `id`, `username` FROM `users` WHERE `admin` = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
-        $stmt->bind_param('i', 0);
+        $stmt->bind_param('i', $notAdmin);
 
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            if ($queryResult->num_rows > 0) {
+                $result['success'] = 'Benutzer wurden gefunden!';
+                $users = [];
+                while ($row = $queryResult->fetch_assoc()) {
+                    array_push($users, $row);
+                }
+                $result['users'] = $users;
+            } else {
+                $result['error'] = 'Keine Benutzer vorhanden!';
+                return $result;
+            }
+        } else {
+            $result['error'] = 'Fehler bei der Abfrage!';
+            return $result;
+        }
 
+        return $result;
     }
 
     public function createProduct()

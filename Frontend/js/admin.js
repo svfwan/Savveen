@@ -34,6 +34,8 @@ $(document).ready(function () {
         deleteProduct(id, path);
     })
 
+
+
     // ajax call for loading all users for admin
     function loadUsersForAdmin() {
         $.ajax({
@@ -44,21 +46,48 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (response) {
-                let $userListAdmin = $('#userListAdmin');
+                const $userListAdmin = $('#userListAdmin');
                 $userListAdmin.empty();
 
-                for (let i = 0; i < response.length; i++) {
-                    let user = response[i];
-                    let $row = $('<div class="row"></div>');
-                    $row.text(user);
-                    $userListAdmin.append($row);
+                if (response.success) {
+                    const users = response.users;
+                    users.forEach(user => {
+                        const card = $('<div class="card mb-3"></div>');
+                        const cardBody = $('<div class="card-body"></div>');
+                        const usernameElement = $('<h5 class="card-title"></h5>').text(user.username);
+                        const buttonContainer = $('<div class="d-flex justify-content-end"></div>');
+                        const detailsButton = $('<button class="btn btn-success me-2">Kundendetails ansehen</button>');
+                        detailsButton.data('user-id', user.id);
+                        const ordersButton = $('<button class="btn btn-warning">Bestellungen laden</button>');
+                        ordersButton.data('user-id', user.id);
+
+                        detailsButton.on('click', function () {
+                            const userId = $(this).data('user-id');
+                            // Handle details button click for the corresponding user ID
+                            //handleDetailsButtonClick(userId);
+                            console.log("detailsButton: " + userId)
+                        });
+
+                        ordersButton.on('click', function () {
+                            const userId = $(this).data('user-id');
+                            // Handle orders button click for the corresponding user ID
+                            //handleOrdersButtonClick(userId);
+                            console.log("handleOrdersButton: " + userId)
+                        });
+
+                        buttonContainer.append(detailsButton, ordersButton);
+                        cardBody.append(usernameElement, buttonContainer);
+                        card.append(cardBody);
+                        $userListAdmin.append(card);
+                    });
+                } else if (response.error) {
+                    showAlert(response.error, 'warning');
                 }
             },
             error: function (error) {
                 console.log(error);
             }
         });
-
     }
 
     // ajax call for loading products for admin
