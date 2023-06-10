@@ -37,39 +37,6 @@ class productLogic
         return $result;
     }
 
-    //checkStock()
-    public function checkStock($param)
-    {
-        $result = array();
-        $id = $param['id'];
-
-        // Check the database connection
-        if (!$this->dh->checkConnection()) {
-            $result["error"] = "Versuchen Sie es später erneut!";
-            return $result;
-        }
-
-        // Prepare and execute the SQL query
-        $stmt = $this->dh->db_obj->prepare("SELECT * FROM `products` WHERE `id` = ?");
-        $stmt->bind_param('i', $id);
-
-        if ($stmt->execute()) {
-            $queryResult = $stmt->get_result();
-            $row = $queryResult->fetch_assoc();
-            if ($row) {
-                $result = $row;
-            } else {
-                $result["error"] = "Produkt nicht gefunden";
-            }
-        } else {
-            $result["error"] = "Versuchen Sie es später erneut!";
-        }
-
-        // Close the connection and return the array
-        $stmt->close();
-        return $result;
-    }
-
     function searchProducts($param)
     {
         $result = array();
@@ -101,6 +68,37 @@ class productLogic
         }
 
         // Schließe die Verbindung und gib das Array zurück
+        $stmt->close();
+        return $result;
+    }
+
+    public function loadProductByID($param)
+    {
+        $result = array();
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->dh->checkConnection()) {
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
+        }
+
+        // Prepare and execute the SQL query
+        $stmt = $this->dh->db_obj->prepare("SELECT * FROM `products` WHERE `id` = ?");
+        $stmt->bind_param("i", $param);
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            $row = $queryResult->fetch_assoc();
+            if ($row) {
+                $result["success"] = true;
+                $result["data"] = $row;
+            } else {
+                $result["success"] = false;
+                $result["error"] = "Produkt nicht gefunden";
+            }
+        } else {
+            $result["error"] = "Versuchen Sie es später erneut!";
+        }
+        // Close the connection and return the array
         $stmt->close();
         return $result;
     }

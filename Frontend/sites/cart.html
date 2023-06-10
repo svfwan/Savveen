@@ -9,37 +9,49 @@
 </head>
 
 <body>
-    <div class="modal fade" id="AdressModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Lieferadresse</h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Lieferadresse wählen</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div id="message-container"></div>
-                    <div id="adressForm" class="container">
-                        <div class="form-group">
-                            <label for="strasse">Strasse: </label>
-                            <input type="text" id="street" class="form-control" name="street"
-                                placeholder="Wohnstraße123" required>
+                    <div id="addressForm" class="container">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="addressType" id="savedAddress" checked>
+                            <label class="form-check-label" for="savedAddress">
+                                Gespeicherte Adresse
+                            </label>
                         </div>
-                        <div class="form-group">
-                            <label for="plz">Postleitzahl: </label>
-                            <input type="plz" id="plz" class="form-control" name="plz" placeholder="1100" required>
+                        <div id="savedAddressFields" class="form-group">
+                            <label for="street">Adresse:</label>
+                            <input type="text" id="savedStreet" class="form-control" disabled>
+                            <label for="plz">Postleitzahl:</label>
+                            <input type="text" id="savedPostcode" class="form-control" disabled>
+                            <label for="ort">Ort:</label>
+                            <input type="text" id="savedCity" class="form-control" disabled>
                         </div>
-
-                        <div class="form-group">
-                            <label for="ort">Ort: </label>
-                            <input type="ort" id="ort" class="form-control" name="ort" placeholder="Wien" required>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="addressType" id="newOrderAddress">
+                            <label class="form-check-label" for="newOrderAddress">
+                                Neue Adresse
+                            </label>
+                        </div>
+                        <div id="newAddressFields" class="form-group">
+                            <label for="newStreet">Adresse:</label>
+                            <input type="text" id="newOrderStreet" class="form-control" placeholder="Wohnstraße123">
+                            <label for="newPlz">Postleitzahl:</label>
+                            <input type="text" id="newOrderPostcode" class="form-control" placeholder="1100">
+                            <label for="newOrt">Ort:</label>
+                            <input type="text" id="newOrderCity" class="form-control" placeholder="Wien">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="newAdrsButton" type="button" class="btn btn-success">Neue Lieferadresse</button>
-                    <button id="oldAdrsButton" type="button" class="btn btn-success">Lieferadresse beibehalten</button>
+                    <button id="confirmOrder" type="button" class="btn btn-success">Bestätigen & Bestellen</button>
                 </div>
-
             </div>
         </div>
     </div>

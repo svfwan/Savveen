@@ -8,6 +8,34 @@ class profileLogic
         $this->dh = $dh;
     }
 
+    public function getSessionInfo()
+    {
+        $result = array();
+        if (isset($_SESSION['username']) && isset($_SESSION['admin'])) {
+            if ($_SESSION['admin']) {
+                $result['status'] = 'loggedInAdmin';
+            } else {
+                $result['status'] = 'loggedInUser';
+            }
+        } elseif (isset($_COOKIE['rememberLogin']) && isset($_COOKIE['username'])) {
+            // Restore the session based on the 'rememberLogin' cookie
+            if (!isset($_SESSION)) {
+                session_start();
+            }
+            $_SESSION['username'] = $_COOKIE['username'];
+            $_SESSION['admin'] = $_COOKIE['admin'] ?? false;
+            if ($_SESSION['admin']) {
+                $result['status'] = 'loggedInAdmin';
+                $result['check'] = 'newDataHandler works';
+            } else {
+                $result['status'] = 'loggedInUser';
+            }
+        } else {
+            $result['status'] = 'notLoggedIn';
+        }
+        return $result;
+    }
+
     public function registerUser($param)
     {
         $result = array();
@@ -100,7 +128,7 @@ class profileLogic
             return $result;
         } else {
             $sql = 'SELECT `email`, `username`, `passwort`, `admin` FROM `users`
-                     WHERE (`username`=? OR `email` = ?) AND `active` = ?';
+                     WHERE (`username`=? OR `email` = ?) AND `aktiv` = ?';
             $stmt = $this->dh->db_obj->prepare($sql);
             $stmt->bind_param('ssi', $userInput, $userInput, $active);
         }
@@ -143,52 +171,31 @@ class profileLogic
         return $result;
     }
 
-
-    public function getSessionInfo()
+    function getProfileData($param)
     {
         $result = array();
-        if (isset($_SESSION['username']) && isset($_SESSION['admin'])) {
-            if ($_SESSION['admin']) {
-                $result['status'] = 'loggedInAdmin';
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = "Versuchen Sie es später erneut";
+            return;
+        }
+
+        $sql = 'SELECT `anrede`, `vorname`, `nachname`, `adresse`, `plz`, `ort`, `email`, `username`
+        FROM `users` WHERE `username` = ?';
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('s', $param);
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            if ($queryResult->num_rows == 1) {
+                $result = $queryResult->fetch_assoc();
             } else {
-                $result['status'] = 'loggedInUser';
-            }
-        } elseif (isset($_COOKIE['rememberLogin']) && isset($_COOKIE['username'])) {
-            // Restore the session based on the 'rememberLogin' cookie
-            if (!isset($_SESSION)) {
-                session_start();
-            }
-            $_SESSION['username'] = $_COOKIE['username'];
-            $_SESSION['admin'] = $_COOKIE['admin'] ?? false;
-            if ($_SESSION['admin']) {
-                $result['status'] = 'loggedInAdmin';
-                $result['check'] = 'newDataHandler works';
-            } else {
-                $result['status'] = 'loggedInUser';
+                $result['error'] = "Fehler bei der Abfrage";
             }
         } else {
-            $result['status'] = 'notLoggedIn';
+            $result['error'] = "Fehler bei der Abfrage";
         }
-        return $result;
-    }
 
-    public function logoutUser()
-    {
-        $result = array();
-        if (isset($_SESSION['username'])) {
-            session_destroy();
-
-            if (isset($_COOKIE['rememberLogin'])) {
-                setcookie('rememberLogin', '', time() - 3600, '/');
-            }
-            if (isset($_COOKIE['username'])) {
-                setcookie('username', '', time() - 3600, '/');
-            }
-            if (isset($_COOKIE['admin'])) {
-                setcookie('admin', '', time() - 3600, '/');
-            }
-            $result['loggedIn'] = false;
-        }
+        $stmt->close();
         return $result;
     }
 
@@ -321,22 +328,24 @@ class profileLogic
         return $data;
     }
 
-    function getProfileData()
+    public function logoutUser()
     {
-        $param = $_GET['param'];
-        $sql = 'SELECT anrede,vorname, nachname, adresse, plz, ort, email, username, passwort FROM users WHERE username = ?';
-        $stmt = $this->dh->db_obj->prepare($sql);
-        $stmt->bind_param('s', $param);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $result = array();
+        if (isset($_SESSION['username'])) {
+            session_destroy();
 
-        $data = array();
-        if ($result->num_rows == 1) {
-            $data = $result->fetch_assoc();
-            $data['success'] = true;
+            if (isset($_COOKIE['rememberLogin'])) {
+                setcookie('rememberLogin', '', time() - 3600, '/');
+            }
+            if (isset($_COOKIE['username'])) {
+                setcookie('username', '', time() - 3600, '/');
+            }
+            if (isset($_COOKIE['admin'])) {
+                setcookie('admin', '', time() - 3600, '/');
+            }
+            $result['loggedIn'] = false;
         }
-        $stmt->close();
-        return $data;
+        return $result;
     }
 
     // helper function

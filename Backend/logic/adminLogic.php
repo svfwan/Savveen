@@ -49,18 +49,17 @@ class adminLogic
         $param = $_POST;
         $category = $param['category'];
         $productName = $param['productName'];
-        $price = floatval($param['price']);
-        $stock = $param['stock'];
+        $price = $param['price'];
         $description = $param['description'];
 
         // Perform validation
-        if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
+        if (empty($category) || empty($productName) || empty($price) || empty($description)) {
             $result['error'] = 'Bitte füllen Sie alle Felder aus!';
             return $result;
         }
 
-        if (!is_numeric($price) || !is_numeric($stock) || $price < 0 || $stock < 0) {
-            $result['error'] = 'Preis und Lagerbestand müssen valide Zahlen sein!';
+        if (!is_numeric($price) ||  $price < 0) {
+            $result['error'] = 'Preis muss valide Zahl sein!';
             return $result;
         }
 
@@ -91,10 +90,10 @@ class adminLogic
         }
 
         // Prepared SQL statement to insert the product into the database
-        $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`, `bestand`)
-        VALUES (?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`)
+        VALUES (?, ?, ?, ?)';
         $stmt = $this->dh->db_obj->prepare($sql);
-        $stmt->bind_param('ssssd', $category, $productName, $price, $description, $stock);
+        $stmt->bind_param('ssis', $category, $productName, $price, $description);
 
         // Execute the statement and check if successful
         if ($stmt->execute() && $stmt->affected_rows > 0 && move_uploaded_file($tmp_path, $actual_path)) {
@@ -107,37 +106,6 @@ class adminLogic
         return $result;
     }
 
-    public function loadProductByID($param)
-    {
-        $result = array();
-
-        // Prüfe die Verbindung zur Datenbank
-        if (!$this->dh->checkConnection()) {
-            $result["error"] = "Versuchen Sie es später erneut!";
-            return $result;
-        }
-
-        // Prepare and execute the SQL query
-        $stmt = $this->dh->db_obj->prepare("SELECT * FROM `products` WHERE `id` = ?");
-        $stmt->bind_param("i", $param);
-        if ($stmt->execute()) {
-            $queryResult = $stmt->get_result();
-            $row = $queryResult->fetch_assoc();
-            if ($row) {
-                $result["success"] = true;
-                $result["data"] = $row;
-            } else {
-                $result["success"] = false;
-                $result["error"] = "Produkt nicht gefunden";
-            }
-        } else {
-            $result["error"] = "Versuchen Sie es später erneut!";
-        }
-        // Close the connection and return the array
-        $stmt->close();
-        return $result;
-    }
-
     public function updateProduct()
     {
         $result = array();
@@ -146,18 +114,17 @@ class adminLogic
         $category = $param['category'];
         $productName = $param['productName'];
         $price = floatval($param['price']);
-        $stock = $param['stock'];
         $description = $param['description'];
         $currentPicturePath = "../" . $param['currentPicture'];
 
         // Perform validation
-        if (empty($category) || empty($productName) || empty($price) || empty($stock) || empty($description)) {
+        if (empty($category) || empty($productName) || empty($price) || empty($description)) {
             $result['error'] = 'Bitte füllen Sie alle Felder aus!';
             return $result;
         }
 
-        if (!is_numeric($price) || !is_numeric($stock) || $price < 0 || $stock < 0) {
-            $result['error'] = 'Preis und Lagerbestand müssen valide Zahlen sein!';
+        if (!is_numeric($price) || $price < 0) {
+            $result['error'] = 'Preis muss valide Zahl sein!';
             return $result;
         }
 
@@ -196,9 +163,9 @@ class adminLogic
         }
 
         // Prepared SQL statement to update the product in the database
-        $sql = 'UPDATE `products` SET `kategorie` = ?, `name` = ?, `preis` = ?, `beschreibung` = ?, `bestand` = ? WHERE `id` = ?';
+        $sql = 'UPDATE `products` SET `kategorie` = ?, `name` = ?, `preis` = ?, `beschreibung` = ? WHERE `id` = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
-        $stmt->bind_param('ssssdi', $category, $productName, $price, $description, $stock, $productID);
+        $stmt->bind_param('ssisi', $category, $productName, $price, $description, $productID);
 
         // Execute the statement and check if successful
         if ($stmt->execute()) {

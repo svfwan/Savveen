@@ -145,18 +145,17 @@ $(document).ready(function () {
         let category = $('#categoryAdd').val();
         let productName = $('#productNameAdd').val();
         let price = $('#priceAdd').val();
-        let stock = $('#stockAdd').val();
         let description = $('#descriptionAdd').val();
         let picture = document.getElementById('pictureAdd').files[0];
 
         // Perform validation
-        if (!category || !productName || !price || !stock || !description || !picture) {
+        if (!category || !productName || !price || !description || !picture) {
             showAlert('Bitte füllen Sie alle Felder aus!', 'warning');
             return;
         }
 
-        if (isNaN(price) || isNaN(stock) || price < 0 || stock < 0) {
-            showAlert('Preis und Lagerbestand müssen valide Zahlen sein!', 'warning');
+        if (isNaN(price) || price < 0) {
+            showAlert('Preis muss valide Zahl sein!', 'warning');
             return;
         }
 
@@ -165,7 +164,6 @@ $(document).ready(function () {
         formData.append('category', category);
         formData.append('productName', productName);
         formData.append('price', price);
-        formData.append('stock', stock);
         formData.append('description', description);
         formData.append('picture', picture, picture.name);
 
@@ -182,7 +180,6 @@ $(document).ready(function () {
                     $('#categoryAdd option:first').prop('selected', true);
                     $('#productNameAdd').val('');
                     $('#priceAdd').val('');
-                    $('#stockAdd').val('');
                     $('#descriptionAdd').val('');
                     $('#pictureAdd').val('');
                     showAlert(response.success, 'success');
@@ -230,20 +227,19 @@ $(document).ready(function () {
         let category = $('#categoryEdit').val();
         let productName = $('#productNameEdit').val();
         let price = $('#priceEdit').val();
-        let stock = $('#stockEdit').val();
         let description = $('#descriptionEdit').val();
         let picture = document.getElementById('pictureEdit').files[0];
         let currentPicture = $('#currentPicturePreviewImg').attr('src').split('?')[0];
 
         // Perform validation
-        if (!category || !productName || !price || !stock || !description) {
+        if (!category || !productName || !price || !description) {
             showModalAlert('Bitte füllen Sie alle Felder aus!', 'warning');
             loadProductByID(productID);
             return;
         }
 
-        if (isNaN(price) || isNaN(stock) || price < 0 || stock < 0) {
-            showModalAlert('Preis und Lagerbestand müssen valide Zahlen sein!', 'warning');
+        if (isNaN(price) || price < 0) {
+            showModalAlert('Preis muss valid Zahl sein!', 'warning');
             loadProductByID(productID);
             return;
         }
@@ -254,7 +250,6 @@ $(document).ready(function () {
         formData.append('category', category);
         formData.append('productName', productName);
         formData.append('price', price);
-        formData.append('stock', stock);
         formData.append('description', description);
         if (picture) {
             formData.append('picture', picture, picture.name);
@@ -326,7 +321,6 @@ $(document).ready(function () {
             $('#categoryEdit').val(product.kategorie);
             $('#productNameEdit').val(product.name);
             $('#priceEdit').val(product.preis);
-            $('#stockEdit').val(product.bestand);
             $('#descriptionEdit').val(product.beschreibung);
             $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);
         } else {
@@ -336,7 +330,6 @@ $(document).ready(function () {
                 $('#categoryEdit').val(product.kategorie);
                 $('#productNameEdit').val(product.name);
                 $('#priceEdit').val(product.preis);
-                $('#stockEdit').val(product.bestand);
                 $('#descriptionEdit').val(product.beschreibung);
                 $('#currentPicturePreviewImg').attr('src', "../Frontend/res/img/" + product.name + ".jpg?" + pictureCacheRemover);
                 $('#changeProductModal').modal('show');

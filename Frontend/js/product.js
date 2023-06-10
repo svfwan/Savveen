@@ -154,35 +154,20 @@ function displayAll(data, $row) {
 }
 
 function addCart(productID) {
-    let myCart = [];
-    let quantityInCart = 0;
-    if (sessionStorage.getItem("myCart")) {
-        myCart = JSON.parse(sessionStorage.getItem("myCart"));
-        for (let i = 0; i < myCart.length; i++) {
-            if (myCart[i].id == productID) {
-                quantityInCart = myCart[i].quant;
-                break;
-            }
-        }
-    }
-
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
         data: {
-            method: "checkStock",
-            param: JSON.stringify({
-                id: productID,
-            }),
+            method: "loadProductByID",
+            param: productID
         },
         dataType: "json",
         success: function (response) {
-            let item = response;
-            let stock = item.bestand;
-            if (quantityInCart + 1 <= stock) {
+            if (response.data) {
+                let item = response.data;
                 addItemtoCart(item);
             } else {
-                alert("Dieses Produkt haben wir leider nicht mehr auf Lager!");
+                alert("Bitte versuchen Sie es später erneut!");
             }
         },
         error: function () {
