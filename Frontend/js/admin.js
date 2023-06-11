@@ -314,7 +314,7 @@ $(document).ready(function () {
 
         // Display the sum
         const sum = order[0].summe;
-        const sumElement = $('<p>').text('Summe: ' + sum + '€');
+        const sumElement = $('<p>').append($('<strong>').text('Summe: ' + sum + '€'));
         if ($('#orderDataModal').is(':visible')) {
             $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
             console.log('hier');
