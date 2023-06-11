@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 10, 2023 at 04:32 AM
+-- Generation Time: Jun 12, 2023 at 01:22 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,18 +40,47 @@ CREATE TABLE `orderlines` (
 --
 
 INSERT INTO `orderlines` (`id`, `receipt_id`, `product_id`, `preis`, `anzahl`) VALUES
-(16, 6, 14, 30, 2),
-(17, 6, 29, 18, 1),
 (18, 7, 15, 110, 1),
 (19, 7, 14, 30, 1),
 (20, 7, 12, 25, 3),
 (21, 7, 30, 20, 2),
 (22, 7, 33, 75, 1),
-(23, 8, 15, 110, 3);
+(23, 8, 15, 110, 3),
+(24, 9, 33, 75, 1),
+(25, 9, 30, 20, 1),
+(26, 9, 14, 30, 2),
+(27, 9, 12, 25, 2),
+(28, 9, 15, 110, 2),
+(29, 9, 29, 18, 1),
+(30, 10, 14, 30, 3),
+(31, 10, 12, 25, 4),
+(32, 10, 15, 110, 2),
+(33, 11, 14, 30, 1),
+(34, 11, 15, 110, 1),
+(35, 11, 33, 75, 1),
+(37, 12, 12, 25, 3),
+(38, 12, 14, 30, 1),
+(39, 13, 12, 25, 3),
+(40, 13, 14, 30, 2);
 
 --
 -- Triggers `orderlines`
 --
+DELIMITER $$
+CREATE TRIGGER `orderlines_delete_update_receipt` AFTER DELETE ON `orderlines` FOR EACH ROW BEGIN
+    DECLARE receiptID INT;
+    SET receiptID = OLD.receipt_id;
+
+    UPDATE receipts
+    SET summe = (SELECT SUM(preis * anzahl) FROM orderlines WHERE receipt_id = receiptID)
+    WHERE id = receiptID;
+
+    IF NOT EXISTS (SELECT 1 FROM orderlines WHERE receipt_id = receiptID) THEN
+        DELETE FROM receipts WHERE id = receiptID;
+    END IF;
+END
+$$
+DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `receipts_update_summe` AFTER INSERT ON `orderlines` FOR EACH ROW BEGIN
     UPDATE receipts
@@ -109,9 +138,13 @@ CREATE TABLE `receipts` (
 --
 
 INSERT INTO `receipts` (`id`, `user_id`, `summe`, `strasse`, `plz`, `ort`, `datum`) VALUES
-(6, 14, 78, 'Teststrasse 1', '1212', 'Wien', '2023-06-10'),
 (7, 14, 330, 'Teststrasse 1', '1212', 'Wien', '2023-06-10'),
-(8, 14, 330, 'Donauinselplatz 1', '1210', 'Wien', '2023-06-10');
+(8, 14, 330, 'Donauinselplatz 1', '1210', 'Wien', '2023-06-10'),
+(9, 14, 443, 'Teststrasse 1', '1212', 'Wien', '2023-06-10'),
+(10, 14, 410, 'Teststrasse 1', '1212', 'Wien', '2023-06-11'),
+(11, 8, 215, 'Hallochenstrasse', '1220', 'Wien', '2023-06-11'),
+(12, 8, 105, 'Hallochenstrasse', '1220', 'Wien', '2023-06-11'),
+(13, 14, 135, 'Teststrasse 1', '1212', 'Wien', '2023-06-11');
 
 --
 -- Triggers `receipts`
@@ -192,7 +225,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `orderlines`
 --
 ALTER TABLE `orderlines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -204,7 +237,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `receipts`
 --
 ALTER TABLE `receipts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `users`

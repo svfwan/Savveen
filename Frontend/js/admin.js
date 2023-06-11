@@ -276,67 +276,62 @@ $(document).ready(function () {
 
     }
 
-
     function showOrderModal(order) {
-        $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
-            const orderTable = $('#orderTable');
+        const table = $('<table>').addClass('table table-striped');
+        const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th><th></th></tr>');
+        const tbody = $('<tbody>');
+        const receiptIDElement = $('<p>').append($('<strong>').text('Bestellnummer: ' + order[0].receipt_id));
 
-            // Clear previous data
-            orderTable.empty();
+        order.forEach(orderLine => {
+            const productName = orderLine.product_name;
+            const price = orderLine.preis;
+            const quantity = orderLine.anzahl;
+            const orderLineID = orderLine.orderline_id;
+            const receiptID = orderLine.receipt_id;
 
-            // Display the date and full address
-            const date = order[0].datum;
-            const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
-            const addressElement = $('<p>').text('Datum: ' + date + ', Adresse: ' + address);
-            orderTable.append(addressElement);
-
-            // Display the order lines
-            const table = $('<table>').addClass('table table-striped');
-            const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th><th></th></tr>');
-            const tbody = $('<tbody>');
-
-            order.forEach(orderLine => {
-                const productName = orderLine.product_name;
-                const price = orderLine.preis;
-                const quantity = orderLine.anzahl;
-                const orderLineID = orderLine.orderline_id;
-                const receiptID = orderLine.receipt_id;
-
-                const row = $('<tr>');
-                const productNameCell = $('<td>').text(productName);
-                const priceCell = $('<td>').text(price + '€');
-                const quantityCell = $('<td>').text(quantity);
-                const buttonCell = $('<td>');
-                const removeButton = $('<button>').addClass('btn btn-danger').text('Produkt entfernen');
-                removeButton.data('orderline-id', orderLineID);
-                removeButton.data('receipt-id', receiptID);
-                removeButton.on('click', function () {
-                    const orderlineID = $(this).data('orderline-id');
-                    const receiptID = $(this).data('receipt-id');
-                    deleteProductFromOrder(orderlineID, receiptID);
-                });
-                buttonCell.append(removeButton);
-
-                row.append(productNameCell, priceCell, quantityCell, buttonCell);
-                tbody.append(row);
+            const row = $('<tr>');
+            const productNameCell = $('<td>').text(productName);
+            const priceCell = $('<td>').text(price + '€');
+            const quantityCell = $('<td>').text(quantity);
+            const buttonCell = $('<td>');
+            const removeButton = $('<button>').addClass('btn btn-danger').text('Produkt entfernen');
+            removeButton.data('orderline-id', orderLineID);
+            removeButton.data('receipt-id', receiptID);
+            removeButton.on('click', function () {
+                const orderlineID = $(this).data('orderline-id');
+                const receiptID = $(this).data('receipt-id');
+                deleteProductFromOrder(orderlineID, receiptID);
             });
+            buttonCell.append(removeButton);
 
-            table.append(thead, tbody);
-            orderTable.append(table);
-
-            // Display the sum
-            const sum = order[0].summe;
-            const sumElement = $('<p>').text('Summe: ' + sum + '€');
-            orderTable.append(sumElement);
-
-            $('#orderDataModal').modal('show');
+            row.append(productNameCell, priceCell, quantityCell, buttonCell);
+            tbody.append(row);
         });
+
+        table.append(thead, tbody);
+
+        // Display the sum
+        const sum = order[0].summe;
+        const sumElement = $('<p>').text('Summe: ' + sum + '€');
+        if ($('#orderDataModal').is(':visible')) {
+            $('#orderTable').html('').append(receiptIDElement, table, sumElement);
+            console.log('hier');
+        } else {
+            // If the modal is not visible, load it and set the content of #orderTable
+            $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
+                $('#orderDataModal').modal('show');
+                $('#orderTable').html('').append(receiptIDElement, table, sumElement);
+            });
+        }
     }
 
     function deleteProductFromOrder(orderlineID, receiptID) {
-
+        // need to implement ajax-call, triggers for updating receipt and 
+        // deleting receipt if no more orderlines already set
+        // need to find way to check if receipt still there if not then different modal behaviour
+        console.log('deleteProduct: ' + orderlineID + ' - ' + receiptID);
+        loadOrderByID(receiptID);
     }
-
 
     // ajax call for loading products for admin
 
