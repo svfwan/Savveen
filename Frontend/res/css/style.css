@@ -231,6 +231,11 @@ footer {
     white-space: nowrap;
 }
 
+.fa-star.checked {
+    color: #006837;
+}
+
+
 .card-body {
     flex-grow: 1;
     padding: 20px;
