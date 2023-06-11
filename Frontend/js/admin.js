@@ -68,7 +68,7 @@ $(document).ready(function () {
                         const buttonContainer = $('<div class="d-flex justify-content-end"></div>');
                         const detailsButton = $('<button class="btn btn-success me-2">Kundendetails ansehen</button>');
                         detailsButton.data('user-id', user.id);
-                        const ordersButton = $('<button class="btn btn-warning">Bestellungen laden</button>');
+                        const ordersButton = $('<button class="btn btn-success">Bestellungen laden</button>');
                         ordersButton.data('user-id', user.id);
                         const ordersList = $('<div></div>').addClass('container col-6 d-none ordersList').attr('id', user.id);
                         detailsButton.on('click', function () {
