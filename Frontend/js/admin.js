@@ -281,7 +281,9 @@ $(document).ready(function () {
         const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th><th></th></tr>');
         const tbody = $('<tbody>');
         const receiptIDElement = $('<p>').append($('<strong>').text('Bestellnummer: ' + order[0].receipt_id));
-
+        const date = order[0].datum;
+        const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
+        const addressElement = $('<p>').append($('<strong>').text('Datum: ' + date + ', Adresse: ' + address));
         order.forEach(orderLine => {
             const productName = orderLine.product_name;
             const price = orderLine.preis;
@@ -314,13 +316,13 @@ $(document).ready(function () {
         const sum = order[0].summe;
         const sumElement = $('<p>').text('Summe: ' + sum + '€');
         if ($('#orderDataModal').is(':visible')) {
-            $('#orderTable').html('').append(receiptIDElement, table, sumElement);
+            $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
             console.log('hier');
         } else {
             // If the modal is not visible, load it and set the content of #orderTable
             $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
                 $('#orderDataModal').modal('show');
-                $('#orderTable').html('').append(receiptIDElement, table, sumElement);
+                $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
             });
         }
     }
