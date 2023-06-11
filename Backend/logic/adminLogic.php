@@ -18,7 +18,7 @@ class adminLogic
             return $result;
         }
 
-        $sql = 'SELECT `id`, `username` FROM `users` WHERE `admin` = ?';
+        $sql = 'SELECT `id`, `username` FROM `users` WHERE `admin` = ? ORDER BY `username`';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $notAdmin);
 
@@ -133,7 +133,7 @@ class adminLogic
             return $result;
         }
 
-        $sql = 'SELECT `id` FROM `receipts` WHERE `user_id` = ?';
+        $sql = 'SELECT `id` FROM `receipts` WHERE `user_id` = ? ORDER BY `datum`, `id`';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $param);
 
