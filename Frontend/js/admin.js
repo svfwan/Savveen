@@ -328,11 +328,34 @@ $(document).ready(function () {
     }
 
     function deleteProductFromOrder(orderlineID, receiptID) {
-        // need to implement ajax-call, triggers for updating receipt and 
-        // deleting receipt if no more orderlines already set
-        // need to find way to check if receipt still there if not then different modal behaviour
-        console.log('deleteProduct: ' + orderlineID + ' - ' + receiptID);
-        loadOrderByID(receiptID);
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'deleteOrderLine',
+                param: JSON.stringify({
+                    orderlineID: orderlineID,
+                    receiptID: receiptID
+                })
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    showModalAlert(response.success, 'success');
+                    loadUsersForAdmin();
+                    loadOrderByID(receiptID);
+                } else if (response.lastProduct) {
+                    $('#orderDataModal').modal('hide');
+                    showAlert(response.lastProduct, 'success');
+                    loadUsersForAdmin();
+                } else if (response.error) {
+                    showModalAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showModalAlert('Fehler bei der Abfrage!', 'danger');
+            }
+        });
     }
 
     // ajax call for loading products for admin

@@ -72,6 +72,9 @@ class businessLogic
             case 'loadOrderByID':
                 $res = $this->adminLogic->loadOrderByID($param);
                 break;
+            case 'deleteOrderLine':
+                $res = $this->adminLogic->deleteOrderLine($param);
+                break;
             case 'createProduct':
                 $res = $this->adminLogic->createProduct();
                 break;

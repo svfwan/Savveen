@@ -198,6 +198,46 @@ class adminLogic
         return $result;
     }
 
+    public function deleteOrderLine($param)
+    {
+        $result = array();
+        $orderlineID = $param['orderlineID'];
+        $receiptID = $param['receiptID'];
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->dh->checkConnection()) {
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
+        }
+
+        // Prepare and execute the SQL query to delete the order line
+        $stmtDelete = $this->dh->db_obj->prepare("DELETE FROM `orderlines` WHERE `id` = ?");
+        $stmtDelete->bind_param("i", $orderlineID);
+
+        // Execute the delete statement
+        if ($stmtDelete->execute()) {
+            $stmtCount = $this->dh->db_obj->prepare("SELECT COUNT(*) FROM `orderlines` WHERE `receipt_id` = ?");
+            $stmtCount->bind_param("i", $receiptID);
+            if ($stmtCount->execute()) {
+                $queryResult = $stmtCount->get_result();
+                $orderLineCount = $queryResult->fetch_row()[0];
+                if ($orderLineCount === 0) {
+                    $result['lastProduct'] = "Bestellung erfolgreich gelöscht!";
+                } else {
+                    // The receipt still exists
+                    $result['success'] = "Produkt erfolgreich von Bestellung entfernt!";
+                }
+            }
+            $stmtCount->close();
+        } else {
+            $result["error"] = "Produkt konnte nicht von Bestellung entfernt werden!";
+        }
+
+        // Close the connection and return the array
+        $stmtDelete->close();
+        return $result;
+    }
+
     public function createProduct()
     {
         $result = array();
