@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 12, 2023 at 01:22 AM
+-- Generation Time: Jun 13, 2023 at 01:14 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -40,11 +40,6 @@ CREATE TABLE `orderlines` (
 --
 
 INSERT INTO `orderlines` (`id`, `receipt_id`, `product_id`, `preis`, `anzahl`) VALUES
-(18, 7, 15, 110, 1),
-(19, 7, 14, 30, 1),
-(20, 7, 12, 25, 3),
-(21, 7, 30, 20, 2),
-(22, 7, 33, 75, 1),
 (23, 8, 15, 110, 3),
 (24, 9, 33, 75, 1),
 (25, 9, 30, 20, 1),
@@ -58,10 +53,11 @@ INSERT INTO `orderlines` (`id`, `receipt_id`, `product_id`, `preis`, `anzahl`) V
 (33, 11, 14, 30, 1),
 (34, 11, 15, 110, 1),
 (35, 11, 33, 75, 1),
-(37, 12, 12, 25, 3),
-(38, 12, 14, 30, 1),
 (39, 13, 12, 25, 3),
-(40, 13, 14, 30, 2);
+(40, 13, 14, 30, 2),
+(41, 14, 14, 30, 1),
+(42, 14, 15, 110, 1),
+(43, 14, 29, 18, 1);
 
 --
 -- Triggers `orderlines`
@@ -138,13 +134,12 @@ CREATE TABLE `receipts` (
 --
 
 INSERT INTO `receipts` (`id`, `user_id`, `summe`, `strasse`, `plz`, `ort`, `datum`) VALUES
-(7, 14, 330, 'Teststrasse 1', '1212', 'Wien', '2023-06-10'),
 (8, 14, 330, 'Donauinselplatz 1', '1210', 'Wien', '2023-06-10'),
 (9, 14, 443, 'Teststrasse 1', '1212', 'Wien', '2023-06-10'),
 (10, 14, 410, 'Teststrasse 1', '1212', 'Wien', '2023-06-11'),
 (11, 8, 215, 'Hallochenstrasse', '1220', 'Wien', '2023-06-11'),
-(12, 8, 105, 'Hallochenstrasse', '1220', 'Wien', '2023-06-11'),
-(13, 14, 135, 'Teststrasse 1', '1212', 'Wien', '2023-06-11');
+(13, 14, 135, 'Teststrasse 1', '1212', 'Wien', '2023-06-11'),
+(14, 8, 158, 'Hallochenstrasse', '1220', 'Wien', '2023-06-12');
 
 --
 -- Triggers `receipts`
@@ -186,7 +181,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `admin`, `aktiv`, `anrede`, `vorname`, `nachname`, `adresse`, `plz`, `ort`, `email`, `username`, `passwort`) VALUES
 (8, 0, 1, 'Frau', 'Martina', 'Musterfrau', 'Hallochenstrasse', '1220', 'Wien', 'martina@martina.at', 'martina', '$2y$10$6POKO4DKi/tlU4xR6ng40uJ/OYUCa5oaRFq.J/q4F3ahFwpIaIoGi'),
 (11, 1, 1, 'Herr', 'Admin', 'Adminov', 'Strasse 1', '1020', '1200', 'admin@admin.at', 'admin', '$2y$10$vpVMHlmp1jlvG4uffYgK2.wvlyogEw/eoSGSoxDBbpYc.vCf7ht9S'),
-(14, 0, 1, 'Herr', 'Tester', 'Testmann', 'Teststrasse 1', '1212', 'Wien', 'test@test.at', 'test123', '$2y$10$wLPNORYFrEFSn.F6lfoft.KzAsPDxECNXAc/nPu0TsDIgJfOWLPtK');
+(14, 0, 1, 'Herr', 'Tester', 'Testmann', 'Teststrasse 1', '1212', 'Wien', 'test@test.at', 'test123', '$2y$10$wLPNORYFrEFSn.F6lfoft.KzAsPDxECNXAc/nPu0TsDIgJfOWLPtK'),
+(17, 0, 1, 'Herr', 'Adama', 'Traore', 'Wolvesstreet 2', '1000', 'London', 'adama@traore.com', 'adama', '$2y$10$2FVVyojjz1FfvhMnKKOJ6OylHyUvB52beZIlqCkp5Oum47nLRACae');
 
 --
 -- Indexes for dumped tables
@@ -225,7 +221,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `orderlines`
 --
 ALTER TABLE `orderlines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -237,13 +233,13 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `receipts`
 --
 ALTER TABLE `receipts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
