@@ -11,11 +11,11 @@ Um die Website lokal zu laufen, werden folgende Anforderungen benötigt:
 - Datenbank `savveen` in phpmyadmin importiert (SQL-Datei dafür finden Sie [hier](./Backend/config/savveen.sql)) und DB-Admin-Account angelegt (Zugriffsdaten finden Sie [hier](./Backend/config/dbaccess.php)).
 - Vorhandene Benutzerkonten zum Einloggen:
 
-| username | email              | password |
-| -------- | ------------------ | -------- |
-| admin    | admin@admin.at     | 12345678 |
-| martina  | martina@martina.at | 12345678 |
-| test123  | test@test.at       | 12345678 |
+  | username | email              | password |
+  | -------- | ------------------ | -------- |
+  | admin    | admin@admin.at     | 12345678 |
+  | martina  | martina@martina.at | 12345678 |
+  | test123  | test@test.at       | 12345678 |
 
 ## General Guide für Entwickler\*Innen
 
