@@ -40,6 +40,7 @@ function loadAllProducts() {
         },
         dataType: "json",
         success: function (data) {
+            $("#category").val("");
             let $row = $("<div class='row'></div>");
             for (let i in data) {
                 let cur = data[i];
@@ -112,18 +113,27 @@ function displayCategory() {
 }
 
 function displayAll(data, $row) {
+    let starsHTML = '';
+    for (let i = 0; i < data.bewertung; i++) {
+        starsHTML += '<span class="fa fa-star checked"></span>';
+    }
+    for (let i = data.bewertung; i < 5; i++) {
+        starsHTML += '<span class="fa fa-star"></span>';
+    }
+    let pictureCacheRemover = new Date().getTime();
     let productHTML = `
         <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="product card product-card">
             <div class="card-img-container">
                 <div class="img-wrapper">
-                <img src="../Frontend/res/img/${data.name}.jpg" class="card-img-top product-img" alt="${data.name}">
+                <img src="../Frontend/res/img/${data.name}.jpg?${pictureCacheRemover}" class="card-img-top product-img" alt="${data.name}">
                 </div>
             </div>
             <div class="card-body product-card-body">
                 <h5 class="card-title">${data.name}</h5>
                 <p class="card-text price">${data.preis}€</p>
                 <p class="card-text description text-sm text-break">${data.beschreibung}</p>
+                <p class="card-text stars">${starsHTML}</p>
                 <button class="btn btn-success add-to-cart-btn" data-product-id="${data.id}">In den Warenkorb hinzufügen</button>
             </div>
             </div>
@@ -144,35 +154,20 @@ function displayAll(data, $row) {
 }
 
 function addCart(productID) {
-    let myCart = [];
-    let quantityInCart = 0;
-    if (sessionStorage.getItem("myCart")) {
-        myCart = JSON.parse(sessionStorage.getItem("myCart"));
-        for (let i = 0; i < myCart.length; i++) {
-            if (myCart[i].id == productID) {
-                quantityInCart = myCart[i].quant;
-                break;
-            }
-        }
-    }
-
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
         data: {
-            method: "checkStock",
-            param: JSON.stringify({
-                id: productID,
-            }),
+            method: "loadProductByID",
+            param: productID
         },
         dataType: "json",
         success: function (response) {
-            let item = response;
-            let stock = item.bestand;
-            if (quantityInCart + 1 <= stock) {
+            if (response.data) {
+                let item = response.data;
                 addItemtoCart(item);
             } else {
-                alert("Dieses Produkt haben wir leider nicht mehr auf Lager!");
+                alert("Bitte versuchen Sie es später erneut!");
             }
         },
         error: function () {
