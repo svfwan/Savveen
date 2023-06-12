@@ -8,7 +8,7 @@ Um die Website lokal zu laufen, werden folgende Anforderungen benötigt:
 
 - XAMPP/MAMPP Installation
   - darin Apache und MySQL laufen lassen
-- Datenbank `savveen` in phpmyadmin importiert -> SQL-Datei dafür finden Sie [hier](./Backend/config/savveen.sql) und DB-Admin-Account angelegt (Zugriffsdaten finden Sie [hier](./Backend/config/dbaccess.php)).
+- Datenbank `savveen` in phpmyadmin importiert (SQL-Datei dafür finden Sie [hier](./Backend/config/savveen.sql)) und DB-Admin-Account angelegt (Zugriffsdaten finden Sie [hier](./Backend/config/dbaccess.php)).
 - Vorhandene Benutzerkonten zum Einloggen:
 
 | username | email              | password |
