@@ -40,6 +40,7 @@ function showAddressModal(username) {
                 $('#savedPostcode').val(response.plz);
                 $('#savedCity').val(response.ort);
                 $('#addressModal').modal('show');
+             
             });
         },
         error: function () {
@@ -47,6 +48,69 @@ function showAddressModal(username) {
         }
     });
 }
+
+function showSuccessfulOrder(receipt_id){
+
+            $('#modal-placeholder').empty();
+            $('#modal-placeholder').load('sites/cart.html #bestellungModal', function () {
+          
+            $('#bestellungModal').modal('show');
+            showModalAlert('Bestellung erfolgreich. Möchten Sie die Rechnung drucken?', 'success');
+
+            $(document).on("click", "#printReceipt", function(event){
+                event.preventDefault();
+                $('#bestellungModal').modal('hide');
+                $('#modal-placeholder').load('sites/cart.html #receiptModal', function () {
+                printReceipt(receipt_id);
+                })
+            })
+               })
+
+
+                /*
+            $('#rezept_id').html(receipt_id);
+            $('#anschrift').html(adr);
+            $('#receiptModal').modal('show');
+            });*/
+  
+        }
+
+
+function printReceipt(receipt_id){
+            $.ajax({
+                type: "GET",
+                url: "../Backend/logic/requestHandler.php",
+                data: {
+                    method: "printReceipt",
+                    param: receipt_id,
+                },
+                dataType: "json",
+                success: function(response){
+                console.log(response);
+                $('#rezept_id').text(response.receipt_id);
+                $('#position').text(response.name);
+                $('#anschrift').text(response.strasse);
+                $('#datum').text(response.datum);
+                $('#ort').text(response.ort);
+                $('#plz').text(response.plz);
+                $('#preis').text(response.preis);
+                $('#anzahl').text(response.anzahl);
+                $('#receiptModal').modal('show');
+
+                $(document).on('click', '#windowPrint', function () {
+                    let printContents = $('#receiptModal').html();
+                    let originalContents = $('body').html();
+                    $('body').html(printContents);
+                    window.print();
+                    $('body').html(originalContents);
+                });
+
+                },
+                error: function(){
+                    alert("Fehler beim Drucken der Rechnung!")
+                }
+               })
+        }
 
 function processOrder() {
     let username = getCookie('username');
@@ -101,7 +165,8 @@ function processOrder() {
                 updateCartItems(myCart);
                 $('#addressModal').modal('hide');
                 $('#modal-placeholder').empty();
-                alert(response.success);
+                //alert(response.success);
+                showSuccessfulOrder(response.receipt);
             } else {
                 showModalAlert(response.error, 'warning')
             }

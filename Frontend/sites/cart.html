@@ -55,6 +55,169 @@
             </div>
         </div>
     </div>
+     <!-- <div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Rechnung</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <h5>Rezept ID:</h5>
+                                <p id="rezept_id"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Name:</h5>
+                                <p id="name"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Position:</h5>
+                                <p id="position"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Datum:</h5>
+                                <p id="datum"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Anschrift:</h5>
+                                <p id="anschrift"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Plz:</h5>
+                                <p id="plz"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Ort:</h5>
+                                <p id="ort"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Preis:</h5>
+                                <p id="preis"></p>
+                            </div>
+                            <div class="col">
+                                <h5>Anzahl:</h5>
+                                <p id="anzahl"></p>
+                            </div>
+                            <button id="windowPrint" type="button" class="btn btn-success">Rechnung drucken</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+
+
+    <style>
+        .invoice {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            font-family: Arial, sans-serif;
+        }
+
+        .invoice h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .invoice .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .invoice .row p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .invoice .total {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .invoice .total p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .invoice .btn-print {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+
+    <div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Rechnung</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="invoice">
+                        <h1>Rechnung</h1>
+                        <div class="row">
+                            <p><strong>Rezept ID:</strong> <span id="rezept_id"></span></p>
+                        </div>
+                       
+                        <div class="row">
+                            <p><strong>Position:</strong> <span id="position"></span></p>
+                        </div>
+                        <div class="row">
+                            <p><strong>Datum:</strong> <span id="datum"></span></p>
+                        </div>
+                        <div class="row">
+                            <p><strong>Anschrift:</strong> <span id="anschrift"></span></p>
+                        </div>
+                        <div class="row">
+                            <p><strong>Plz:</strong> <span id="plz"></span></p>
+                        </div>
+                        <div class="row">
+                            <p><strong>Ort:</strong> <span id="ort"></span></p>
+                        </div>
+                        <div class="row">
+                            <p><strong>Preis:</strong> <span id="preis"></span></p>
+                        </div>
+                        <div class="row">
+                            <p><strong>Anzahl:</strong> <span id="anzahl"></span></p>
+                        </div>
+                        
+                        <div class="btn-print">
+                            <button id="windowPrint" type="button" class="btn btn-success">Rechnung drucken</button>
+                            </div>
+                        </div>
+                        </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="modal fade" id="bestellungModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Bestellungsbestätigung </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    
+                </div>
+                <button id="printReceipt" type="button" class="btn btn-success">Rechnung drucken</button>
+
+            </div>
+        </div>
+    </div>
+
     </div>
 
 

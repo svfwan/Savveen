@@ -59,6 +59,7 @@ class orderLogic
             return $result;
         }
         $receipt_id = $stmt->insert_id;
+        
         $stmt->close();
 
         // Create the order lines
@@ -88,10 +89,58 @@ class orderLogic
 
         // Return a success response
         $result['success'] = 'Bestellung erfolgreich abgeschlossen!';
+        $result['receipt']=$receipt_id;
         return $result;
     }
 
     function getOrders($param)
     {
     }
+
+
+
+    function printReceipt($param) {
+        $result = array();
+        $receipt_id = $param;
+        $result['receipt_id'] = $receipt_id;
+        if (!$this->dh->checkConnection()) {
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
+        } 
+        
+    
+        $this->dh->db_obj->begin_transaction();
+    /*
+    "SELECT t1.spalte1, t2.spalte2, t3.spalte3
+        FROM tabelle1 AS t1
+        INNER JOIN tabelle2 AS t2 ON t1.spalteX = t2.spalteY
+        INNER JOIN tabelle3 AS t3 ON t2.spalteZ = t3.spalteW";
+     */
+        $stmt = $this->dh->db_obj->prepare("SELECT r.id AS receipt_id, r.user_id, r.summe, r.strasse, r.plz, r.ort, r.datum,
+        ol.id AS orderline_id, ol.product_id, ol.preis, ol.anzahl,
+        p.name AS product_name
+        FROM receipts r
+        JOIN orderlines ol ON r.id = ol.receipt_id
+        JOIN products p ON ol.product_id = p.id
+        WHERE r.id = ?");
+
+        $stmt->bind_param("s", $receipt_id);
+        $stmt->execute();
+        $sql_result = $stmt->get_result();
+        if ($sql_result->num_rows == 1) {
+            $row = $sql_result->fetch_assoc();
+            $result['strasse'] = $row['strasse'];
+            $result['datum'] = $row['datum'];
+            $result['summe']=$row['summe'];
+            $result['plz']=$row['plz'];
+            $result['ort']=$row['ort'];
+            $result['preis']=$row['preis'];
+            $result['anzahl']=$row['anzahl'];
+            $result['name']=$row['product_name'];
+
+        }
+    
+        return $result;  
+    
+}
 }
