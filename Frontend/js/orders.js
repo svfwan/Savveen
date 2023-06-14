@@ -40,7 +40,7 @@ function showAddressModal(username) {
                 $('#savedPostcode').val(response.plz);
                 $('#savedCity').val(response.ort);
                 $('#addressModal').modal('show');
-             
+
             });
         },
         error: function () {
@@ -49,68 +49,130 @@ function showAddressModal(username) {
     });
 }
 
-function showSuccessfulOrder(receipt_id){
-
-            $('#modal-placeholder').empty();
-            $('#modal-placeholder').load('sites/cart.html #bestellungModal', function () {
-          
-            $('#bestellungModal').modal('show');
-            showModalAlert('Bestellung erfolgreich. Möchten Sie die Rechnung drucken?', 'success');
-
-            $(document).on("click", "#printReceipt", function(event){
-                event.preventDefault();
-                $('#bestellungModal').modal('hide');
-                $('#modal-placeholder').load('sites/cart.html #receiptModal', function () {
-                printReceipt(receipt_id);
-                })
-            })
-               })
+function showSuccessfulOrder(receiptID) {
+    $('#modal-placeholder').empty();
+    $('#modal-placeholder').load('sites/cart.html #receiptModal', function () {
+        $('#receiptModal').modal('show');
+        $(document).on("click", "#printReceipt", function () {
+            printReceipt(receiptID);
+        })
+    })
+}
 
 
-                /*
-            $('#rezept_id').html(receipt_id);
-            $('#anschrift').html(adr);
-            $('#receiptModal').modal('show');
-            });*/
-  
-        }
+function printReceipt(receiptID) {
+    $.ajax({
+        type: "GET",
+        url: "../Backend/logic/requestHandler.php",
+        data: {
+            method: "loadOrderByID",
+            param: receiptID,
+        },
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                const receipt = response.data;
+                const date = receipt[0].datum;
+                const address = receipt[0].strasse + ', ' + receipt[0].plz + ' ' + receipt[0].ort;
+                const receiptID = receipt[0].receipt_id;
+                const sum = receipt[0].summe;
 
+                const html = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Rechnung</title>
+                        <style>
+                            /* General Styles */
+                            /* Paste your style.css content here */
 
-function printReceipt(receipt_id){
-            $.ajax({
-                type: "GET",
-                url: "../Backend/logic/requestHandler.php",
-                data: {
-                    method: "printReceipt",
-                    param: receipt_id,
-                },
-                dataType: "json",
-                success: function(response){
-                console.log(response);
-                $('#rezept_id').text(response.receipt_id);
-                $('#position').text(response.name);
-                $('#anschrift').text(response.strasse);
-                $('#datum').text(response.datum);
-                $('#ort').text(response.ort);
-                $('#plz').text(response.plz);
-                $('#preis').text(response.preis);
-                $('#anzahl').text(response.anzahl);
-                $('#receiptModal').modal('show');
+                            /* Additional Styles for the receipt */
+                            .receipt-container {
+                                margin: 20px;
+                                padding: 20px;
+                                border: 1px solid #ddd;
+                                border-radius: 4px;
+                                background-color: #fff;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            }
 
-                $(document).on('click', '#windowPrint', function () {
-                    let printContents = $('#receiptModal').html();
-                    let originalContents = $('body').html();
-                    $('body').html(printContents);
-                    window.print();
-                    $('body').html(originalContents);
-                });
+                            .receipt-title {
+                                font-size: 24px;
+                                font-weight: bold;
+                                color: #006837;
+                                margin-bottom: 20px;
+                            }
 
-                },
-                error: function(){
-                    alert("Fehler beim Drucken der Rechnung!")
-                }
-               })
-        }
+                            .receipt-info {
+                                margin-bottom: 10px;
+                            }
+
+                            .receipt-info strong {
+                                font-weight: bold;
+                            }
+
+                            .receipt-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+
+                            .receipt-table th,
+                            .receipt-table td {
+                                padding: 10px;
+                                border: 1px solid #ddd;
+                            }
+
+                            .receipt-sum {
+                                margin-top: 20px;
+                                font-weight: bold;
+                            }
+                        </style>
+                    </head>
+                    <body onload="window.print();">
+                        <div class="receipt-container">
+                            <h1 class="receipt-title">Rechnung</h1>
+                            <p class="receipt-info">Rechnungsnummer: <strong>${receiptID}</strong></p>
+                            <p class="receipt-info">Datum: <strong>${date}</strong></p>
+                            <p class="receipt-info">Adresse: <strong>${address}</strong></p>
+                            <table class="receipt-table">
+                                <thead>
+                                    <tr>
+                                        <th>Produkte</th>
+                                        <th>Preis</th>
+                                        <th>Anzahl</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${receipt.map(orderLine => `
+                                        <tr>
+                                            <td>${orderLine.product_name}</td>
+                                            <td>${orderLine.preis}€</td>
+                                            <td>${orderLine.anzahl}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <p class="receipt-sum">Summe: <strong>${sum}€</strong></p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                const receiptWindow = window.open("", "_blank");
+                receiptWindow.document.open();
+                receiptWindow.document.write(html);
+                receiptWindow.document.close();
+            } else {
+                showModalAlert("Rechnungsdaten inkorrekt!", "warning");
+            }
+        },
+        error: function () {
+            alert("Fehler beim Laden der Rechnung!");
+        },
+    });
+}
 
 function processOrder() {
     let username = getCookie('username');
@@ -165,7 +227,6 @@ function processOrder() {
                 updateCartItems(myCart);
                 $('#addressModal').modal('hide');
                 $('#modal-placeholder').empty();
-                //alert(response.success);
                 showSuccessfulOrder(response.receipt);
             } else {
                 showModalAlert(response.error, 'warning')
