@@ -356,7 +356,70 @@ $(document).ready(function () {
                 showModalAlert('Fehler bei der Abfrage!', 'danger');
             }
         });
+
     }
+
+
+    function showOrderModal(order) {
+        $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
+            const orderTable = $('#orderTable');
+
+            // Clear previous data
+            orderTable.empty();
+
+            // Display the date and full address
+            const date = order[0].datum;
+            const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
+            const addressElement = $('<p>').text('Datum: ' + date + ', Adresse: ' + address);
+            orderTable.append(addressElement);
+
+            // Display the order lines
+            const table = $('<table>').addClass('table table-striped');
+            const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th><th></th></tr>');
+            const tbody = $('<tbody>');
+
+            order.forEach(orderLine => {
+                const productName = orderLine.product_name;
+                const price = orderLine.preis;
+                const quantity = orderLine.anzahl;
+                const orderLineID = orderLine.orderline_id;
+                const receiptID = orderLine.receipt_id;
+
+                const row = $('<tr>');
+                const productNameCell = $('<td>').text(productName);
+                const priceCell = $('<td>').text(price + '€');
+                const quantityCell = $('<td>').text(quantity);
+                const buttonCell = $('<td>');
+                const removeButton = $('<button>').addClass('btn btn-danger').text('Produkt entfernen');
+                removeButton.data('orderline-id', orderLineID);
+                removeButton.data('receipt-id', receiptID);
+                removeButton.on('click', function () {
+                    const orderlineID = $(this).data('orderline-id');
+                    const receiptID = $(this).data('receipt-id');
+                    deleteProductFromOrder(orderlineID, receiptID);
+                });
+                buttonCell.append(removeButton);
+
+                row.append(productNameCell, priceCell, quantityCell, buttonCell);
+                tbody.append(row);
+            });
+
+            table.append(thead, tbody);
+            orderTable.append(table);
+
+            // Display the sum
+            const sum = order[0].summe;
+            const sumElement = $('<p>').text('Summe: ' + sum + '€');
+            orderTable.append(sumElement);
+
+            $('#orderDataModal').modal('show');
+        });
+    }
+
+    function deleteProductFromOrder(orderlineID, receiptID) {
+
+    }
+
 
     // ajax call for loading products for admin
 
