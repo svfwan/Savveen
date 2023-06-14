@@ -23,7 +23,7 @@ $(document).ready(function () {
 
         $("#modal-placeholder").empty();
 
-        $('#modal-placeholder').load("sites/orders.html #orderDataModal", function () {
+        $('#modal-placeholder').load("sites/orders.html #ordersModal", function () {
 
             //   $("#OrdersModal").modal("show"); //dar
 
@@ -56,14 +56,12 @@ function getOrderInfo() {
         error: function (error) {
             console.log(error);
         },
-    }); //ajax call ende
+    });
 }
 
 function displayOrder(order) {
+    const ordersTable = $('#ordersTable');
 
-    const orderTable = $('#orderTable');
-
-    // Display the order lines
     const table = $('<table>').addClass('table table-striped');
     const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th></tr>');
     const tbody = $('<tbody>');
@@ -83,52 +81,31 @@ function displayOrder(order) {
     }
 
     table.append(thead, tbody);
-    orderTable.append(table);
-
-    //Lieferdetails
-
-    // Display the date and full address
-
-    const d = $('<h6>').text('');
-
-    orderTable.append(d); //nur für den absatz, keine ahnung wie ich das mache
+    ordersTable.append(table);
 
     const details = $('<h6>').text('Bestelldetails');
-
-    orderTable.append(details);
+    ordersTable.append(details);
 
     const date = order[0].datum;
     const addressElement = $('<p>').text('Datum: ' + date);
-    orderTable.append(addressElement);
-
+    ordersTable.append(addressElement);
 
     const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
     const addressElement1 = $('<p>').text(' Adresse: ' + address);
-    orderTable.append(addressElement1);
+    ordersTable.append(addressElement1);
 
-
-
-    // Display the sum
     const sum = order[0].summe;
     const sumElement = $('<p>').text('Summe: ' + sum + '€');
-    orderTable.append(sumElement);
+    ordersTable.append(sumElement);
 
-    $('#orderDataModal').modal('show');
+    $('#ordersModal').modal('show');
 
-
-    //line
     const table1 = $('<table>').addClass('table table-striped');
     const thead1 = $('<thead>').append('<tr><th></th><th></th><th></th><th></th></tr>');
     const tbody1 = $('<tbody>');
     table1.append(thead1, tbody1);
-    orderTable.append(table1);
-
+    ordersTable.append(table1);
 }
-
-
-
-//--- ende 
-
 
 function showAddressModal(username) {
     $.ajax({
