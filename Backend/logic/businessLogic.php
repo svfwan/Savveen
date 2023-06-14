@@ -51,6 +51,11 @@ class businessLogic
             case 'loadProductByID':
                 $res = $this->productLogic->loadProductByID($param);
                 break;
+
+            case 'getOrders':
+                $res = $this->orderLogic->getOrders($param);
+                break;
+
             case 'processOrder':
                 $res = $this->orderLogic->processOrder($param);
                 break;

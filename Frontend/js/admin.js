@@ -9,6 +9,16 @@ $(document).ready(function () {
         loadUsersForAdmin();
     });
 
+    $(document).on('click', '#activateUser', function () {
+        let userID = $(this).data('user-id');
+        activateUser(userID);
+    });
+
+    $(document).on('click', '#deactivateUser', function () {
+        let userID = $(this).data('user-id');
+        deactivateUser(userID);
+    });
+
     $(document).on('click', '#showProductManagement', function () {
         loadSection('productManagement');
         loadProductsForAdmin();
@@ -53,30 +63,26 @@ $(document).ready(function () {
                     const users = response.users;
                     users.forEach(user => {
                         const card = $('<div class="card mb-3"></div>');
-                        const cardBody = $('<div class="card-body"></div>');
+                        const cardBody = $('<div class="card-body userCard"></div>');
                         const usernameElement = $('<h5 class="card-title"></h5>').text(user.username);
                         const buttonContainer = $('<div class="d-flex justify-content-end"></div>');
                         const detailsButton = $('<button class="btn btn-success me-2">Kundendetails ansehen</button>');
                         detailsButton.data('user-id', user.id);
                         const ordersButton = $('<button class="btn btn-warning">Bestellungen laden</button>');
                         ordersButton.data('user-id', user.id);
-
+                        const ordersList = $('<div></div>').addClass('container col-6 d-none ordersList').attr('id', user.id);
                         detailsButton.on('click', function () {
-                            const userId = $(this).data('user-id');
-                            // Handle details button click for the corresponding user ID
-                            //handleDetailsButtonClick(userId);
-                            console.log("detailsButton: " + userId)
+                            const userID = $(this).data('user-id');
+                            loadUserByID(userID);
                         });
 
                         ordersButton.on('click', function () {
-                            const userId = $(this).data('user-id');
-                            // Handle orders button click for the corresponding user ID
-                            //handleOrdersButtonClick(userId);
-                            console.log("handleOrdersButton: " + userId)
+                            const userID = $(this).data('user-id');
+                            loadOrdersList(userID);
                         });
 
                         buttonContainer.append(detailsButton, ordersButton);
-                        cardBody.append(usernameElement, buttonContainer);
+                        cardBody.append(usernameElement, buttonContainer, ordersList);
                         card.append(cardBody);
                         $userListAdmin.append(card);
                     });
@@ -84,11 +90,253 @@ $(document).ready(function () {
                     showAlert(response.error, 'warning');
                 }
             },
-            error: function (error) {
-                console.log(error);
+            error: function () {
+                showAlert('Fehler beim Laden der Benutzer', 'warning');
             }
         });
     }
+
+    function loadUserByID(userID) {
+        $.ajax({
+            type: 'GET',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'loadUserByID',
+                param: userID
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    let user = response.data;
+                    showUserDataModal(user);
+                } else {
+                    showAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showAlert('Fehler beim Laden der Benutzerdaten!', 'warning');
+            }
+        });
+    }
+
+    function showUserDataModal(user) {
+        if ($('#userDataModal').is(':visible')) {
+            var statusText = user.aktiv === 1 ? 'Aktiv' : 'Nicht Aktiv';
+            $('#userStatus').text(statusText);
+            $('#userFOD').text(user.anrede);
+            $('#userFirstName').text(user.vorname);
+            $('#userLastName').text(user.nachname);
+            $('#userAddress').text(user.adresse);
+            $('#userPostcode').text(user.plz);
+            $('#userCity').text(user.ort);
+            $('#userEmail').text(user.email);
+            $('#userUsername').text(user.username);
+            $('#activateUser').data('user-id', user.id);
+            $('#deactivateUser').data('user-id', user.id);
+        } else {
+            $('#modal-placeholder').load("sites/dashboard.html #userDataModal", function () {
+                var statusText = user.aktiv === 1 ? 'Aktiv' : 'Nicht Aktiv';
+                $('#userStatus').text(statusText);
+                $('#userFOD').text(user.anrede);
+                $('#userFirstName').text(user.vorname);
+                $('#userLastName').text(user.nachname);
+                $('#userAddress').text(user.adresse);
+                $('#userPostcode').text(user.plz);
+                $('#userCity').text(user.ort);
+                $('#userEmail').text(user.email);
+                $('#userUsername').text(user.username);
+                $('#activateUser').data('user-id', user.id);
+                $('#deactivateUser').data('user-id', user.id);
+                $('#userDataModal').modal('show');
+            });
+        }
+    }
+
+    function activateUser(userID) {
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'activateUser',
+                param: userID
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    showModalAlert(response.success, 'success');
+                    loadUserByID(userID);
+                    loadUsersForAdmin();
+                } else if (response.error) {
+                    showModalAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showModalAlert('Fehler bei der Abfrage!', 'danger');
+                loadUserByID(userID);
+            }
+        });
+    }
+
+    function deactivateUser(userID) {
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'deactivateUser',
+                param: userID
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    showModalAlert(response.success, 'success');
+                    loadUserByID(userID);
+                    loadUsersForAdmin();
+                } else if (response.error) {
+                    showModalAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showModalAlert('Fehler bei der Abfrage!', 'danger');
+                loadUserByID(userID);
+            }
+        });
+    }
+
+    function loadOrdersList(userID) {
+        const ordersListContainer = $('.ordersList#' + userID);
+        $.ajax({
+            type: 'GET',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'loadOrdersByUserID',
+                param: userID
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    let orders = response.data;
+                    const targetID = userID;
+                    $('.ordersList').not('#' + targetID).empty().hide();
+                    ordersListContainer.empty().show();
+                    showOrdersList(orders, userID);
+                } else if (response.noOrders) {
+                    showAlert(response.noOrders, 'warning');
+                } else {
+                    showAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showAlert('Fehler bei der Abfrage der Bestellungen!', 'danger');
+            }
+        });
+    }
+
+    function showOrdersList(orders, userID) {
+        const orderList = $('<ul>').addClass('list-group');
+        orders.forEach(order => {
+            const listItem = $('<li>').addClass('list-group-item d-flex justify-content-between align-items-center');
+            const text = $('<span>').text('Bestellung #' + order.id);
+            const button = $('<button>').addClass('btn btn-success').text('Bestellung bearbeiten');
+            button.data('order-id', order.id);
+            button.on('click', function () {
+                const orderID = $(this).data('order-id');
+                loadOrderByID(orderID);
+            });
+
+            listItem.append(text, button);
+            orderList.append(listItem);
+        });
+
+        const ordersListContainer = $('.ordersList#' + userID);
+        ordersListContainer.empty().append(orderList); // Append the orderListDiv inside the container
+        ordersListContainer.removeClass('d-none'); // Remove the 'd-none' class to show the orders list
+    }
+
+    function loadOrderByID(orderID) {
+        $.ajax({
+            type: 'GET',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'loadOrderByID',
+                param: orderID
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    let order = response.data;
+                    showOrderModal(order);
+                } else {
+                    showAlert('Bestellung konnte nicht geladen werden!', 'warning');
+                }
+            },
+            error: function () {
+                showAlert('Fehler bei der Abfrage der Bestellung!', 'danger');
+            }
+        });
+
+    }
+
+
+    function showOrderModal(order) {
+        $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
+            const orderTable = $('#orderTable');
+
+            // Clear previous data
+            orderTable.empty();
+
+            // Display the date and full address
+            const date = order[0].datum;
+            const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
+            const addressElement = $('<p>').text('Datum: ' + date + ', Adresse: ' + address);
+            orderTable.append(addressElement);
+
+            // Display the order lines
+            const table = $('<table>').addClass('table table-striped');
+            const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th><th></th></tr>');
+            const tbody = $('<tbody>');
+
+            order.forEach(orderLine => {
+                const productName = orderLine.product_name;
+                const price = orderLine.preis;
+                const quantity = orderLine.anzahl;
+                const orderLineID = orderLine.orderline_id;
+                const receiptID = orderLine.receipt_id;
+
+                const row = $('<tr>');
+                const productNameCell = $('<td>').text(productName);
+                const priceCell = $('<td>').text(price + '€');
+                const quantityCell = $('<td>').text(quantity);
+                const buttonCell = $('<td>');
+                const removeButton = $('<button>').addClass('btn btn-danger').text('Produkt entfernen');
+                removeButton.data('orderline-id', orderLineID);
+                removeButton.data('receipt-id', receiptID);
+                removeButton.on('click', function () {
+                    const orderlineID = $(this).data('orderline-id');
+                    const receiptID = $(this).data('receipt-id');
+                    deleteProductFromOrder(orderlineID, receiptID);
+                });
+                buttonCell.append(removeButton);
+
+                row.append(productNameCell, priceCell, quantityCell, buttonCell);
+                tbody.append(row);
+            });
+
+            table.append(thead, tbody);
+            orderTable.append(table);
+
+            // Display the sum
+            const sum = order[0].summe;
+            const sumElement = $('<p>').text('Summe: ' + sum + '€');
+            orderTable.append(sumElement);
+
+            $('#orderDataModal').modal('show');
+        });
+    }
+
+    function deleteProductFromOrder(orderlineID, receiptID) {
+
+    }
+
 
     // ajax call for loading products for admin
 
@@ -133,8 +381,8 @@ $(document).ready(function () {
                     }
                 }
             },
-            error: function (error) {
-                console.log(error);
+            error: function () {
+                showAlert('Fehler bei der Abfrage!', 'danger');
             }
         });
     }
@@ -210,12 +458,10 @@ $(document).ready(function () {
                     showEditModal(product);
                 } else {
                     // Show an error message if the product was not found or there was an error
-                    showAlert('Produkt konnte nict geladen werden!', 'danger');
+                    showAlert('Produkt konnte nict geladen werden!', 'warning');
                 }
             },
-            error: function (error) {
-                console.log(error);
-                // Show an error message if there was an error with the AJAX request
+            error: function () {
                 showAlert('Fehler bei der Abfrage des Produkts!', 'danger');
             }
         });
