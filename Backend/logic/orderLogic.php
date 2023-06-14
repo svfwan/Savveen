@@ -59,6 +59,7 @@ class orderLogic
             return $result;
         }
         $receipt_id = $stmt->insert_id;
+
         $stmt->close();
 
         // Create the order lines
@@ -88,6 +89,7 @@ class orderLogic
 
         // Return a success response
         $result['success'] = 'Bestellung erfolgreich abgeschlossen!';
+        $result['receipt'] = $receipt_id;
         return $result;
     }
 
