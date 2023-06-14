@@ -315,7 +315,6 @@ $(document).ready(function () {
         const sumElement = $('<p>').append($('<strong>').text('Summe: ' + sum + '€'));
         if ($('#orderDataModal').is(':visible')) {
             $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
-            console.log('hier');
         } else {
             // If the modal is not visible, load it and set the content of #orderTable
             $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {

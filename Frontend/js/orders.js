@@ -18,17 +18,9 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#showOrders', function () {
-        console.log('showOrders');
-        //showOrders();
-
         $("#modal-placeholder").empty();
-
         $('#modal-placeholder').load("sites/orders.html #ordersModal", function () {
-
-            //   $("#OrdersModal").modal("show"); //dar
-
             getOrderInfo();
-
         })
     })
 
@@ -48,13 +40,12 @@ function getOrderInfo() {
         },
         dataType: "json",
         success: function (response) {
-            console.log(response);
             for (let i in response) {
                 displayOrder(response[i]);
             }
         },
-        error: function (error) {
-            console.log(error);
+        error: function () {
+            alert("Fehler beim Laden der Bestellungen!");
         },
     });
 }

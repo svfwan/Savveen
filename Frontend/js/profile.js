@@ -158,8 +158,8 @@ $(document).ready(function () {
         $("#usernameold").text(response.username);
         $("#formofAddressold").text(response.anrede);
       },
-      error: function (error) {
-        console.log(error);
+      error: function () {
+        alert("Fehler beim Login!");
       },
     });
   }
@@ -206,9 +206,7 @@ $(document).ready(function () {
       },
       dataType: 'json',
       success: function (response) {
-        console.log(response);
         if (response.success) {
-          // todo: reset values of form after success
           showModalAlert(response.success, 'success');
           $('#firstNameold').text(response.vorname);
           $('#lastNameold').text(response.nachname);
@@ -223,8 +221,8 @@ $(document).ready(function () {
           showModalAlert(response.error, 'warning');
         }
       },
-      error: function (error) {
-        console.log(error);
+      error: function () {
+        alert("Fehler beim Aktualisieren der Daten!");
       }
 
     });
@@ -266,7 +264,6 @@ $(document).ready(function () {
         },
         dataType: "json",
         success: function (response) {
-          console.log(response);
           if (
             response.status === "loggedInAdmin" ||
             response.status === "loggedInUser"

@@ -100,7 +100,6 @@ function displayCategory() {
                 if (selectedValue === "") {
                     displayAll(cur, $row);
                 } else if (cur.kategorie === selectedValue) {
-                    console.log(cur.beschreibung);
                     displayAll(cur, $row);
                 }
             }
