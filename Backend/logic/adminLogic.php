@@ -18,7 +18,7 @@ class adminLogic
             return $result;
         }
 
-        $sql = 'SELECT `id`, `username` FROM `users` WHERE `admin` = ?';
+        $sql = 'SELECT `id`, `username` FROM `users` WHERE `admin` = ? ORDER BY `username`';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $notAdmin);
 
@@ -40,6 +40,201 @@ class adminLogic
 
         $stmt->close();
 
+        return $result;
+    }
+
+    public function loadUserByID($param)
+    {
+        $result = array();
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $sql = 'SELECT `id`, `aktiv`,`anrede`, `vorname`, `nachname`, `adresse`, `plz`, `ort`, `email`, `username`
+        FROM `users` WHERE `id` = ?';
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('i', $param);
+
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            if ($queryResult->num_rows == 1) {
+                $result['success'] = 'Benutzer gefunden!';
+                $result['data'] = $queryResult->fetch_assoc();
+            } else {
+                $result['error'] = 'Benutzer nicht gefunden!';
+            }
+        } else {
+            $result['error'] = 'Inkorrekte Abfragedaten!';
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+
+    public function activateUser($param)
+    {
+        $result = array();
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $sql = 'UPDATE `users` SET `aktiv` = 1 WHERE `id` = ?';
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('i', $param);
+
+        // Execute the statement
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            // Check if any rows were affected
+            $result['success'] = 'Benutzer erfolgreich aktiviert!';
+        } else {
+            $result['error'] = 'Benutzer ist bereits aktiviert!';
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+
+    public function deactivateUser($param)
+    {
+        $result = array();
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $sql = 'UPDATE `users` SET `aktiv` = 0 WHERE `id` = ?';
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('i', $param);
+
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            $result['success'] = 'Benutzer erfolgreich deaktiviert!';
+        } else {
+            $result['error'] = 'Benutzer ist bereits deaktiviert!';
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+
+    public function loadOrdersByUserID($param)
+    {
+        $result = array();
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $sql = 'SELECT `id` FROM `receipts` WHERE `user_id` = ? ORDER BY `datum`, `id`';
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('i', $param);
+
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            if ($queryResult->num_rows > 0) {
+                $orders = array();
+                while ($row = $queryResult->fetch_assoc()) {
+                    array_push($orders, $row);
+                }
+                $result['success'] = 'Bestellungen geladen';
+                $result['data'] = $orders;
+            } else {
+                $result['noOrders'] = 'Dieser Benuter hat keine Bestellungen';
+            }
+        } else {
+            $result['error'] = 'Inkorrekte Benutzerdaten, versuchen Sie es später erneut!';
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+
+    public function loadOrderByID($param)
+    {
+        $result = array();
+
+        if (!$this->dh->checkConnection()) {
+            $result['error'] = 'Versuchen Sie es später erneut!';
+            return $result;
+        }
+
+        $sql = "SELECT r.id AS receipt_id, r.user_id, r.summe, r.strasse, r.plz, r.ort, r.datum,
+        ol.id AS orderline_id, ol.product_id, ol.preis, ol.anzahl,
+        p.name AS product_name
+        FROM receipts r
+        JOIN orderlines ol ON r.id = ol.receipt_id
+        JOIN products p ON ol.product_id = p.id
+        WHERE r.id = ?;";
+        $stmt = $this->dh->db_obj->prepare($sql);
+        $stmt->bind_param('i', $param);
+
+        if ($stmt->execute()) {
+            $queryResult = $stmt->get_result();
+            if ($queryResult->num_rows > 0) {
+                $order = array();
+                while ($row = $queryResult->fetch_assoc()) {
+                    array_push($order, $row);
+                }
+                $result['success'] = 'Bestellung geladen';
+                $result['data'] = $order;
+            } else {
+                $result['error'] = 'Diese Bestellung existiert nicht!';
+            }
+        } else {
+            $result['error'] = 'Inkorrekte Bestelldaten, versuchen Sie es später erneut!';
+        }
+
+        $stmt->close();
+
+        return $result;
+    }
+
+    public function deleteOrderLine($param)
+    {
+        $result = array();
+        $orderlineID = $param['orderlineID'];
+        $receiptID = $param['receiptID'];
+
+        // Prüfe die Verbindung zur Datenbank
+        if (!$this->dh->checkConnection()) {
+            $result["error"] = "Versuchen Sie es später erneut!";
+            return $result;
+        }
+
+        // Prepare and execute the SQL query to delete the order line
+        $stmtDelete = $this->dh->db_obj->prepare("DELETE FROM `orderlines` WHERE `id` = ?");
+        $stmtDelete->bind_param("i", $orderlineID);
+
+        // Execute the delete statement
+        if ($stmtDelete->execute()) {
+            $stmtCount = $this->dh->db_obj->prepare("SELECT COUNT(*) FROM `orderlines` WHERE `receipt_id` = ?");
+            $stmtCount->bind_param("i", $receiptID);
+            if ($stmtCount->execute()) {
+                $queryResult = $stmtCount->get_result();
+                $orderLineCount = $queryResult->fetch_row()[0];
+                if ($orderLineCount === 0) {
+                    $result['lastProduct'] = "Bestellung erfolgreich gelöscht!";
+                } else {
+                    // The receipt still exists
+                    $result['success'] = "Produkt erfolgreich von Bestellung entfernt!";
+                }
+            }
+            $stmtCount->close();
+        } else {
+            $result["error"] = "Produkt konnte nicht von Bestellung entfernt werden!";
+        }
+
+        // Close the connection and return the array
+        $stmtDelete->close();
         return $result;
     }
 

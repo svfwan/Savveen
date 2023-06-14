@@ -68,7 +68,7 @@ $(document).ready(function () {
                         const buttonContainer = $('<div class="d-flex justify-content-end"></div>');
                         const detailsButton = $('<button class="btn btn-success me-2">Kundendetails ansehen</button>');
                         detailsButton.data('user-id', user.id);
-                        const ordersButton = $('<button class="btn btn-warning">Bestellungen laden</button>');
+                        const ordersButton = $('<button class="btn btn-success">Bestellungen laden</button>');
                         ordersButton.data('user-id', user.id);
                         const ordersList = $('<div></div>').addClass('container col-6 d-none ordersList').attr('id', user.id);
                         detailsButton.on('click', function () {
@@ -271,6 +271,89 @@ $(document).ready(function () {
             },
             error: function () {
                 showAlert('Fehler bei der Abfrage der Bestellung!', 'danger');
+            }
+        });
+
+    }
+
+    function showOrderModal(order) {
+        const table = $('<table>').addClass('table table-striped');
+        const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th><th></th></tr>');
+        const tbody = $('<tbody>');
+        const receiptIDElement = $('<p>').append($('<strong>').text('Bestellnummer: ' + order[0].receipt_id));
+        const date = order[0].datum;
+        const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
+        const addressElement = $('<p>').append($('<strong>').text('Datum: ' + date + ', Adresse: ' + address));
+        order.forEach(orderLine => {
+            const productName = orderLine.product_name;
+            const price = orderLine.preis;
+            const quantity = orderLine.anzahl;
+            const orderLineID = orderLine.orderline_id;
+            const receiptID = orderLine.receipt_id;
+
+            const row = $('<tr>');
+            const productNameCell = $('<td>').text(productName);
+            const priceCell = $('<td>').text(price + '€');
+            const quantityCell = $('<td>').text(quantity);
+            const buttonCell = $('<td>');
+            const removeButton = $('<button>').addClass('btn btn-danger').text('Produkt entfernen');
+            removeButton.data('orderline-id', orderLineID);
+            removeButton.data('receipt-id', receiptID);
+            removeButton.on('click', function () {
+                const orderlineID = $(this).data('orderline-id');
+                const receiptID = $(this).data('receipt-id');
+                deleteProductFromOrder(orderlineID, receiptID);
+            });
+            buttonCell.append(removeButton);
+
+            row.append(productNameCell, priceCell, quantityCell, buttonCell);
+            tbody.append(row);
+        });
+
+        table.append(thead, tbody);
+
+        // Display the sum
+        const sum = order[0].summe;
+        const sumElement = $('<p>').append($('<strong>').text('Summe: ' + sum + '€'));
+        if ($('#orderDataModal').is(':visible')) {
+            $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
+            console.log('hier');
+        } else {
+            // If the modal is not visible, load it and set the content of #orderTable
+            $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
+                $('#orderDataModal').modal('show');
+                $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
+            });
+        }
+    }
+
+    function deleteProductFromOrder(orderlineID, receiptID) {
+        $.ajax({
+            type: 'POST',
+            url: '../Backend/logic/requestHandler.php',
+            data: {
+                method: 'deleteOrderLine',
+                param: JSON.stringify({
+                    orderlineID: orderlineID,
+                    receiptID: receiptID
+                })
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    showModalAlert(response.success, 'success');
+                    loadUsersForAdmin();
+                    loadOrderByID(receiptID);
+                } else if (response.lastProduct) {
+                    $('#orderDataModal').modal('hide');
+                    showAlert(response.lastProduct, 'success');
+                    loadUsersForAdmin();
+                } else if (response.error) {
+                    showModalAlert(response.error, 'warning');
+                }
+            },
+            error: function () {
+                showModalAlert('Fehler bei der Abfrage!', 'danger');
             }
         });
 

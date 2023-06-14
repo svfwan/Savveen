@@ -62,6 +62,24 @@ class businessLogic
             case 'loadAllUsers':
                 $res = $this->adminLogic->loadAllUsers();
                 break;
+            case 'loadUserByID':
+                $res = $this->adminLogic->loadUserByID($param);
+                break;
+            case 'activateUser':
+                $res = $this->adminLogic->activateUser($param);
+                break;
+            case 'deactivateUser':
+                $res = $this->adminLogic->deactivateUser($param);
+                break;
+            case 'loadOrdersByUserID':
+                $res = $this->adminLogic->loadOrdersByUserID($param);
+                break;
+            case 'loadOrderByID':
+                $res = $this->adminLogic->loadOrderByID($param);
+                break;
+            case 'deleteOrderLine':
+                $res = $this->adminLogic->deleteOrderLine($param);
+                break;
             case 'createProduct':
                 $res = $this->adminLogic->createProduct();
                 break;
