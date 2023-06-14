@@ -44,8 +44,6 @@ $(document).ready(function () {
         deleteProduct(id, path);
     })
 
-
-
     // ajax call for loading all users for admin
     function loadUsersForAdmin() {
         $.ajax({
@@ -356,10 +354,10 @@ $(document).ready(function () {
                 showModalAlert('Fehler bei der Abfrage!', 'danger');
             }
         });
+
     }
 
     // ajax call for loading products for admin
-
     function loadProductsForAdmin() {
         let pictureCacheRemover = new Date().getTime();
         $.ajax({

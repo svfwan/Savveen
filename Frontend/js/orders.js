@@ -20,9 +20,92 @@ $(document).ready(function () {
     $(document).on('click', '#showOrders', function () {
         console.log('showOrders');
         //showOrders();
+
+        $("#modal-placeholder").empty();
+
+        $('#modal-placeholder').load("sites/orders.html #ordersModal", function () {
+
+            //   $("#OrdersModal").modal("show"); //dar
+
+            getOrderInfo();
+
+        })
     })
 
 });
+
+function getOrderInfo() {
+    let username = getCookie('username');
+
+    $.ajax({
+        type: "GET",
+        url: "../Backend/logic/requestHandler.php",
+        data: {
+            method: "getOrders",
+            param: JSON.stringify({
+                username: username,
+            }),
+        },
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+            for (let i in response) {
+                displayOrder(response[i]);
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        },
+    });
+}
+
+function displayOrder(order) {
+    const ordersTable = $('#ordersTable');
+
+    const table = $('<table>').addClass('table table-striped');
+    const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th></tr>');
+    const tbody = $('<tbody>');
+
+    for (let i = 0; i < order.length; i++) {
+        const productName = order[i].name;
+        const price = order[i].preis;
+        const quantity = order[i].anzahl;
+
+        const row = $('<tr>');
+        const productNameCell = $('<td>').text(productName);
+        const priceCell = $('<td>').text(price + '€');
+        const quantityCell = $('<td>').text(quantity);
+
+        row.append(productNameCell, priceCell, quantityCell);
+        tbody.append(row);
+    }
+
+    table.append(thead, tbody);
+    ordersTable.append(table);
+
+    const details = $('<h6>').text('Bestelldetails');
+    ordersTable.append(details);
+
+    const date = order[0].datum;
+    const addressElement = $('<p>').text('Datum: ' + date);
+    ordersTable.append(addressElement);
+
+    const address = order[0].strasse + ', ' + order[0].plz + ' ' + order[0].ort;
+    const addressElement1 = $('<p>').text(' Adresse: ' + address);
+    ordersTable.append(addressElement1);
+
+    const sum = order[0].summe;
+    const sumElement = $('<p>').text('Summe: ' + sum + '€');
+    ordersTable.append(sumElement);
+
+    $('#ordersModal').modal('show');
+
+    const table1 = $('<table>').addClass('table table-striped');
+    const thead1 = $('<thead>').append('<tr><th></th><th></th><th></th><th></th></tr>');
+    const tbody1 = $('<tbody>');
+    table1.append(thead1, tbody1);
+    ordersTable.append(table1);
+}
 
 function showAddressModal(username) {
     $.ajax({

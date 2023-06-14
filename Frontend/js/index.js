@@ -5,30 +5,7 @@
   - how to handle session prolonging
 
   possible solution:
-  - let isClicked = false;
-    // Function to handle click event
-    function handleClick() {
-      isClicked = true;
-    }
-
-    // Add click event listener to all elements on the page
-    document.addEventListener('click', handleClick);
-
-    // Timer function to check if any click event occurred in the last 5 minutes
-    function checkClickStatus() {
-      if (isClicked) {
-        console.log('Click event occurred within the last 5 minutes');
-      } else {
-        console.log('No click event occurred within the last 5 minutes');
-      }
-
-      // Reset the click status
-      isClicked = false;
-    }
-
-    // Set the timer to check the click status every 5 minutes
-    setInterval(checkClickStatus, 5 * 60 * 1000);
-
+  - 
   further issues/ideas/solutions:
   
 */
