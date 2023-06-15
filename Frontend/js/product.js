@@ -49,8 +49,8 @@ function loadAllProducts() {
 
             fillCart();
         },
-        error: function (error) {
-            alert(error);
+        error: function () {
+            alert("Fehler bei der Abfrage!");
         },
     });
 }
@@ -77,7 +77,7 @@ function searchProducts(value) {
                 }
             }
         },
-        error: function (error) {
+        error: function () {
             alert("Fehler bei der Abfrage");
         },
     });
@@ -105,8 +105,8 @@ function displayCategory() {
             }
             fillCart();
         },
-        error: function (error) {
-            alert(error);
+        error: function () {
+            alert("Fehler bei der Abfrage!");
         },
     });
 }

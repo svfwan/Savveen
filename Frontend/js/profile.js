@@ -71,6 +71,7 @@ $(document).ready(function () {
           email: $("#email").val(),
           username: $("#username").val(),
           password: $("#password").val(),
+          passwordSecond: $("#passwordSecond").val()
         }),
       },
       dataType: "json",
@@ -86,7 +87,8 @@ $(document).ready(function () {
           $("#email").val("");
           $("#username").val("");
           $("#password").val("");
-          $("#termCheck").prop("checked", false);
+          $("#passwordSecond").val("");
+          document.getElementById('termsCheck').checked = false;
           showModalAlert(
             "Registrierung erfolgreich, Sie können sich nun einloggen!",
             "success"
@@ -95,7 +97,7 @@ $(document).ready(function () {
           showModalAlert(response.error, "danger");
         }
       },
-      error: function (error) {
+      error: function () {
         alert("Fehler bei der Abfrage!");
       },
     });
@@ -103,14 +105,32 @@ $(document).ready(function () {
 
   // ajax call for login
   $(document).on('click', '#loginButton', function () {
+    let userInput = $('#userInput').val().trim();
+    let password = $('#password').val().trim();
+
+    if (userInput === '') {
+      showModalAlert('Geben Sie bitte einen Benutzernamen oder E-Mail ein!', 'warning');
+      return;
+    }
+
+    if (password === '') {
+      showModalAlert('Geben Sie bitte ein Passwort ein!', 'warning');
+      return;
+    }
+
+    if (password.length < 8) {
+      showModalAlert('Geben Sie bitte ein Passwort mit mindestens 8 Zeichen ein!', 'warning');
+      return;
+    }
+
     $.ajax({
       type: 'POST',
       url: '../Backend/logic/requestHandler.php',
       data: {
         method: 'loginUser',
         param: JSON.stringify({
-          userInput: $('#userInput').val(),
-          password: $('#password').val(),
+          userInput: userInput,
+          password: password,
           rememberLogin: $('#remember_login').prop('checked')
         })
       },
@@ -132,7 +152,7 @@ $(document).ready(function () {
           showModalAlert(response.error, 'warning');
         }
       },
-      error: function (error) {
+      error: function () {
         alert("Fehler bei der Abfrage!");
       }
     });
@@ -165,13 +185,12 @@ $(document).ready(function () {
   }
 
   function changeProfileData() {
-    // client-side validation
     let username = getCookie('username');
     let newData = [];
     newData.firstName = $('#firstNamenew').val();
     newData.lastName = $('#lastNamenew').val();
     newData.email = $('#emailnew').val();
-    newData.password = $('#passwordnew').val();
+    newData.pw = $('#passwordnew').val();
     newData.adress = $('#addressnew').val();
     newData.city = $('#citynew').val();
     newData.plz = $('#postcodenew').val();
@@ -208,14 +227,16 @@ $(document).ready(function () {
       success: function (response) {
         if (response.success) {
           showModalAlert(response.success, 'success');
-          $('#firstNameold').text(response.vorname);
-          $('#lastNameold').text(response.nachname);
-          $('#addressold').text(response.adress);
-          $('#postcodeold').text(response.postcode);
-          $('#cityold').text(response.city);
-          $('#emailold').text(response.email);
-          $('#usernameold').text(response.username);
-          $('#formofAddressold').text(response.anrede);
+          $('#firstNamenew').val('');
+          $('#lastNamenew').val('');
+          $('#emailnew').val('');
+          $('#passwordnew').val('');
+          $('#addressnew').val('');
+          $('#citynew').val('');
+          $('#postcodenew').val('');
+          $('#usernamenew').val('');
+          $('#pw_alt').val('');
+          loadProfileData();
           updateFeatures();
         } else if (response.error) {
           showModalAlert(response.error, 'warning');
@@ -224,9 +245,7 @@ $(document).ready(function () {
       error: function () {
         alert("Fehler beim Aktualisieren der Daten!");
       }
-
     });
-
   }
 
   // ajax call for logout
@@ -357,6 +376,22 @@ $(document).ready(function () {
       isValid = false;
     } else {
       $("#password").removeClass("is-invalid");
+    }
+
+    if ($("#passwordSecond").val().trim().length < 8) {
+      $("#passwordSecond").addClass("is-invalid");
+      isValid = false;
+    } else {
+      $("#passwordSecond").removeClass("is-invalid");
+    }
+
+    if ($("#password").val() != $("#passwordSecond").val()) {
+      $("#password").addClass("is-invalid");
+      $("#passwordSecond").addClass("is-invalid");
+      isValid = false;
+    } else {
+      $("#password").removeClass("is-invalid");
+      $("#passwordSecond").removeClass("is-invalid");
     }
 
     return isValid;
