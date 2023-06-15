@@ -300,7 +300,7 @@ $(document).ready(function () {
             removeButton.on('click', function () {
                 const orderlineID = $(this).data('orderline-id');
                 const receiptID = $(this).data('receipt-id');
-                deleteProductFromOrder(orderlineID, receiptID);
+                changeOrderLine(orderlineID, receiptID);
             });
             buttonCell.append(removeButton);
 
@@ -315,7 +315,6 @@ $(document).ready(function () {
         const sumElement = $('<p>').append($('<strong>').text('Summe: ' + sum + '€'));
         if ($('#orderDataModal').is(':visible')) {
             $('#orderTable').html('').append(receiptIDElement, addressElement, table, sumElement);
-            console.log('hier');
         } else {
             // If the modal is not visible, load it and set the content of #orderTable
             $('#modal-placeholder').load("sites/dashboard.html #orderDataModal", function () {
@@ -325,12 +324,12 @@ $(document).ready(function () {
         }
     }
 
-    function deleteProductFromOrder(orderlineID, receiptID) {
+    function changeOrderLine(orderlineID, receiptID) {
         $.ajax({
             type: 'POST',
             url: '../Backend/logic/requestHandler.php',
             data: {
-                method: 'deleteOrderLine',
+                method: 'changeOrderLine',
                 param: JSON.stringify({
                     orderlineID: orderlineID,
                     receiptID: receiptID
@@ -354,7 +353,6 @@ $(document).ready(function () {
                 showModalAlert('Fehler bei der Abfrage!', 'danger');
             }
         });
-
     }
 
     // ajax call for loading products for admin

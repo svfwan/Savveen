@@ -71,6 +71,14 @@ class profileLogic
             $result['error'] = 'Bitte geben Sie ein Passwort mit mindestens 8 Zeichen ein!';
             return $result;
         }
+        if (empty($person['passwordSecond']) || strlen(trim($person['passwordSecond'])) == 0 || strlen(trim($person['passwordSecond'])) < 8) {
+            $result['error'] = 'Bitte geben Sie ein Passwort mit mindestens 8 Zeichen ein!';
+            return $result;
+        }
+        if ($person['password'] != $person['passwordSecond']) {
+            $result['error'] = 'Ihre Passworteingaben stimmen nicht überein!';
+            return $result;
+        }
 
         // prevent JS-Injection and hash password
         $fod = htmlspecialchars($person['formofAddress'], ENT_QUOTES);
@@ -124,8 +132,11 @@ class profileLogic
         }
 
         if (empty($userInput)) {
-            $result['error'] = 'Um dich einzuloggen, muss E-Mail oder Username angegeben werden';
+            $result['error'] = 'Geben Sie bitte einen Benutzernamen oder E-Mail ein!';
             return $result;
+        } else if (empty($password)) {
+            $result['error'] = 'Geben Sie bitte ein Passwort ein!';
+            return;
         } else {
             $sql = 'SELECT `email`, `username`, `passwort`, `admin` FROM `users`
                      WHERE (`username`=? OR `email` = ?) AND `aktiv` = ?';
@@ -202,7 +213,6 @@ class profileLogic
     function updateUserData($param)
     {
         $result = array();
-        $newUserData = array();
         $sql = 'SELECT anrede,vorname, nachname, adresse, plz, ort, email, username, passwort FROM users WHERE username = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('s', $param['actualusername']);
@@ -214,10 +224,7 @@ class profileLogic
                 $data['error'] = "Sie haben Ihr altes Passwort nicht eingegeben.";
                 return $data;
             } elseif (!password_verify($param['pw_alt'], $row['passwort'])) {
-
                 $data['error'] = "Das eingegebene Passwort ist nicht korrekt. Bitte probieren Sie es noch einmal.";
-
-
                 return $data;
             } else {
                 if (!empty($param['firstName'])) {
@@ -249,7 +256,7 @@ class profileLogic
                     $data['city'] = $row['ort'];
                 }
 
-                if (!empty($param['email'])) {
+                if (!empty($param['email']) && filter_var($this->test_input($param["email"]), FILTER_VALIDATE_EMAIL)) {
                     $data['email'] = $param['email'];
                 } else {
                     $data['email'] = $row['email'];
@@ -260,10 +267,9 @@ class profileLogic
                     $data['username'] = $row['username'];
                 }
                 if (!empty($param['pw'])) {
-                    $data['pw'] = $param['pw'];
+                    $data['pw'] = password_hash($param['pw'], PASSWORD_DEFAULT);
                 } else {
                     $data['pw'] = $row['passwort'];
-                    //$pw = $row['passwort'];
                 }
                 if (!empty($param['formofAddress'])) {
                     $data['formofAddress'] = $param['formofAddress'];

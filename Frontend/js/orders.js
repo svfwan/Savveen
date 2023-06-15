@@ -18,17 +18,9 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#showOrders', function () {
-        console.log('showOrders');
-        //showOrders();
-
         $("#modal-placeholder").empty();
-
         $('#modal-placeholder').load("sites/orders.html #ordersModal", function () {
-
-            //   $("#OrdersModal").modal("show"); //dar
-
             getOrderInfo();
-
         })
     })
 
@@ -36,7 +28,6 @@ $(document).ready(function () {
 
 function getOrderInfo() {
     let username = getCookie('username');
-
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -48,13 +39,18 @@ function getOrderInfo() {
         },
         dataType: "json",
         success: function (response) {
-            console.log(response);
-            for (let i in response) {
-                displayOrder(response[i]);
+            if (!(response.length === 1 && response[0].length === 0)) {
+                $('#ordersTable').removeClass('d-none');
+                for (let i in response) {
+                    displayOrder(response[i]);
+                }
+            } else {
+                $('#message-container').html('<div class="alert alert-warning" role="alert">Sie haben keine Bestellungen!</div>');
+                $('#ordersModal').modal('show');
             }
         },
-        error: function (error) {
-            console.log(error);
+        error: function () {
+            alert("Fehler beim Laden der Bestellungen!");
         },
     });
 }
@@ -95,8 +91,20 @@ function displayOrder(order) {
     ordersTable.append(addressElement1);
 
     const sum = order[0].summe;
-    const sumElement = $('<p>').text('Summe: ' + sum + '€');
-    ordersTable.append(sumElement);
+    const sumElement = $('<p>').addClass('sum-element').text('Summe: ' + sum + '€');
+
+    const button = $('<button>').attr('type', 'button').addClass('btn btn-success').text('Rechnung drucken');
+    let receiptID = order[0].id;
+    button.on('click', function () {
+        printReceipt(receiptID);
+    });
+
+    const sumRow = $('<div>').addClass('row');
+    const leftCol = $('<div>').addClass('col-md-6').append(sumElement);
+    const rightCol = $('<div>').addClass('col-md-6 text-right').append(button);
+    sumRow.append(leftCol, rightCol);
+
+    ordersTable.append(sumRow);
 
     $('#ordersModal').modal('show');
 
@@ -123,7 +131,6 @@ function showAddressModal(username) {
                 $('#savedPostcode').val(response.plz);
                 $('#savedCity').val(response.ort);
                 $('#addressModal').modal('show');
-
             });
         },
         error: function () {
@@ -141,7 +148,6 @@ function showSuccessfulOrder(receiptID) {
         })
     })
 }
-
 
 function printReceipt(receiptID) {
     $.ajax({
