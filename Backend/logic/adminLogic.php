@@ -8,22 +8,26 @@ class adminLogic
         $this->dh = $dh;
     }
 
+    // Funktion zum Laden aller Benutzer
     public function loadAllUsers()
     {
         $result = array();
         $notAdmin = 0;
 
+        // Verbindung zur DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
+        // Query um Beutzer die nicht Admin sind abzurufen
         $sql = 'SELECT `id`, `username` FROM `users` WHERE `admin` = ? ORDER BY `username`';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $notAdmin);
 
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
+            // Wenn es Beneutzer gibt iterieren und in result-Array einfügen
             if ($queryResult->num_rows > 0) {
                 $result['success'] = 'Benutzer wurden gefunden!';
                 $users = [];
@@ -43,15 +47,18 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Laden eines bestimmten Benutzer nach ID
     public function loadUserByID($param)
     {
         $result = array();
 
+        // Verbindung zu DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
+        // Lade alle notwendigen Daten des Benutzers
         $sql = 'SELECT `id`, `aktiv`,`anrede`, `vorname`, `nachname`, `adresse`, `plz`, `ort`, `email`, `username`
         FROM `users` WHERE `id` = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
@@ -59,6 +66,7 @@ class adminLogic
 
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
+            // Wenn der Benutzer gefunden wurde, schicke das Ergebnis im result-Array mit
             if ($queryResult->num_rows == 1) {
                 $result['success'] = 'Benutzer gefunden!';
                 $result['data'] = $queryResult->fetch_assoc();
@@ -74,24 +82,27 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Aktivieren eines Benutzers
     public function activateUser($param)
     {
         $result = array();
 
+        // Verbindung zu DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
+        // Update-Query zum Ändern des booleans `aktiv` des Benutzers
         $sql = 'UPDATE `users` SET `aktiv` = 1 WHERE `id` = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $param);
 
-        // Execute the statement
+        // Wenn erfolgreiche Query und die Reihe verändert wurde dann teile das mit
         if ($stmt->execute() && $stmt->affected_rows > 0) {
-            // Check if any rows were affected
             $result['success'] = 'Benutzer erfolgreich aktiviert!';
         } else {
+            // Ansonsten informieren, dass der Benutzer bereits aktiviert ist
             $result['error'] = 'Benutzer ist bereits aktiviert!';
         }
 
@@ -99,23 +110,26 @@ class adminLogic
 
         return $result;
     }
-
+    // Funktion zum Deaktivieren eines Benutzers
     public function deactivateUser($param)
     {
         $result = array();
-
+        // Verbindung zu DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
+        // Update-Query zum Ändern des booleans `aktiv` des Benutzers
         $sql = 'UPDATE `users` SET `aktiv` = 0 WHERE `id` = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $param);
 
+        // Wenn erfolgreiche Query und die Reihe verändert wurde dann teile das mit
         if ($stmt->execute() && $stmt->affected_rows > 0) {
             $result['success'] = 'Benutzer erfolgreich deaktiviert!';
         } else {
+            // Ansonsten informieren, dass der Benutzer bereits deaktiviert ist
             $result['error'] = 'Benutzer ist bereits deaktiviert!';
         }
 
@@ -124,21 +138,25 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Laden der Bestellungen eines Benutzers
     public function loadOrdersByUserID($param)
     {
         $result = array();
 
+        // Verbindung zu DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
+        // Query zum Laden aller IDs von Bestellungen des gewählten Benutzers
         $sql = 'SELECT `id` FROM `receipts` WHERE `user_id` = ? ORDER BY `datum`, `id`';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('i', $param);
 
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
+            // Wenn der Benutzer Bestellungen hat in result-Array speichern
             if ($queryResult->num_rows > 0) {
                 $orders = array();
                 while ($row = $queryResult->fetch_assoc()) {
@@ -147,6 +165,7 @@ class adminLogic
                 $result['success'] = 'Bestellungen geladen';
                 $result['data'] = $orders;
             } else {
+                // Ansonsten mitteilen, dass er keine Bestellungen hat
                 $result['noOrders'] = 'Dieser Benuter hat keine Bestellungen';
             }
         } else {
@@ -158,15 +177,18 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Laden der Bestellungsdaten einer spezifischen Bestellung
     public function loadOrderByID($param)
     {
         $result = array();
 
+        // Verbindung zur DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
+        // Query zum Abfragen aller Infos zu einer Bestellung
         $sql = "SELECT r.id AS receipt_id, r.user_id, r.summe, r.strasse, r.plz, r.ort, r.datum,
         ol.id AS orderline_id, ol.product_id, ol.preis, ol.anzahl,
         p.name AS product_name
@@ -179,6 +201,7 @@ class adminLogic
 
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
+            // Wenn die Bestellpositionen gefunden wurden dann im result-Array mitgeben
             if ($queryResult->num_rows > 0) {
                 $order = array();
                 while ($row = $queryResult->fetch_assoc()) {
@@ -198,18 +221,20 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Ändern einer Bestellposition
     public function changeOrderLine($param)
     {
         $result = array();
         $orderlineID = $param['orderlineID'];
         $receiptID = $param['receiptID'];
 
-        // Prüfe die Verbindung zur Datenbank
+        // Verbindung zur DB testen
         if (!$this->dh->checkConnection()) {
             $result["error"] = "Versuchen Sie es später erneut!";
             return $result;
         }
 
+        // Update bzw. Delete Query, je nach dem ob Bestellposition mehr als 1 Produkt beinhaltet
         $stmtUpdateOrDelete = $this->dh->db_obj->prepare("
         IF (SELECT anzahl FROM `orderlines` WHERE `id` = ?) > 1
         THEN
@@ -219,13 +244,16 @@ class adminLogic
         END IF;
         ");
         $stmtUpdateOrDelete->bind_param("iii", $orderlineID, $orderlineID, $orderlineID);
-        // Execute the update or delete statement
         if ($stmtUpdateOrDelete->execute()) {
+            // Checken ob Rechnung noch vorhanden, denn falls die letzte Bestellposition gelöscht wurde vorher
+            // dann wird ein Trigger (siehe SQL-Datei) in der DB ausgeführt welcher automatisch die Zeile 
+            // in der Tabelle `receipts` löscht
             $stmtCheckReceipt = $this->dh->db_obj->prepare("SELECT COUNT(*) FROM `receipts` WHERE `id` = ?");
             $stmtCheckReceipt->bind_param("i", $receiptID);
             if ($stmtCheckReceipt->execute()) {
                 $queryResult = $stmtCheckReceipt->get_result();
                 $receiptExists = $queryResult->fetch_row()[0];
+                // Je nachdem dann die Antwort mitgeben
                 if ($receiptExists === 0) {
                     $result['lastProduct'] = "Bestellung erfolgreich gelöscht!";
                 } else {
@@ -241,6 +269,7 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Erstellen eines Produktes
     public function createProduct()
     {
         $result = array();
@@ -250,7 +279,7 @@ class adminLogic
         $price = $param['price'];
         $description = $param['description'];
 
-        // Perform validation
+        // Validierung
         if (empty($category) || empty($productName) || empty($price) || empty($description)) {
             $result['error'] = 'Bitte füllen Sie alle Felder aus!';
             return $result;
@@ -270,30 +299,30 @@ class adminLogic
         $tmp_path = $picture['tmp_name'];
         $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
 
-        // Check if file is an image
+        // Validieren ob Bild
         $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
         if (!in_array(strtolower($fileExtension), $allowedExtensions)) {
             $result['error'] = 'Ungültige Dateierweiterung! Nur JPG, JPEG, PNG und GIF sind erlaubt.';
             return $result;
         }
 
-        // Process the file upload
+        // Bildpfad vorbereiten
         $filename = $productName . '.jpg';
         $actual_path = "../../Frontend/res/img/" . $filename;
 
-        // Check the connection
+        // Verbindung zur DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
         }
 
-        // Prepared SQL statement to insert the product into the database
+        // Query zum Erstellen des Produktes in der DB
         $sql = 'INSERT INTO `products` (`kategorie`, `name`, `preis`, `beschreibung`)
         VALUES (?, ?, ?, ?)';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('ssis', $category, $productName, $price, $description);
 
-        // Execute the statement and check if successful
+        // Wenn Produkt in DB erstellt und Bild gespeichert wurde im Pfad dann im resukt-Array mitgeben
         if ($stmt->execute() && $stmt->affected_rows > 0 && move_uploaded_file($tmp_path, $actual_path)) {
             $result['success'] = 'Produkt erfolgreich hinzugefügt!';
         } else {
@@ -304,6 +333,7 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Aktualisieren eines Produktes
     public function updateProduct()
     {
         $result = array();
@@ -315,7 +345,7 @@ class adminLogic
         $description = $param['description'];
         $currentPicturePath = "../" . $param['currentPicture'];
 
-        // Perform validation
+        // Validierung
         if (empty($category) || empty($productName) || empty($price) || empty($description)) {
             $result['error'] = 'Bitte füllen Sie alle Felder aus!';
             return $result;
@@ -326,7 +356,7 @@ class adminLogic
             return $result;
         }
 
-        // Check the connection
+        // Verbindung zur DB testen
         if (!$this->dh->checkConnection()) {
             $result['error'] = 'Versuchen Sie es später erneut!';
             return $result;
@@ -335,9 +365,9 @@ class adminLogic
         $databaseUpdated = false;
         $pictureMoved = false;
 
-        // Check if a new picture is provided
+        // Wenn auch ein Bild mitgegeben wurde dann wird validiert und das Bild gespeichert
+        // ansonsten das existierende Bild umbenannt
         if (isset($_FILES['picture']) && $_FILES['picture']['size'] > 0) {
-            // Process the file upload for the new picture
             $picture = $_FILES['picture'];
             $tmpPath = $picture['tmp_name'];
             $fileExtension = pathinfo($picture['name'], PATHINFO_EXTENSION);
@@ -360,13 +390,13 @@ class adminLogic
             }
         }
 
-        // Prepared SQL statement to update the product in the database
+        // Update-Query zum Ändern der Produktdaten
         $sql = 'UPDATE `products` SET `kategorie` = ?, `name` = ?, `preis` = ?, `beschreibung` = ? WHERE `id` = ?';
         $stmt = $this->dh->db_obj->prepare($sql);
         $stmt->bind_param('ssisi', $category, $productName, $price, $description, $productID);
 
-        // Execute the statement and check if successful
         if ($stmt->execute()) {
+            // Wenn tatsächlich Daten in der DB geändert wurden
             if ($stmt->affected_rows > 0) {
                 $databaseUpdated = true;
             }
@@ -378,6 +408,8 @@ class adminLogic
 
         $stmt->close();
 
+        // Wenn Daten in der DB oder das Bild geändert bzw umbenannt wurde
+        // dann teile das mit, da man ja das Bild nicht ändern muss
         if ($databaseUpdated || $pictureMoved) {
             $result['success'] = 'Produkt erfolgreich aktualisiert!';
         } else {
@@ -387,27 +419,30 @@ class adminLogic
         return $result;
     }
 
+    // Funktion zum Löschen eines Produktes
     public function deleteProduct($param)
     {
         $result = array();
         $id = $param['id'];
         $currentPicturePath = "../" . $param['currentPicture'];
 
-        // Prüfe die Verbindung zur Datenbank
+        // Verbindung zur DB testen
         if (!$this->dh->checkConnection()) {
             $result["error"] = "Versuchen Sie es später erneut!";
             return $result;
         }
 
-        // Prepare and execute the SQL query
+        // Query zum Löschend des Produktes in der DB
         $stmt = $this->dh->db_obj->prepare("DELETE FROM `products` WHERE `id` = ?");
         $stmt->bind_param("i", $id);
+        // Wenn die Daten gelöscht wurden und das Bild aus dem Ordner der Produktbilder gelöscht wurde
+        // dann teile das mit
         if ($stmt->execute() && unlink($currentPicturePath)) {
             $result['success'] = "Produkt wurde erfolgreich gelöscht";
         } else {
             $result["error"] = "Produkt konnte nicht gelöscht werden!";
         }
-        // Close the connection and return the array
+
         $stmt->close();
         return $result;
     }
