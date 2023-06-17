@@ -1,17 +1,23 @@
+/*
+In "profile.js", "profile.html" und "profileLogic.php" befindet sich die Logik für den Login und die Registrieruung.
+*/ 
 $(document).ready(function () {
 
-  updateFeatures();
 
+  updateFeatures();
+   // Wenn jemand noch kein Benutzerkonto hat und sich registrieren will, und auf das Login-Modal klickt und die Person noch kein BenutzerInnenkonto besitzt,
+   //dann erscheint noch ein Button in Form eines Links, wo man sich registrieren kann. Beim draufklicken, öffnet sich das Modal zur Registrierung und das Modal zum Login wird gehidet.
   $(document).on('click', '#openRegisterModal', function (event) {
     event.preventDefault();  // Prevent the default action
     $('#loginModal').modal('hide');  // Hide the login modal
-
+      
     // Load the content of register.html into the modal placeholder and show the register modal
     $('#modal-placeholder').load('sites/register.html', function () {
       $('#registerModal').modal('show');  // Assume the id of the register modal is 'registerModal'
     });
   });
-
+   //Wenn man sich einloggen will und auf den Button klickt zum Einloggen, dann öffnet sich das LoginModal und das RegistrierungsModal wird gehidet
+  // Wenn jemand eingeloggt ist
   $(document).on("click", "#openLoginModal", function (event) {
     event.preventDefault(); // Prevent the default action
     $("#registerModal").modal("hide"); // Hide the register modal
@@ -21,7 +27,7 @@ $(document).ready(function () {
       $("#loginModal").modal("show");
     });
   });
-
+  //Hier wird das Modal entsprechend geöffnet, je nachdem ob man eingeloggt ist oder nicht
   $(document).on('click', '#profileAction', function () {
     let isLoggedIn = !!getCookie('username');
     var filePath = isLoggedIn ? 'sites/profile.html' : 'sites/login.html';
@@ -34,11 +40,13 @@ $(document).ready(function () {
       $(modalId).modal('show');
     });
   });
-
+   //Hier kann der/ die BenutzerIn seine BenutzerInnendaten ändern beim Klick auf den entsprechenden Button. 
+   //Dann wird die Funktion changeProfileData aufgerufen
   $(document).on('click', '#changeButton', function () {
     changeProfileData();
   });
-
+  //Hier wird der ajax-Call für die Registrierung ausgeführt.
+  //In jquery wird noch überprüft, ob der User die Nutzungsbedingungen akzeptiert hat und die Registrierung valide ist.
   // ajax call for registration
   $(document).on("click", "#registerButton", function () {
     if (!$("#termsCheck").prop("checked")) {
@@ -56,6 +64,8 @@ $(document).ready(function () {
       );
       return;
     }
+    // Der "Post"- Ajax call wird ausgeführt, welcher die einzelnen Daten an das Backens schickst und die Methode
+    // registerUser wird in weiterer Folge aufgerufen
     $.ajax({
       type: "POST",
       url: "../Backend/logic/requestHandler.php",
@@ -74,6 +84,8 @@ $(document).ready(function () {
           passwordSecond: $("#passwordSecond").val()
         }),
       },
+      // es erscheint eine Meldung je nachdem, ob die Registrierung erfolgreich war 
+      //und nach dem Erfolg werden die Inputs aus dem Formular gelöscht
       dataType: "json",
       success: function (response) {
         if (response.success) {
@@ -102,12 +114,13 @@ $(document).ready(function () {
       },
     });
   });
-
+    // wenn auf den Loginbutton geklickt wird, wird ein ajax call für den Login ausgeführt
   // ajax call for login
   $(document).on('click', '#loginButton', function () {
     let userInput = $('#userInput').val().trim();
     let password = $('#password').val().trim();
-
+    //Zuerst wir überprüft, ob die Email und das Passwort nicht leer sind und ob das Passwort eine Länge >=8 besitzt,
+    // wenn dies nicht der Fall ist, dann erscheint eine entsprechende Meldung
     if (userInput === '') {
       showModalAlert('Geben Sie bitte einen Benutzernamen oder E-Mail ein!', 'warning');
       return;
@@ -122,7 +135,7 @@ $(document).ready(function () {
       showModalAlert('Geben Sie bitte ein Passwort mit mindestens 8 Zeichen ein!', 'warning');
       return;
     }
-
+    //Hier wird der ajax call ausgeführt, welcher die  loginUser Methode ausführt
     $.ajax({
       type: 'POST',
       url: '../Backend/logic/requestHandler.php',
@@ -136,6 +149,9 @@ $(document).ready(function () {
       },
       dataType: 'json',
       success: function (response) {
+        // wenn der Login erfolgreich war, wird das Loginformular und der Loginbutton gehidet
+        // und eine entsprechende Meldung erscheint.
+        // Im Falle eines Errors erscheint eine Warnungsmeldung
         if (response.success) {
           updateFeatures();
           // Hide the login form and show success message
@@ -157,7 +173,9 @@ $(document).ready(function () {
       }
     });
   });
-
+  // Wenn man seine Profildaten ändern will, erscheint das Modal, welches diese Daten enthält. 
+  // Hier wird die Methode getProfileData aufgerufen, welche im Success-Full die alten Daten des Users anzeigt. 
+  // Im Error-Fall erscheint eine entsprechende Meldung
   function loadProfileData() {
     let username = getCookie("username");
     $.ajax({
@@ -184,6 +202,9 @@ $(document).ready(function () {
     });
   }
 
+ // Wenn man seine Profildaten ändern will, dann wird die Funktion changeProfileData aufgerufen,
+ // welche einen Postrequest an den requestHandler schickt, der die updateuserData-Method aufruft.
+ // Im Success-Fall werden die aktualisierten User-Daten geladen und im Error-Fall eine entsprechende Meldung.
   function changeProfileData() {
     let username = getCookie('username');
     let newData = [];
@@ -247,7 +268,8 @@ $(document).ready(function () {
       }
     });
   }
-
+  // Der Ajax-Call für Logout, welcher einen Post-Request an den Request-Handler schickt und die Methode logoutUser wird aufgeruden,
+  // welche den User ausloggt
   // ajax call for logout
   $(document).on("click", "#logoutButton", function () {
     $.ajax({
@@ -268,7 +290,10 @@ $(document).ready(function () {
     });
   });
 
+  // 
   // helper functions
+  /* wenn man sich einloggt, ausloggt oder seite refreshed oder wenn man profildaten ändert*/ 
+  // damit die Daten immer richtig aktualisiert werden
   function updateFeatures() {
     const username = getCookie("username");
     const rememberLogin = getCookie("rememberLogin");
@@ -317,7 +342,7 @@ $(document).ready(function () {
       loadAllProducts();
     }
   }
-
+// Hier wird die entsprechende Navbar, je nach Status angezeigt
   function updateNavbar(isLoggedIn, username, isAdmin) {
     // default state - not logged in users
     $("#usernameDisplay").text("");
@@ -341,7 +366,7 @@ $(document).ready(function () {
       }
     }
   }
-
+  //wird immer von validateRegisterForm aufgerufen
   function validateInput(input) {
     if (input.val().trim().length === 0) {
       input.addClass("is-invalid");
@@ -354,13 +379,13 @@ $(document).ready(function () {
 
   function validateRegisterForm() {
     let isValid = true;
-
+    // checkt schrittweise, ob Daten eingegeben wurden bei RegisterModal
     isValid = validateInput($("#firstName")) && isValid;
     isValid = validateInput($("#lastName")) && isValid;
     isValid = validateInput($("#address")) && isValid;
     isValid = validateInput($("#postcode")) && isValid;
     isValid = validateInput($("#city")) && isValid;
-
+    // checkt, ob das eine gültige Email ist
     let email = $("#email").val().trim();
     if (email.length === 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       $("#email").addClass("is-invalid");
@@ -370,26 +395,28 @@ $(document).ready(function () {
     }
 
     isValid = validateInput($("#username")) && isValid;
-
+    // checht, ob es 8 Zeichen ohne Leerzeichen hat
     if ($("#password").val().trim().length < 8) {
       $("#password").addClass("is-invalid");
       isValid = false;
     } else {
+      // macht rote Umrandung weg
       $("#password").removeClass("is-invalid");
     }
-
+     // ckeckt 2.Passwort
     if ($("#passwordSecond").val().trim().length < 8) {
       $("#passwordSecond").addClass("is-invalid");
       isValid = false;
     } else {
       $("#passwordSecond").removeClass("is-invalid");
     }
-
+    // wenn Passwörter nicht übereinstimmen
     if ($("#password").val() != $("#passwordSecond").val()) {
       $("#password").addClass("is-invalid");
       $("#passwordSecond").addClass("is-invalid");
       isValid = false;
     } else {
+      // wenn Passwörter übereinstimmen
       $("#password").removeClass("is-invalid");
       $("#passwordSecond").removeClass("is-invalid");
     }
