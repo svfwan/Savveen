@@ -297,7 +297,13 @@ class profileLogic
                     $data['username'] = $row['username'];
                 }
                 if (!empty($param['pw'])) {
-                    $data['pw'] = password_hash($param['pw'], PASSWORD_DEFAULT);
+                    if (strlen(trim($param['pw'])) == 0 || strlen(trim($param['pw'])) < 8) {
+                        $data['error'] = "Passwort muss mindestens 8 Zeichen lang sein!";
+                        $stmt->close();
+                        return $data;
+                    } else {
+                        $data['pw'] = password_hash($param['pw'], PASSWORD_DEFAULT);
+                    }
                 } else {
                     $data['pw'] = $row['passwort'];
                 }
@@ -345,7 +351,7 @@ class profileLogic
                 $actualUsername
             );
             // Der neue Cookie wird gesetzt
-            if ($stmtUpdate->execute()) {
+            if ($stmtUpdate->execute() && $stmtUpdate->affected_rows > 0) {
                 if (isset($_COOKIE['rememberLogin']) && $_COOKIE['rememberLogin']) {
                     // 30-Tage Cookie
                     setcookie('rememberLogin', true, time() + (86400 * 30), '/');
@@ -359,7 +365,7 @@ class profileLogic
                 }
                 $data['success'] = 'Daten erfolgreich aktualisisert';
             } else {
-                $data['error'] = 'Versuchen Sie es später erneut!';
+                $data['error'] = 'Daten bereits aktuell!';
             }
             $stmtUpdate->close();
         }
