@@ -468,6 +468,9 @@ $(document).ready(function () {
         }
 
         // Setze die Daten in einem FormData, da ein Bild mitgeschickt werden muss
+        // createProduct und updateProduct sind die einzigen Methoden
+        // wo die Daten nicht im JSON-Format geschickt werden, da es sonst keine
+        // Alternative gibt Bilder mitzuschicken
         let formData = new FormData();
         formData.append('method', 'createProduct');
         formData.append('category', category);
