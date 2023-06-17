@@ -1,4 +1,5 @@
 <?php
+// Zentrale Data-Handler Klasse
 include('dbaccess.php');
 class dataHandler
 {
