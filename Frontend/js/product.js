@@ -90,7 +90,7 @@ function searchProducts(value) { //nach Produkten mit buchstaben/wörtern filter
         },
     });
 }
- 
+
 function displayCategory() { //nur eine bestimmte kategorie anzeigen 
     const selectedValue = $("#category").val();
     //selectedValue = Kategorie nach der gefiltert werden soll. 
@@ -108,7 +108,7 @@ function displayCategory() { //nur eine bestimmte kategorie anzeigen
             let $row = $("<div class='row'></div>");
             for (let i in data) {
                 let cur = data[i];
-                if (selectedValue === "") { 
+                if (selectedValue === "") {
                     displayAll(cur, $row);
                 } else if (cur.kategorie === selectedValue) {
                     displayAll(cur, $row);
@@ -157,7 +157,7 @@ function displayAll(data, $row) { //Produkte anzeigen
 
     $row.append($product);
 
-    
+
 
     if ($row.children().length === 4) {
         $("#mainView").append($row);
@@ -228,12 +228,12 @@ function updateCartItems(myCart) {
     $cartItems.empty();
     $cartTotal.empty();
 
-    
+
 
     if (myCart.length > 0) {
         let gesamtpreis = 0;
 
-        
+
 
         for (let i = 0; i < myCart.length; i++) {
             const item = myCart[i];
@@ -276,8 +276,8 @@ function updateCartItems(myCart) {
     }
 }
 
-function fillCart() { 
-    const isAdmin = getCookie('admin') === 'true'; 
+function fillCart() {
+    const isAdmin = getCookie('admin') === 'true';
     const isLoggedIn = getCookie('username') ? true : false;
 
     if (isLoggedIn && isAdmin) { //kontrolliert ob user und admin eingeloggt sind
@@ -305,7 +305,7 @@ function removeItem(data) { //anzahl eines produkts um 1 verringern
     for (let i = 0; i < myCart.length; i++) {
         if (myCart[i].id === data.id) {
             if (myCart[i].quant === 1) {//wenn Anzahl 1 verringert werden soll, wird das ganze produkt aus dem array entfernt
-                myCart.splice(i, 1); 
+                myCart.splice(i, 1);
                 break;
             } else {
                 myCart[i].quant = myCart[i].quant - 1; //sonst wird nur die anzahl verringert.
@@ -328,7 +328,7 @@ function addExistingItem(data) { //ein produkt hinzufügen, was bereits im waren
     }
 
     for (let i = 0; i < myCart.length; i++) {
-        if (myCart[i].id === data.id) { 
+        if (myCart[i].id === data.id) {
             myCart[i].quant = myCart[i].quant + 1; //anzahl des produkts um 1 erhöhen
             break;
         }

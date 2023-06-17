@@ -6,6 +6,7 @@ Savveen ist der Kosmetik-Webshop, welcher im Rahmen des Webentwicklungsprojekts 
 
 Um die Website lokal zu laufen, werden folgende Anforderungen benötigt:
 
+- Projekt von GitHub heruntergeladen und im htdocs-Ordner - [Link zum Repo](https://github.com/wi21b030/Savveen)
 - XAMPP/MAMPP Installation
   - darin Apache und MySQL laufen lassen
 - Datenbank `savveen` in phpmyadmin importiert (SQL-Datei dafür finden Sie [hier](./Backend/config/savveen.sql)) und DB-Admin-Account angelegt (Zugriffsdaten finden Sie [hier](./Backend/config/dbaccess.php)).

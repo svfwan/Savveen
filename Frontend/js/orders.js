@@ -1,8 +1,8 @@
 $(document).ready(function () {
     $(document).on('click', '#orderCart', function () {
         let isLoggedIn = !!getCookie('username');  //überprüft, ob ein user angemeldet ist
-        if (!isLoggedIn) { 
-            alert("Bitte melden Sie sich an, um zu bestellen!"); 
+        if (!isLoggedIn) {
+            alert("Bitte melden Sie sich an, um zu bestellen!");
             $('#modal-placeholder').load('sites/login.html', function () {
                 $('#loginModal').modal('show');
             });
@@ -96,7 +96,7 @@ function displayOrder(order) { //bestellungen anzeigen
     const sum = order[0].summe;
     const sumElement = $('<p>').addClass('sum-element').text('Summe: ' + sum + '€');
 
-    const button = $('<button>').attr('type', 'button').addClass('btn btn-success').text('Rechnung drucken'); 
+    const button = $('<button>').attr('type', 'button').addClass('btn btn-success').text('Rechnung drucken');
     let receiptID = order[0].id;
     button.on('click', function () {
         printReceipt(receiptID);   //rechnung drucken 
@@ -302,7 +302,7 @@ function processOrder() { //verarbeitung der bestellung
         orderData.city = newCity;
     }
 
-        //ajax call für bestellung verarbeiten
+    //ajax call für bestellung verarbeiten
     $.ajax({
         type: 'POST',
         url: '../Backend/logic/requestHandler.php',

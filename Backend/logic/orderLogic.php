@@ -22,7 +22,7 @@ class orderLogic
         $this->dh->db_obj->begin_transaction(); //Gruppiert einer Reihe von Datenbankoperationen als einen Schritt
 
         //parameter aus $param speichern. 
-        $username = $param['username']; 
+        $username = $param['username'];
         $cartItems = $param['cartItems'];
         $address = $param['address'];
         $postcode = $param['postcode'];
@@ -50,7 +50,7 @@ class orderLogic
         $user_id = $row['id'];
         $stmt->close();
 
-        
+
         //Rechnung in db einfügen
         $stmt = $this->dh->db_obj->prepare("INSERT INTO `receipts` (user_id, strasse, plz, ort, datum) VALUES (?, ?, ?, ?, NOW())");
         $stmt->bind_param("isss", $user_id, $address, $postcode, $city);
@@ -103,7 +103,7 @@ class orderLogic
         $cur = 0;
         $arr = array();
 
-   
+
         if (!$this->dh->checkConnection()) {
             $result["error"] = "Versuchen Sie es später erneut!";
             return $result;
@@ -130,7 +130,7 @@ class orderLogic
 
         // Füge die Ergebnisse in das Array ein
         //ein array, indem jeder eintrag ein weiteres array mit der selben rechnungsid ist. 
-        
+
         while ($row = $result->fetch_assoc()) {
             if ($idx == 0) {
                 $cur = $row['id'];

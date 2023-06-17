@@ -359,7 +359,7 @@ $(document).ready(function () {
       }
     }
   }
-  
+
   //wird immer von validateRegisterForm aufgerufen
   function validateInput(input) {
     if (input.val().trim().length === 0) {
