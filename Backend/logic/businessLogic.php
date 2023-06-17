@@ -6,6 +6,8 @@ include('orderLogic.php');
 include('adminLogic.php');
 class businessLogic
 {
+    // Initialsieren der Logic-Klassen
+    // und des zentralen Data-Handlers
     private $productLogic;
     private $profileLogic;
     private $orderLogic;
@@ -20,6 +22,8 @@ class businessLogic
         session_start();
     }
 
+    // Methode die abhängig von angegebener Methode und Paramter
+    // spezifische Logik ausführt
     function handleRequest($method, $param)
     {
         $res = array();
@@ -51,7 +55,6 @@ class businessLogic
             case 'loadProductByID':
                 $res = $this->productLogic->loadProductByID($param);
                 break;
-
             case 'getOrders':
                 $res = $this->orderLogic->getOrders($param);
                 break;
