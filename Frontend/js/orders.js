@@ -1,23 +1,23 @@
 $(document).ready(function () {
     $(document).on('click', '#orderCart', function () {
-        let isLoggedIn = !!getCookie('username');
-        if (!isLoggedIn) {
-            alert("Bitte melden Sie sich an, um zu bestellen!");
+        let isLoggedIn = !!getCookie('username');  //überprüft, ob ein user angemeldet ist
+        if (!isLoggedIn) { 
+            alert("Bitte melden Sie sich an, um zu bestellen!"); 
             $('#modal-placeholder').load('sites/login.html', function () {
                 $('#loginModal').modal('show');
             });
             return;
-        } else if (isLoggedIn) {
+        } else if (isLoggedIn) { //user eingeloggt
             let username = getCookie('username');
-            showAddressModal(username);
+            showAddressModal(username); //AdresseModal anzeigen
         }
     });
 
-    $(document).on('click', '#confirmOrder', function () {
-        processOrder();
+    $(document).on('click', '#confirmOrder', function () { //wenn adresse bestätigt
+        processOrder(); //bestellung verarbeiten
     });
 
-    $(document).on('click', '#showOrders', function () {
+    $(document).on('click', '#showOrders', function () { //bestellungen anzeigen
         $("#modal-placeholder").empty();
         $('#modal-placeholder').load("sites/orders.html #ordersModal", function () {
             getOrderInfo();
@@ -27,7 +27,7 @@ $(document).ready(function () {
 });
 
 function getOrderInfo() {
-    let username = getCookie('username');
+    let username = getCookie('username');  //infos aus der db zu den bestellungen eines users holen
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -39,10 +39,10 @@ function getOrderInfo() {
         },
         dataType: "json",
         success: function (response) {
-            if (!(response.length === 1 && response[0].length === 0)) {
+            if (!(response.length === 1 && response[0].length === 0)) { //wenn es keine bestellungen gibt
                 $('#ordersTable').removeClass('d-none');
                 for (let i in response) {
-                    displayOrder(response[i]);
+                    displayOrder(response[i]); //bestellungsanzeigen funktion aufrufen
                 }
             } else {
                 $('#message-container').html('<div class="alert alert-warning" role="alert">Sie haben keine Bestellungen!</div>');
@@ -55,14 +55,16 @@ function getOrderInfo() {
     });
 }
 
-function displayOrder(order) {
+function displayOrder(order) { //bestellungen anzeigen
     const ordersTable = $('#ordersTable');
+    //es wird ein arr(order) weitergegenen mit einer bestimmten rechnungsid
 
+    //table erstellen für je rechnungsid
     const table = $('<table>').addClass('table table-striped');
     const thead = $('<thead>').append('<tr><th>Produkte</th><th>Preis</th><th>Anzahl</th></tr>');
     const tbody = $('<tbody>');
 
-    for (let i = 0; i < order.length; i++) {
+    for (let i = 0; i < order.length; i++) { //details zu den produkten anzeigen
         const productName = order[i].name;
         const price = order[i].preis;
         const quantity = order[i].anzahl;
@@ -76,6 +78,7 @@ function displayOrder(order) {
         tbody.append(row);
     }
 
+    //Lieferdetails zu der Bestellung einer bestimmten rechnungsid
     table.append(thead, tbody);
     ordersTable.append(table);
 
@@ -93,13 +96,13 @@ function displayOrder(order) {
     const sum = order[0].summe;
     const sumElement = $('<p>').addClass('sum-element').text('Summe: ' + sum + '€');
 
-    const button = $('<button>').attr('type', 'button').addClass('btn btn-success').text('Rechnung drucken');
+    const button = $('<button>').attr('type', 'button').addClass('btn btn-success').text('Rechnung drucken'); 
     let receiptID = order[0].id;
     button.on('click', function () {
-        printReceipt(receiptID);
+        printReceipt(receiptID);   //rechnung drucken 
     });
 
-    const sumRow = $('<div>').addClass('row');
+    const sumRow = $('<div>').addClass('row'); //um Button "Rechnung drucken" und die Summe in einer row anzuzeigen
     const leftCol = $('<div>').addClass('col-md-6').append(sumElement);
     const rightCol = $('<div>').addClass('col-md-6 text-right').append(button);
     sumRow.append(leftCol, rightCol);
@@ -115,7 +118,7 @@ function displayOrder(order) {
     ordersTable.append(table1);
 }
 
-function showAddressModal(username) {
+function showAddressModal(username) { //modall anzeigen, für die gespeicherte adresse
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
@@ -139,7 +142,7 @@ function showAddressModal(username) {
     });
 }
 
-function showSuccessfulOrder(receiptID) {
+function showSuccessfulOrder(receiptID) { //modall, das bei einer erfolgreichen bestellung angezeigt wird
     $('#modal-placeholder').empty();
     $('#modal-placeholder').load('sites/cart.html #receiptModal', function () {
         $('#receiptModal').modal('show');
@@ -149,12 +152,12 @@ function showSuccessfulOrder(receiptID) {
     })
 }
 
-function printReceipt(receiptID) {
+function printReceipt(receiptID) { //rechnung drucken 
     $.ajax({
         type: "GET",
         url: "../Backend/logic/requestHandler.php",
         data: {
-            method: "loadOrderByID",
+            method: "loadOrderByID", //ajax call, bei dem man die bestellung einer bestimmten rechnungsid holt. 
             param: receiptID,
         },
         dataType: "json",
@@ -166,6 +169,7 @@ function printReceipt(receiptID) {
                 const receiptID = receipt[0].receipt_id;
                 const sum = receipt[0].summe;
 
+                //Rechnung wird wie folgt angezeigt.
                 const html = `
                     <!DOCTYPE html>
                     <html lang="en">
@@ -249,7 +253,7 @@ function printReceipt(receiptID) {
                     </html>
                 `;
 
-                const receiptWindow = window.open("", "_blank");
+                const receiptWindow = window.open("", "_blank"); //Rechnung öffnet sich in einem neuen fenster
                 receiptWindow.document.open();
                 receiptWindow.document.write(html);
                 receiptWindow.document.close();
@@ -263,7 +267,7 @@ function printReceipt(receiptID) {
     });
 }
 
-function processOrder() {
+function processOrder() { //verarbeitung der bestellung
     let username = getCookie('username');
     let orderData = {
         username: username,
@@ -278,7 +282,7 @@ function processOrder() {
         };
     });
     orderData.cartItems = cartItems;
-    const selectedAddressId = $('input[name="addressType"]:checked').attr('id');
+    const selectedAddressId = $('input[name="addressType"]:checked').attr('id'); //überprüft, ob gespeicherte oder neue Adresse ausgewählt wurde
     if (selectedAddressId === 'savedAddress') {
         orderData.address = $('#savedStreet').val();
         orderData.postcode = $('#savedPostcode').val();
@@ -288,7 +292,7 @@ function processOrder() {
         let newPostcode = $('#newOrderPostcode').val();
         let newCity = $('#newOrderCity').val();
 
-        if (!newStreet || !newPostcode || !newCity) {
+        if (!newStreet || !newPostcode || !newCity) { //neue Adresse unvollständig
             showModalAlert('Bitte geben Sie eine vollständige Adresse an!', 'warning');
             return;
         }
@@ -298,6 +302,7 @@ function processOrder() {
         orderData.city = newCity;
     }
 
+        //ajax call für bestellung verarbeiten
     $.ajax({
         type: 'POST',
         url: '../Backend/logic/requestHandler.php',
