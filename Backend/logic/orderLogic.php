@@ -8,26 +8,27 @@ class orderLogic
         $this->dh = $dh;
     }
 
-    function processOrder($param)
+    function processOrder($param) //bestellung verarbeiten
     {
         $result = array();
 
-        // Check the database connection
+        // datenbankverbindung überprüfen
         if (!$this->dh->checkConnection()) {
             $result["error"] = "Versuchen Sie es später erneut!";
             return $result;
         }
 
         // Start a transaction
-        $this->dh->db_obj->begin_transaction();
+        $this->dh->db_obj->begin_transaction(); //Gruppiert einer Reihe von Datenbankoperationen als einen Schritt
 
-        $username = $param['username'];
+        //parameter aus $param speichern. 
+        $username = $param['username']; 
         $cartItems = $param['cartItems'];
         $address = $param['address'];
         $postcode = $param['postcode'];
         $city = $param['city'];
 
-        // Query the user ID based on the username
+        // userid je nach username abfragen
         $stmt = $this->dh->db_obj->prepare("SELECT `id` FROM `users` WHERE `username` = ?");
         $stmt->bind_param("s", $username);
         if (!$stmt->execute()) {
@@ -49,7 +50,8 @@ class orderLogic
         $user_id = $row['id'];
         $stmt->close();
 
-        // Insert the receipt into the database
+        
+        //Rechnung in db einfügen
         $stmt = $this->dh->db_obj->prepare("INSERT INTO `receipts` (user_id, strasse, plz, ort, datum) VALUES (?, ?, ?, ?, NOW())");
         $stmt->bind_param("isss", $user_id, $address, $postcode, $city);
         if (!$stmt->execute()) {
@@ -62,14 +64,14 @@ class orderLogic
 
         $stmt->close();
 
-        // Create the order lines
+        // Orderlines erstellen
         try {
             foreach ($cartItems as $item) {
                 $product_id = $item['id'];
                 $preis = $item['price'];
                 $anzahl = $item['quantity'];
 
-                // Insert the order line into the database
+                // Orderlines in db einfügen
                 $stmt = $this->dh->db_obj->prepare("INSERT INTO `orderlines` (receipt_id, product_id, preis, anzahl) VALUES (?, ?, ?, ?)");
                 $stmt->bind_param("iiii", $receipt_id, $product_id, $preis, $anzahl);
                 if (!$stmt->execute()) {
@@ -87,13 +89,13 @@ class orderLogic
         }
         $this->dh->db_obj->commit();
 
-        // Return a success response
+        // gibt nachricht zurück
         $result['success'] = 'Bestellung erfolgreich abgeschlossen!';
         $result['receipt'] = $receipt_id;
         return $result;
     }
 
-    function getOrders($param)
+    function getOrders($param) //Bestellungen zu einem user aus der db holen
     {
         $username = $param['username'];
         $tab = array();
@@ -101,13 +103,18 @@ class orderLogic
         $cur = 0;
         $arr = array();
 
-        // Check the database connection
+   
         if (!$this->dh->checkConnection()) {
             $result["error"] = "Versuchen Sie es später erneut!";
             return $result;
         }
 
         // SQL statement
+
+        //Da der username gegeben ist und nicht die userid, wird diese mittels SELECT 'id' from 'users' where username = ? ermittelt
+        //table products und orderlines werden gejoined, sodass die rechnungsids übereinstimmen
+        //es wird zuerst nach datum, dann nach aufsteigender rechnungsid sortiert. 
+        //summe, produktname, datum, rechnungsid, adresse, productid, preis der einzelnen produkte werden aus den tabellen geholt.
         $sql = "SELECT `receipts`.`summe`,`products`.`name`, `receipts`.`datum`, 
         `receipts`.`id`, `receipts`.`strasse`, `receipts`.`plz`, 
         `receipts`.`ort`, `orderlines`.`anzahl`, 
@@ -122,6 +129,8 @@ class orderLogic
         $result = $stmt->get_result();
 
         // Füge die Ergebnisse in das Array ein
+        //ein array, indem jeder eintrag ein weiteres array mit der selben rechnungsid ist. 
+        
         while ($row = $result->fetch_assoc()) {
             if ($idx == 0) {
                 $cur = $row['id'];
