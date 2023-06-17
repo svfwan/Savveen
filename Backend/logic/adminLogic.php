@@ -8,7 +8,7 @@ class adminLogic
         $this->dh = $dh;
     }
 
-    // Funktion zum Laden aller Benutzer
+    // Methode zum Laden aller Benutzer
     public function loadAllUsers()
     {
         $result = array();
@@ -47,7 +47,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Laden eines bestimmten Benutzer nach ID
+    // Methode zum Laden eines bestimmten Benutzer nach ID
     public function loadUserByID($param)
     {
         $result = array();
@@ -82,7 +82,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Aktivieren eines Benutzers
+    // Methode zum Aktivieren eines Benutzers
     public function activateUser($param)
     {
         $result = array();
@@ -110,7 +110,7 @@ class adminLogic
 
         return $result;
     }
-    // Funktion zum Deaktivieren eines Benutzers
+    // Methode zum Deaktivieren eines Benutzers
     public function deactivateUser($param)
     {
         $result = array();
@@ -138,7 +138,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Laden der Bestellungen eines Benutzers
+    // Methode zum Laden der Bestellungen eines Benutzers
     public function loadOrdersByUserID($param)
     {
         $result = array();
@@ -177,7 +177,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Laden der Bestellungsdaten einer spezifischen Bestellung
+    // Methode zum Laden der Bestellungsdaten einer spezifischen Bestellung
     public function loadOrderByID($param)
     {
         $result = array();
@@ -221,7 +221,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Ändern einer Bestellposition
+    // Methode zum Ändern einer Bestellposition
     public function changeOrderLine($param)
     {
         $result = array();
@@ -269,7 +269,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Erstellen eines Produktes
+    // Methode zum Erstellen eines Produktes
     public function createProduct()
     {
         $result = array();
@@ -333,7 +333,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Aktualisieren eines Produktes
+    // Methode zum Aktualisieren eines Produktes
     public function updateProduct()
     {
         $result = array();
@@ -419,7 +419,7 @@ class adminLogic
         return $result;
     }
 
-    // Funktion zum Löschen eines Produktes
+    // Methode zum Löschen eines Produktes
     public function deleteProduct($param)
     {
         $result = array();

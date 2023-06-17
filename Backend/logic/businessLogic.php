@@ -22,7 +22,7 @@ class businessLogic
         session_start();
     }
 
-    // Funktion die abhänig von angegebener Methode und Paramter
+    // Methode die abhängig von angegebener Methode und Paramter
     // spezifische Logik ausführt
     function handleRequest($method, $param)
     {
