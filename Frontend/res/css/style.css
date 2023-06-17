@@ -1,5 +1,3 @@
-/* General Styles */
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
@@ -13,12 +11,9 @@ body {
     padding: 20px;
 }
 
-/* Navbar */
-
 .navbar {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     color: #006837;
-    /* Set the font color to #006837 (dark green) */
 }
 
 #navbarLogo {
@@ -29,7 +24,6 @@ body {
 
 .navbar-brand:hover {
     color: #006837;
-    /* Keep the same font color on hover */
 }
 
 .navbar .btn {
@@ -43,12 +37,10 @@ body {
 
 .navbar .btn:hover {
     color: #006837;
-    /* Keep the same font color on hover */
 }
 
 .navbar .btn span {
     color: #006837;
-    /* Set the font color to #006837 (dark green) */
 }
 
 .navbar img {
@@ -56,8 +48,6 @@ body {
     height: 20px;
     margin-right: 6px;
 }
-
-/* Offcanvas */
 
 .offcanvas-header {
     background-color: #006837;
@@ -93,8 +83,6 @@ body {
     background-color: #005a2d;
 }
 
-/* General Alert Container */
-
 #alertContent {
     margin-top: 20px;
 }
@@ -115,10 +103,6 @@ body {
     color: #721c24;
 }
 
-/* General Main Container */
-
-/* Info Offcanvas */
-
 #infoCanvas {
     margin-top: 20px;
 }
@@ -126,8 +110,6 @@ body {
 #infoCanvas h3 {
     margin-top: 40px;
 }
-
-/* Footer */
 
 footer {
     background-color: #006837;
@@ -137,8 +119,6 @@ footer {
     color: #fff;
 }
 
-/* Styling for Register Modal */
-
 .modal-content {
     background-color: #fff;
     border-radius: 4px;
@@ -163,8 +143,6 @@ footer {
     background-color: #f2f2f2;
 }
 
-/* Styling for Login Modal */
-
 .modal-content {
     background-color: #fff;
     border-radius: 4px;
@@ -188,8 +166,6 @@ footer {
 .modal-footer {
     background-color: #f2f2f2;
 }
-
-/* Additional Styles for Admin Dashboard */
 
 .card-deck {
     margin-top: 20px;
@@ -211,8 +187,6 @@ footer {
     color: #666;
 }
 
-/* Additional Styles for Product Cards */
-
 .product-card {
     display: flex;
     flex-direction: column;
@@ -221,7 +195,6 @@ footer {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    /* Added */
 }
 
 .price,
@@ -235,7 +208,6 @@ footer {
     color: #006837;
 }
 
-
 .card-body {
     flex-grow: 1;
     padding: 20px;
@@ -247,7 +219,6 @@ footer {
     background-color: #fff;
     border-radius: 0 0 8px 8px;
     overflow: hidden;
-    /* Added */
 }
 
 .card-img-container {
@@ -256,11 +227,8 @@ footer {
     align-items: center;
     justify-content: center;
     height: 200px;
-    /* Set the desired height for the image */
     overflow: hidden;
-    /* Hide any overflowing content */
     border-radius: 8px 8px 0 0;
-    /* Add rounded corners to the top */
 }
 
 .img-wrapper {
@@ -276,8 +244,6 @@ footer {
     max-height: 100%;
     object-fit: contain;
 }
-
-
 
 .card-title {
     font-size: 18px;
