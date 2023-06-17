@@ -8,10 +8,8 @@ class productLogic
         $this->dh = $dh;
     }
 
-    public function loadAllProducts()
+    public function loadAllProducts() //alle produkte aus der db holen
     {
-        //hier werden die fkt reingeschrieben. 
-
 
         $result = array(); // Initialisiere das Array
 
@@ -37,7 +35,7 @@ class productLogic
         return $result;
     }
 
-    function searchProducts($param)
+    function searchProducts($param) //nach produkten suchen, die einen buchstaben/wort enthalten
     {
         $result = array();
         $searchTerm = $param['letter'];
@@ -54,12 +52,12 @@ class productLogic
             $queryResult = $stmt->get_result();
             // Füge die Ergebnisse in das Array ein
             while ($row = $queryResult->fetch_assoc()) {
-                // Convert both the search term and name to lowercase for case-insensitive comparison
+                //produktname und buchstaben in kleinbuchstaben umwandeln, damit es case insensitive ist
                 if (stripos(strtolower($row['name']), strtolower($searchTerm)) !== false) {
                     array_push($result, $row);
                 }
             }
-            // Check if any products were found
+            // überprüfe, ob produkte gefunden wurden. 
             if (count($result) === 0) {
                 $result["error"] = "Kein Produkt gefunden!";
             }
@@ -72,7 +70,7 @@ class productLogic
         return $result;
     }
 
-    public function loadProductByID($param)
+    public function loadProductByID($param) //die details zu einem produkt angeben, productid ist gegeben
     {
         $result = array();
 
@@ -82,23 +80,23 @@ class productLogic
             return $result;
         }
 
-        // Prepare and execute the SQL query
+        // SQL - Prepared Statemenent durchführen 
         $stmt = $this->dh->db_obj->prepare("SELECT * FROM `products` WHERE `id` = ?");
         $stmt->bind_param("i", $param);
         if ($stmt->execute()) {
             $queryResult = $stmt->get_result();
             $row = $queryResult->fetch_assoc();
-            if ($row) {
+            if ($row) { //produkt gefunden
                 $result["success"] = true;
                 $result["data"] = $row;
             } else {
-                $result["success"] = false;
+                $result["success"] = false; //produkt nicht gefunden
                 $result["error"] = "Produkt nicht gefunden";
             }
         } else {
             $result["error"] = "Versuchen Sie es später erneut!";
         }
-        // Close the connection and return the array
+        //Verbindung schließen und array zurückgeben
         $stmt->close();
         return $result;
     }

@@ -1,9 +1,12 @@
 <?php
+// zentraler Request-Handler
 include('./businessLogic.php');
 $requestType = $_SERVER['REQUEST_METHOD'];
 $method = '';
 $param = '';
 
+// Methode und Parameter des Requests werden gesetzt wenn vorhanden
+// und JSON Objekte werden decoded
 switch ($requestType) {
     case 'GET':
         isset($_GET['method']) ? $method = $_GET['method'] : false;
@@ -18,9 +21,12 @@ switch ($requestType) {
         break;
 }
 
+// Methode und Parameter werden übergeben
 $logic = new businessLogic();
 $result = $logic->handleRequest($method, $param);
 
+// Wenn es ein Resultat gibt wird die ans Frontend per erfolgreicher Response zurückgeschickt
+// ansonsten erhält das Frontend einen 'Bad Request'
 if ($result == null) {
     response('GET', 400, null);
 } else {
